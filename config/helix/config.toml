@@ -1,0 +1,61 @@
+theme = "tokyonight_moon"
+
+[editor]
+mouse = true
+cursorline = true
+line-number = "relative"
+completion-trigger-len = 1 # 触发自动补全的最少字符数
+auto-format = false
+auto-save = true
+auto-info = true
+completion-timeout = 5
+true-color = true
+bufferline = "multiple"
+color-modes = true
+
+[editor.soft-wrap]
+enable = true
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+auto-signature-help = true
+display-signature-help-docs = true
+
+[editor.statusline]
+left = ["mode", "spinner", "version-control"]
+center = ["file-name"]
+right = [
+  "diagnostics",
+  "selections",
+  "position",
+  "total-line-numbers",
+  "file-encoding",
+  "file-line-ending",
+  "file-type",
+]
+separator = "│"
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+
+[editor.cursor-shape]
+normal = "block"
+insert = "bar"
+select = "block"
+
+# 缩进提示线
+[editor.indent-guides]
+render = true
+skip-levels = 1
+
+[editor.file-picker]
+hidden = false
+
+[keys.normal.space]
+m = ":fmt"
+e = ":wq"
+
+[keys.insert]
+"C-a" = "insert_at_line_start"
+"C-e" = "insert_at_line_end"

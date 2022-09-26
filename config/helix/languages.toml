@@ -1,0 +1,162 @@
+[language-server.scls]
+command = "simple-completion-language-server"
+
+[language-server.basedpyright]
+command = "basedpyright-langserver"
+args = ["--stdio"]
+
+[language-server.basedpyright.config]
+python.analysis.venvPath = "."
+python.analysis.venv = ".venv"
+basedpyright.analysis.autoSearchPaths = true
+# basedpyright.analysis.diagnosticMode = "workspace"
+basedpyright.analysis.useLibraryCodeForType = true
+# basedpyright.analysis.logLevel = "Error"
+basedpyright.analysis.typeCheckingMode = "basic"
+basedpyright.analysis.autoImoprtCompletion = true
+
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
+[[language]]
+name = "python"
+scope = "source.python"
+injection-regex = "python"
+file-types = ["py", "pyi", "py3", "pyw", "ptl", "rpy", "cpy", "ipy", "pyt"]
+shebangs = ["python"]
+roots = [
+  "pyproject.toml",
+  "setup.py",
+  "poetry.lock",
+  "pyrightconfig.json",
+  "requirements.txt",
+  ".venv/",
+]
+comment-token = "#"
+indent = { tab-width = 4, unit = "    " }
+language-servers = ["scls", "basedpyright", "ruff"]
+formatter = { command = "ruff", args = ["format", "--line-length", "88", "-"] }
+auto-format = false
+
+
+[[language]]
+name = "bash"
+language-servers = ["scls"]
+indent = { tab-width = 4, unit = "    " }
+formatter = { command = 'shfmt', args = ["-i", "4"] }
+file-types = [
+  "sh",
+  "bash",
+  ".bash_login",
+  ".bash_logout",
+  ".bash_profile",
+  ".bashrc",
+  ".profile",
+  ".bash_alias",
+  ".bash_path",
+  "host",
+]
+
+[language-server.deno-lsp]
+command = "deno"
+args = ["lsp"]
+environment = { NO_COLOR = "1" }
+
+[language-server.deno-lsp.config.deno]
+enable = true
+suggest = { completeFunctionCalls = false, imports = { hosts = { "https://deno.land" = true } } }
+
+[[language]]
+name = "markdown"
+language-servers = ["scls"]
+indent = { tab-width = 4, unit = "    " }
+file-types = ["md", "markdown"]
+roots = [".git"]
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "md"] }
+auto-format = true
+
+[language-server.rust-analyzer.config.check]
+command = "clippy"
+
+[[language]]
+name = "rust"
+language-servers = ["scls", "rust-analyzer"]
+
+[[language]]
+name = "toml"
+formatter = { command = "taplo", args = ["fmt", "-"] }
+language-servers = ["scls"]
+auto-format = true
+
+[[language]]
+name = "stub"
+scope = "text.stub"
+file-types = []
+shebangs = []
+roots = []
+auto-format = false
+language-servers = ["scls"]
+
+[[language]]
+name = "javascript"
+shebangs = ["deno"]
+roots = ["deno.json", "deno.jsonc"]
+file-types = ["js"]
+language-servers = ["deno-lsp"]
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "js"] }
+auto-format = true
+
+[[language]]
+name = "json"
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "json"] }
+auto-format = true
+
+[[language]]
+name = "jsonc"
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "jsonc"] }
+auto-format = true
+
+[[language]]
+name = "typescript"
+shebangs = ["deno"]
+roots = ["deno.json", "deno.jsonc"]
+file-types = ["ts"]
+language-servers = ["deno-lsp"]
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "ts"] }
+auto-format = true
+
+[[language]]
+name = "jsx"
+shebangs = ["deno"]
+roots = ["deno.json", "deno.jsonc"]
+file-types = ["jsx"]
+language-servers = ["deno-lsp"]
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "jsx"] }
+auto-format = true
+
+[[language]]
+name = "tsx"
+shebangs = ["deno"]
+roots = ["deno.json", "deno.jsonc"]
+file-types = ["tsx"]
+language-servers = ["deno-lsp"]
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "tsx"] }
+auto-format = true
+
+
+[[language]]
+name = "css"
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "css"] }
+auto-format = true
+
+[[language]]
+name = "html"
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "html"] }
+auto-format = true
+
+[[language]]
+name = "yaml"
+file-types = ["yaml", "yml"]
+formatter = { command = 'deno', args = ["fmt", "-", "--ext", "yaml"] }
+auto-format = true

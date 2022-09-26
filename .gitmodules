@@ -1,0 +1,11 @@
+; [submodule "alacritty/catppuccin"]
+;   path = config/alacritty/catppuccin
+;   url = https://github.com/catppuccin/alacritty.git
+;
+; [submodule "zsh-autosuggestions"]
+;   path = home/zsh/zsh-autosuggestions
+;   url = https://github.com/zsh-users/zsh-autosuggestions.git
+
+; [submodule "zsh-syntax-hightlighting"]
+;   path = home/zsh/zsh-syntax-highlighting
+;   url = https://github.com/zsh-users/zsh-syntax-highlighting.git
