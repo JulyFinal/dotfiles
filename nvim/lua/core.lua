@@ -3,3 +3,4 @@ require('mapping')
 require('plugins')
 
 require('pconfs.nvim-cmp')
+require('pconfs.nvim-treesitter')

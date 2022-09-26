@@ -52,6 +52,8 @@ return packer.startup({function()
   -- lspkind
   use 'onsails/lspkind-nvim'
 
+  use 'nvim-treesitter/nvim-treesitter'
+
   if packer_bootstrap then
     require('packer').sync()
   end
