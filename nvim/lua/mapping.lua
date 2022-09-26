@@ -1,9 +1,9 @@
+-- n, v, i, t = mode names
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-local map = vim.api.nvim_set_keymap
--- 复用 opt 参数
+local map = vim.api.nvim_set_keymap -- 复用 opt 参数
 local opt = {noremap = true, silent = true }
 
 
@@ -18,12 +18,18 @@ map("n", "<A-j>", "<C-w>j", opt)
 map("n", "<A-k>", "<C-w>k", opt)
 map("n", "<A-l>", "<C-w>l", opt)
 
+-- Save file
+map("n", "<C-s>", "<cmd> w <CR>", opt)
+-- exit
+map("n", "<C-q>", "<cmd> wqall! <CR>", opt)
+-- update packer
+map("n", "<leader>uu", "<cmd> PackerSync <CR>", opt)
+
 -- 比例控制
 map("n", "<C-Left>", ":vertical resize -2<CR>", opt)
 map("n", "<C-Right>", ":vertical resize +2<CR>", opt)
 map("n", "<C-Down>", ":resize +2<CR>", opt)
 map("n", "<C-Up>", ":resize -2<CR>", opt)
-
 
 -- Terminal相关
 map("n", "<leader>tt", ":sp | terminal<CR>", opt)
@@ -38,15 +44,17 @@ map("t", "<A-l>", [[ <C-\><C-N><C-w>l ]], opt)
 map("v", "<", "<gv", opt)
 map("v", ">", ">gv", opt)
 
-
 -- ctrl u / ctrl + d  只移动9行，默认移动半屏
 map("n", "<C-u>", "9k", opt)
 map("n", "<C-d>", "9j", opt)
 
-
 -- 在visual 模式里粘贴不要复制
 map("v", "p", '"_dP', opt)
 
--- insert 模式下，跳到行首行尾
+-- 模拟emacs基本键位
 map("i", "<C-a>", "<ESC>I", opt)
 map("i", "<C-e>", "<ESC>A", opt)
+map("i", "<C-n>", "<ESC>ja", opt)
+map("i", "<C-p>", "<ESC>ka", opt)
+map("i", "<C-f>", "<ESC>la", opt)
+map("i", "<C-b>", "<ESC>ha", opt)

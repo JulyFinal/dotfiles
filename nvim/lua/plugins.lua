@@ -15,6 +15,8 @@ local packer_bootstrap = ensure_packer()
 
 return packer.startup({function()
   use 'wbthomason/packer.nvim'
+  use 'nvim-lua/plenary.nvim'
+  use "lukas-reineke/indent-blankline.nvim"
 
   if packer_bootstrap then
     require('packer').sync()

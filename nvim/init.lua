@@ -1,4 +1,1 @@
-require('basic')
-require('mapping')
-require('plugins')
-
+require('core')
