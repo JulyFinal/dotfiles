@@ -18,6 +18,8 @@ gtkrc-2.0
 ibus
 JetBrains
 kactivitymanagerd*
+kfontinstuirc
+device_automounter_kcmrc
 kate*
 kcminputrc
 kconf_updaterc
@@ -61,3 +63,4 @@ vlcrc
 xdg-desktop-portal-kderc
 xsettingsd
 Zettlr
+yesplaymusic
