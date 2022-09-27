@@ -70,6 +70,6 @@ nvim_tree.setup({
         },
     },
     system_open = {
-        cmd = 'open', -- mac 直接设置为 open
+        cmd = 'dolphin', -- mac 直接设置为 open
     },
 })
