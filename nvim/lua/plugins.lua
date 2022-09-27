@@ -57,6 +57,12 @@ return packer.startup({function()
   use 'kyazdani42/nvim-web-devicons' 
   use 'kyazdani42/nvim-tree.lua'
 
+  use {
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    "neovim/nvim-lspconfig",
+  }
+
   if packer_bootstrap then
     require('packer').sync()
   end

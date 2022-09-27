@@ -1,22 +1,34 @@
 local lspkind = require('lspkind')
 local cmp = require'cmp'
 
+
 cmp_keybinds = {
-    -- 上一个
-    ['<C-k>'] = cmp.mapping.select_prev_item(),
-    -- 下一个
-    ['<C-j>'] = cmp.mapping.select_next_item(),
-    -- 确认
-    -- Accept currently selected item. If none selected, `select` first item.
-    -- Set `select` to `false` to only confirm explicitly selected items.
-    ['<CR>'] = cmp.mapping.confirm({
-      select = true ,
-      behavior = cmp.ConfirmBehavior.Replace
-    }),
-    -- ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-    ['<C-u>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-    ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-  }
+  -- 确认
+  ['<CR>'] = cmp.mapping.confirm({
+    select = true ,
+    behavior = cmp.ConfirmBehavior.Replace
+  }),
+  -- ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+  ['<C-u>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+  ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+
+  ['<Tab>'] = function(fallback)
+    if cmp.visible() then
+      cmp.select_next_item()
+    else
+      fallback()
+    end
+  end,
+  ['<S-Tab>'] = function(fallback)
+    if cmp.visible() then
+      cmp.select_prev_item()
+    else
+      fallback()
+    end
+  end,
+  ['<Esc>'] = cmp.mapping.close(),
+
+}
 
 cmp.setup {
   -- 指定 snippet 引擎
@@ -41,14 +53,14 @@ cmp.setup {
     -- For vsnip users.
     { name = 'vsnip' },
     -- For luasnip users.
-    -- { name = 'luasnip' },
+    { name = 'luasnip' },
     --For ultisnips users.
-    -- { name = 'ultisnips' },
+    { name = 'ultisnips' },
     -- -- For snippy users.
-    -- { name = 'snippy' },
-  }, { { name = 'buffer' },
-       { name = 'path' }
-    }),
+    { name = 'snippy' },
+  }, 
+  { { name = 'buffer' }, { name = 'path' } }
+  ),
 
   -- 快捷键
   mapping = cmp_keybinds,
@@ -78,6 +90,6 @@ cmp.setup.cmdline(':', {
   sources = cmp.config.sources({
     { name = 'path' }
   }, {
-      { name = 'cmdline' }
-    })
+    { name = 'cmdline' }
+  })
 })

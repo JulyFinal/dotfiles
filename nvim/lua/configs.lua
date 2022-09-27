@@ -1,6 +1,5 @@
 local opt = vim.opt
 local g = vim.g
--- local config = require("core.utils").load_config()
 
 -- Indenting
 opt.expandtab = true
@@ -30,6 +29,8 @@ opt.signcolumn = "yes"
 opt.splitbelow = true
 opt.splitright = true
 opt.termguicolors = true
+vim.cmd[[hi pmenu ctermfg=black guibg=black]]
+-- api.nvim_set_hl(0, "Pmenu", { bg=black, ctermfg=0, bold=true })
 opt.timeoutlen = 400
 opt.undofile = true
 
