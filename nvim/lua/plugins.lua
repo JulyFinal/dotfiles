@@ -54,6 +54,9 @@ return packer.startup({function()
 
   use 'nvim-treesitter/nvim-treesitter'
 
+  use 'kyazdani42/nvim-web-devicons' 
+  use 'kyazdani42/nvim-tree.lua'
+
   if packer_bootstrap then
     require('packer').sync()
   end
