@@ -30,6 +30,7 @@ alias pc4="proxychains4"
 alias setproxy="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY SUCCESS!!!'"
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
+alias tree="lsd --tree"
 
 
 # eval
