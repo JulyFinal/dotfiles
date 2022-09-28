@@ -2,8 +2,7 @@ akregatorrc
 arkrc
 baloofile*
 bluedevilglobalrc
-clash
-clash_win
+clash*
 dconf
 discoverrc
 dolphinrc
@@ -23,7 +22,7 @@ device_automounter_kcmrc
 kate*
 kcminputrc
 kconf_updaterc
-KDE
+KDE*
 kde*
 kgammarc
 kglobalshortcutsrc
@@ -35,9 +34,8 @@ krunnerrc
 kscreenlockerrc
 ksmserverrc
 ktimezonedrc
-kwalletrc
-kwinrc
-kwinrulesrc
+kwallet*
+kwin*
 kxkbrc
 krdcrc
 lazygit
@@ -45,10 +43,7 @@ libaccounts-glib
 menus
 microsoft-edge
 mimeapps.list
-plasma-localerc
-plasmanotifyrc
-plasma-org.kde.plasma.desktop-appletsrc
-plasmashellrc
+plasma*
 powermanagementprofilesrc
 pulse
 QtProject.conf
@@ -56,10 +51,8 @@ session
 systemsettingsrc
 trashrc
 Trolltech.conf
-user-dirs.dirs
-user-dirs.locale
-vlc
-vlcrc
+user-dirs*
+vlc*
 xdg-desktop-portal-kderc
 xsettingsd
 Zettlr
@@ -69,3 +62,5 @@ Kingsoft
 glib*
 gnome*
 email*
+filetype*
+wayfire*
