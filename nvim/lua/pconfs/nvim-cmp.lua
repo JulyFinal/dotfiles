@@ -8,7 +8,6 @@ cmp_keybinds = {
     select = true ,
     behavior = cmp.ConfirmBehavior.Replace
   }),
-  -- ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
   ['<C-u>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
   ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
 
@@ -77,13 +76,13 @@ cmp.setup {
     })
   },
 }
+--
 -- Use buffer source for `/`.
 cmp.setup.cmdline('/', {
   sources = {
     { name = 'buffer' }
   }
 })
-
 
 -- Use cmdline & path source for ':'.
 cmp.setup.cmdline(':', {

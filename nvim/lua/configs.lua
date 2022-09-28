@@ -120,7 +120,7 @@ opt.swapfile = false
 opt.splitbelow = true
 opt.splitright = true
 -- 自动补全不自动选中
-g.completeopt = "menu,menuone,noselect,noinsert"
+g.completeopt = {'menu', 'menuone', 'noselect'}
 -- 样式
 opt.background = "dark"
 

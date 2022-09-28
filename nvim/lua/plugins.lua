@@ -63,6 +63,12 @@ return packer.startup({function()
     "neovim/nvim-lspconfig",
   }
 
+  use "jose-elias-alvarez/null-ls.nvim"
+
+  use {
+    'nvim-telescope/telescope.nvim', tag = '0.1.0',
+  }
+
   if packer_bootstrap then
     require('packer').sync()
   end
@@ -72,3 +78,4 @@ config = {
     open_fn = require('packer.util').float,
   }
 }})
+
