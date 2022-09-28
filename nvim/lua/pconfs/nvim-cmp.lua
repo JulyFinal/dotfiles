@@ -37,13 +37,15 @@ cmp.setup {
       vim.fn["vsnip#anonymous"](args.body)
 
       -- For `luasnip` users.
-      -- require('luasnip').lsp_expand(args.body)
+      require('luasnip').lsp_expand(args.body)
 
       -- For `ultisnips` users.
-      -- vim.fn["UltiSnips#Anon"](args.body)
+      vim.fn["UltiSnips#Anon"](args.body)
 
       -- For `snippy` users.
-      -- require'snippy'.expand_snippet(args.body)
+      require'snippy'.expand_snippet(args.body)
+
+      vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
     end,
   },
   -- 来源
@@ -55,7 +57,7 @@ cmp.setup {
     { name = 'luasnip' },
     --For ultisnips users.
     { name = 'ultisnips' },
-    -- -- For snippy users.
+    -- For snippy users.
     { name = 'snippy' },
   }, 
   { { name = 'buffer' }, { name = 'path' } }
@@ -76,7 +78,16 @@ cmp.setup {
     })
   },
 }
---
+
+-- Set configuration for specific filetype.
+cmp.setup.filetype('gitcommit', {
+  sources = cmp.config.sources({
+    { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+  }, {
+    { name = 'buffer' },
+  })
+})
+
 -- Use buffer source for `/`.
 cmp.setup.cmdline('/', {
   sources = {
