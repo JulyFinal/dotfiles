@@ -1,69 +1,94 @@
-local api = vim.api
-
 require("mason").setup()
-require("mason-lspconfig").setup({
+
+local mason_lspconfig = require("mason-lspconfig")
+local lspconfig = require 'lspconfig'
+
+
+local opts = { noremap = true, silent = true }
+vim.keymap.set('n', '<space>w', vim.diagnostic.open_float, opts)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+
+local on_attach = function(client, bufnr)
+  -- Enable completion triggered by <c-x><c-o>
+  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+  -- Mappings.
+  local opts = { buffer = bufnr, noremap = true, silent = true }
+  local vks = function(mode, keys, cmd)
+    vim.keymap.set(mode, keys, cmd, opts)
+  end
+  vks('n', 'gD', "<cmd>lua vim.lsp.buf.declaration<cr>")
+  vks('n', 'gd', "<cmd>lua vim.lsp.buf.definition<cr>")
+  vks('n', 'K', "<cmd>lua vim.lsp.buf.hover<cr>")
+  vks('n', 'gi', "<cmd>lua vim.lsp.buf.implementation<cr>")
+  vks('n', '<C-k>', "<cmd>lua vim.lsp.buf.signature_help<cr>")
+  vks('n', '<space>wa', "<cmd>lua vim.lsp.buf.add_workspace_folder<cr>")
+  vks('n', '<space>wr', "<cmd>lua vim.lsp.buf.remove_workspace_folder<cr>")
+  vks('n', '<space>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end)
+  vks('n', '<space>D', "<cmd>lua vim.lsp.buf.type_definition<cr>")
+  vks('n', '<space>rn', "<cmd>lua vim.lsp.buf.rename<cr>")
+  vks('n', 'gr', "<cmd>lua vim.lsp.buf.references<cr>")
+  vks("n", "<leader>f", "<cmd>lua vim.lsp.buf.formatting()<cr>")
+end
+
+-- Set up lspconfig.
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+mason_lspconfig.setup({
   ensure_installed = { "sumneko_lua", "pyright" },
   automatic_installation = true,
 })
 
-require("null-ls").setup({
-  sources = {
-    require("null-ls").builtins.formatting.stylua,
-    require("null-ls").builtins.diagnostics.eslint,
-    require("null-ls").builtins.completion.spell,
-  },
-})
 
-local lsp_defaults = {
-  flags = {
-    debounce_text_changes = 150,
-  },
-  capabilities = require('cmp_nvim_lsp').update_capabilities(
-  vim.lsp.protocol.make_client_capabilities()
-  ),
-  on_attach = function(client, bufnr)
-    vim.api.nvim_exec_autocmds('User', { 
-      pattern = 'LspAttached',
-      -- desc = 'Acciones LSP',
-      callback = function()
-        -- Mappings.
-        local opts = { buffer = bufnr, noremap = true, silent = true }
-        local vks = function(mode, keys, cmd)
-          vim.keymap.set(mode, keys, cmd, opts)
-        end
-        vks('n', 'gD', vim.lsp.buf.declaration)
-        vks('n', 'gd', vim.lsp.buf.definition)
-        vks('n', 'K', vim.lsp.buf.hover)
-        vks('n', 'gi', vim.lsp.buf.implementation)
-        vks('n', '<C-k>', vim.lsp.buf.signature_help)
-        vks('n', '<space>wa', vim.lsp.buf.add_workspace_folder)
-        vks('n', '<space>wr', vim.lsp.buf.remove_workspace_folder)
-        vks('n', '<space>wl', function()
-          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end)
-        vks('n', '<space>D', vim.lsp.buf.type_definition)
-        vks('n', '<space>rn', vim.lsp.buf.rename)
-        vks('n', 'gr', vim.lsp.buf.references)
-        vks('n', '<space>e', vim.diagnostic.open_float)
-        vks('n', '[d', vim.diagnostic.goto_prev)
-        vks('n', ']d', vim.diagnostic.goto_next)
-        vks('n', '<space>q', vim.diagnostic.setloclist)
-        vks("n", "<leader>f", vim.lsp.buf.formatting())
-      end
+
+mason_lspconfig.setup_handlers({
+  function(server_name) -- Default handler (optional)
+    require("lspconfig")[server_name].setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
+  end,
+  ["sumneko_lua"] = function()
+    require("lspconfig").sumneko_lua.setup({
+      on_attach = on_attach,
+      capabilities = capabilities,
+
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" },
+          },
+
+          workspace = {
+            library = {
+              [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+              [vim.fn.stdpath("config") .. "/lua"] = true,
+            },
+          },
+        },
+      },
     })
-  end
-}
+  end,
 
-local lspconfig = require('lspconfig')
+  ["pyright"] = function()
+    lspconfig.pyright.setup({
+      on_attach = opts.on_attach,
+      capabilities = opts.capabilities,
 
-lspconfig.util.default_config = vim.tbl_deep_extend(
-  'force',
-  lspconfig.util.default_config,
-  lsp_defaults
-)
-
-lspconfig.sumneko_lua.setup({})
-lspconfig.pyright.setup({})
+      settings = {
+        python = {
+          analysis = {
+            -- Disable strict type checking
+            typeCheckingMode = "off"
+          }
+        }
+      },
+    })
+  end,
+})
 
 
 local sign = function(opts)
