@@ -1,7 +1,6 @@
 local lspkind = require('lspkind')
 local cmp = require 'cmp'
 
-
 local cmp_keybinds = {
   ['<C-u>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
   ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),

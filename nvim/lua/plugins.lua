@@ -15,17 +15,12 @@ local packer_bootstrap = ensure_packer()
 
 return packer.startup({ function()
   use 'wbthomason/packer.nvim'
+
   use 'nvim-lua/plenary.nvim'
 
   use {
     "lukas-reineke/indent-blankline.nvim",
-    config = function() require("indent_blankline").setup {
-        -- for example, context is off by default, use this to turn it on
-        show_current_context = true,
-        show_current_context_start = true,
-        space_char_blankline = " ",
-      }
-    end
+    config = function() require("indent_blankline").setup {} end
   }
 
   use {
@@ -45,21 +40,15 @@ return packer.startup({ function()
   use 'hrsh7th/cmp-buffer' -- { name = 'buffer' },
   use 'hrsh7th/cmp-path' -- { name = 'path' }
   use 'hrsh7th/cmp-cmdline' -- { name = 'cmdline' }
-  use 'hrsh7th/nvim-cmp'
+  use {'hrsh7th/nvim-cmp'}
   -- lspkind
   use 'onsails/lspkind-nvim'
-
-  use 'hrsh7th/cmp-vsnip'
-  use 'hrsh7th/vim-vsnip'
-  use 'rafamadriz/friendly-snippets'
+  use { 'rafamadriz/friendly-snippets', module = { "cmp", "cmp_nvim_lsp" }, event = "InsertEnter", }
 
   -- For luasnip users.
   use 'L3MON4D3/LuaSnip'
-  use 'saadparwaiz1/cmp_luasnip'
+  use { 'saadparwaiz1/cmp_luasnip', after = "LuaSnip" }
 
-  -- For snippy users.
-  use 'dcampos/nvim-snippy'
-  use 'dcampos/cmp-snippy'
 
   use 'nvim-treesitter/nvim-treesitter'
 
@@ -84,6 +73,18 @@ return packer.startup({ function()
       require('Comment').setup()
     end
   }
+
+  use 'shaunsingh/moonlight.nvim'
+
+  -- using packer.nvim
+  use { 'akinsho/bufferline.nvim', tag = "v2.*", }
+
+  use({
+  "NTBBloodbath/galaxyline.nvim",
+  config = function()
+    require("galaxyline.themes.eviline")
+  end,
+})
 
   if packer_bootstrap then
     require('packer').sync()

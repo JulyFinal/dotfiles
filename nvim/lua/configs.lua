@@ -1,6 +1,8 @@
 local opt = vim.opt
 local g = vim.g
 
+vim.cmd[[colorscheme moonlight]]
+
 -- Indenting
 opt.expandtab = true
 opt.shiftwidth = 2
@@ -118,14 +120,9 @@ opt.swapfile = false
 opt.splitbelow = true
 opt.splitright = true
 -- 自动补全不自动选中
-g.completeopt = {'menuone', 'noselect'}
+g.completeopt = "menuone,noselect"
 -- 样式
 opt.background = "dark"
-
--- 不可见字符的显示，这里只把空格显示为一个点
-opt.list = true
-opt.listchars:append "space: "
-opt.listchars:append "eol:↴"
 
 -- 补全增强
 opt.wildmenu = true

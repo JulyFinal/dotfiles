@@ -3,7 +3,6 @@ require("mason").setup()
 local mason_lspconfig = require("mason-lspconfig")
 local lspconfig = require 'lspconfig'
 
-
 local opts = { noremap = true, silent = true }
 vim.keymap.set('n', '<space>w', vim.diagnostic.open_float, opts)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
@@ -35,7 +34,26 @@ local on_attach = function(client, bufnr)
 end
 
 -- Set up lspconfig.
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+
+capabilities.textDocument.completion.completionItem = {
+  documentationFormat = { "markdown", "plaintext", "python", "lua" },
+  snippetSupport = true,
+  preselectSupport = true,
+  insertReplaceSupport = true,
+  labelDetailsSupport = true,
+  deprecatedSupport = true,
+  commitCharactersSupport = true,
+  tagSupport = { valueSet = { 1 } },
+  resolveSupport = {
+    properties = {
+      "documentation",
+      "detail",
+      "additionalTextEdits",
+    },
+  },
+}
 
 mason_lspconfig.setup({
   ensure_installed = { "sumneko_lua", "pyright" },
@@ -52,16 +70,12 @@ mason_lspconfig.setup_handlers({
     }
   end,
   ["sumneko_lua"] = function()
-    require("lspconfig").sumneko_lua.setup({
-      on_attach = on_attach,
-      capabilities = capabilities,
-
+    lspconfig.sumneko_lua.setup({
       settings = {
         Lua = {
           diagnostics = {
             globals = { "vim" },
           },
-
           workspace = {
             library = {
               [vim.fn.expand("$VIMRUNTIME/lua")] = true,
@@ -75,9 +89,6 @@ mason_lspconfig.setup_handlers({
 
   ["pyright"] = function()
     lspconfig.pyright.setup({
-      on_attach = opts.on_attach,
-      capabilities = opts.capabilities,
-
       settings = {
         python = {
           analysis = {
