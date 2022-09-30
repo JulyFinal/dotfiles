@@ -29,8 +29,6 @@ opt.signcolumn = "yes"
 opt.splitbelow = true
 opt.splitright = true
 opt.termguicolors = true
-vim.cmd[[hi pmenu ctermfg=black guibg=black]]
--- api.nvim_set_hl(0, "Pmenu", { bg=black, ctermfg=0, bold=true })
 opt.timeoutlen = 400
 opt.undofile = true
 
@@ -120,7 +118,7 @@ opt.swapfile = false
 opt.splitbelow = true
 opt.splitright = true
 -- 自动补全不自动选中
-g.completeopt = {'menu', 'menuone', 'noselect'}
+g.completeopt = {'menuone', 'noselect'}
 -- 样式
 opt.background = "dark"
 
@@ -136,4 +134,4 @@ opt.pumheight = 10
 -- 永远显示 tabline
 opt.showtabline = 1
 -- 使用增强状态栏插件后不再需要 vim 的模式提示
-opt.showmode = true
+opt.showmode = false

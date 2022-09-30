@@ -57,10 +57,6 @@ return packer.startup({ function()
   use 'L3MON4D3/LuaSnip'
   use 'saadparwaiz1/cmp_luasnip'
 
-  -- For ultisnips users.
-  use 'SirVer/ultisnips'
-  use 'quangnguyen30192/cmp-nvim-ultisnips'
-
   -- For snippy users.
   use 'dcampos/nvim-snippy'
   use 'dcampos/cmp-snippy'
@@ -80,6 +76,13 @@ return packer.startup({ function()
 
   use {
     'nvim-telescope/telescope.nvim', tag = '0.1.0',
+  }
+
+  use {
+    'numToStr/Comment.nvim',
+    config = function()
+      require('Comment').setup()
+    end
   }
 
   if packer_bootstrap then

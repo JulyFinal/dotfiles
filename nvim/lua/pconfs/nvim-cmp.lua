@@ -1,51 +1,68 @@
 local lspkind = require('lspkind')
-local cmp = require'cmp'
+local cmp = require 'cmp'
 
 
-cmp_keybinds = {
-  -- 确认
-  ['<CR>'] = cmp.mapping.confirm({
-    select = true ,
-    behavior = cmp.ConfirmBehavior.Replace
-  }),
+local cmp_keybinds = {
   ['<C-u>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
   ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
 
-  ['<Tab>'] = function(fallback)
+  ["<CR>"] = cmp.mapping.confirm {
+    behavior = cmp.ConfirmBehavior.Replace,
+    select = false,
+  },
+  ["<Tab>"] = cmp.mapping(function(fallback)
     if cmp.visible() then
       cmp.select_next_item()
+    elseif require("luasnip").expand_or_jumpable() then
+      vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
     else
       fallback()
     end
-  end,
-  ['<S-Tab>'] = function(fallback)
+  end, { "i", "s", }),
+  ["<S-Tab>"] = cmp.mapping(function(fallback)
     if cmp.visible() then
       cmp.select_prev_item()
+    elseif require("luasnip").jumpable(-1) then
+      vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true), "")
     else
       fallback()
     end
-  end,
-  ['<Esc>'] = cmp.mapping.close(),
-
+  end, { "i", "s", }),
 }
 
+local function border(hl_name)
+  return {
+    { "╭", hl_name },
+    { "─", hl_name },
+    { "╮", hl_name },
+    { "│", hl_name },
+    { "╯", hl_name },
+    { "─", hl_name },
+    { "╰", hl_name },
+    { "│", hl_name },
+  }
+end
+
 cmp.setup {
+  window = {
+    completion = {
+      border = border "CmpBorder",
+      winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
+    },
+    documentation = {
+      border = border "CmpDocBorder",
+      winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
+    },
+  },
   -- 指定 snippet 引擎
   snippet = {
     expand = function(args)
       -- For `vsnip` users.
       vim.fn["vsnip#anonymous"](args.body)
-
       -- For `luasnip` users.
       require('luasnip').lsp_expand(args.body)
-
-      -- For `ultisnips` users.
-      vim.fn["UltiSnips#Anon"](args.body)
-
       -- For `snippy` users.
-      require'snippy'.expand_snippet(args.body)
-
-      vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      require 'snippy'.expand_snippet(args.body)
     end,
   },
   -- 来源
@@ -55,12 +72,11 @@ cmp.setup {
     { name = 'vsnip' },
     -- For luasnip users.
     { name = 'luasnip' },
-    --For ultisnips users.
-    { name = 'ultisnips' },
     -- For snippy users.
     { name = 'snippy' },
-  }, 
-  { { name = 'buffer' }, { name = 'path' } }
+    -- { name = ''}
+  },
+    { { name = 'buffer' }, { name = 'path' } }
   ),
 
   -- 快捷键
@@ -69,10 +85,8 @@ cmp.setup {
   formatting = {
     format = lspkind.cmp_format({
       with_text = true, -- do not show text alongside icons
-      maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-      before = function (entry, vim_item)
-        -- Source 显示提示来源
-        vim_item.menu = "["..string.upper(entry.source.name).."]"
+      before = function(entry, vim_item)
+        vim_item.menu = "[" .. string.upper(entry.source.name) .. "]"
         return vim_item
       end
     })
