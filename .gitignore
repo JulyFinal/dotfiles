@@ -29,7 +29,7 @@ kglobalshortcutsrc
 khotkeysrc
 klipperrc
 kmixrc
-konsolerc
+kon*
 krunnerrc
 kscreenlockerrc
 ksmserverrc
@@ -64,3 +64,5 @@ gnome*
 email*
 filetype*
 wayfire*
+flameshot
+fish
