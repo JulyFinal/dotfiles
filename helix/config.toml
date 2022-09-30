@@ -1,0 +1,27 @@
+theme = "tokyonight"
+
+[editor]
+mouse = true
+cursorline = true
+auto-completion = true
+
+[editor.statusline]
+left = ["mode", "spinner"]
+center = ["file-name"]
+right =  ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
+separator = "|"
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = false
+
+[editor.indent-guides]
+render = true
+
+[keys.normal]
+C-s = ":w"
+C-q = ":write-quit-all!"
