@@ -53,7 +53,7 @@ font:
     family: 'FiraCode Nerd Font'
     style: Bold Italic
   # 细描边
-  # AppleFontSmoothing: True
+  AppleFontSmoothing: True
 
 key_bindings:
   - { key: C, mods: Command, action: Copy }
