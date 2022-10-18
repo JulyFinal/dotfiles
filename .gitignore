@@ -59,6 +59,7 @@ Zettlr
 yesplaymusic
 libreoffice*
 Kingsoft
+kingsoft
 glib*
 gnome*
 email*
@@ -70,3 +71,4 @@ raycast
 thefuck
 .DS_Store
 packer_compiled.lua
+
