@@ -30,7 +30,7 @@ local on_attach = function(client, bufnr)
   vks('n', '<space>D', "<cmd>lua vim.lsp.buf.type_definition<cr>")
   vks('n', '<space>rn', "<cmd>lua vim.lsp.buf.rename<cr>")
   vks('n', 'gr', "<cmd>lua vim.lsp.buf.references<cr>")
-  vks("n", "<leader>f", "<cmd>lua vim.lsp.buf.formatting()<cr>")
+  vks("n", "<leader>,", "<cmd>lua vim.lsp.buf.formatting()<cr>")
 end
 
 -- Set up lspconfig.

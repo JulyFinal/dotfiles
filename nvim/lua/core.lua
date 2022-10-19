@@ -8,3 +8,9 @@ require('pconfs.nvim-tree')
 require('pconfs.mason')
 require('pconfs.bufferline')
 require('pconfs.telescope')
+require('pconfs.outline')
+require('pconfs.hop')
+
+-- back cmd
+vim.cmd[[colorscheme moonlight]]
+

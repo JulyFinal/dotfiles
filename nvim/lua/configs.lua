@@ -1,7 +1,6 @@
 local opt = vim.opt
 local g = vim.g
 
-vim.cmd[[colorscheme moonlight]]
 
 -- Indenting
 opt.expandtab = true

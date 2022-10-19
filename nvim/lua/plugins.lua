@@ -78,7 +78,12 @@ return packer.startup({ function()
 
   -- using packer.nvim
   use { 'akinsho/bufferline.nvim', tag = "v2.*", }
+  -- outline
+  use "simrat39/symbols-outline.nvim"
+  -- easymotion
+  use { 'phaazon/hop.nvim', branch = 'v2' }
 
+  -- line
   use({
   "NTBBloodbath/galaxyline.nvim",
   config = function()
