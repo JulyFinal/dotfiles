@@ -6,4 +6,3 @@ map('n', 'ff', builtin.find_files, {})
 map('n', 'fg', builtin.live_grep, {})
 map('n', 'fb', builtin.buffers, {})
 map('n', 'fh', builtin.help_tags, {})
-

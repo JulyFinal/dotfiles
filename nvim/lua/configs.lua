@@ -1,7 +1,6 @@
 local opt = vim.opt
 local g = vim.g
 
-
 -- Indenting
 opt.expandtab = true
 opt.shiftwidth = 2

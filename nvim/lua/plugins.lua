@@ -40,7 +40,7 @@ return packer.startup({ function()
   use 'hrsh7th/cmp-buffer' -- { name = 'buffer' },
   use 'hrsh7th/cmp-path' -- { name = 'path' }
   use 'hrsh7th/cmp-cmdline' -- { name = 'cmdline' }
-  use {'hrsh7th/nvim-cmp'}
+  use { 'hrsh7th/nvim-cmp' }
   -- lspkind
   use 'onsails/lspkind-nvim'
   use { 'rafamadriz/friendly-snippets', module = { "cmp", "cmp_nvim_lsp" }, event = "InsertEnter", }
@@ -85,11 +85,11 @@ return packer.startup({ function()
 
   -- line
   use({
-  "NTBBloodbath/galaxyline.nvim",
-  config = function()
-    require("galaxyline.themes.eviline")
-  end,
-})
+    "NTBBloodbath/galaxyline.nvim",
+    config = function()
+      require("galaxyline.themes.eviline")
+    end,
+  })
 
   if packer_bootstrap then
     require('packer').sync()

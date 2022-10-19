@@ -12,5 +12,4 @@ require('pconfs.outline')
 require('pconfs.hop')
 
 -- back cmd
-vim.cmd[[colorscheme moonlight]]
-
+vim.cmd [[colorscheme moonlight]]
