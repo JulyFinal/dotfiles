@@ -26,6 +26,7 @@ KDE*
 kde*
 kgammarc
 kglobalshortcutsrc
+kge*
 khotkeysrc
 klipperrc
 kmixrc
@@ -38,6 +39,7 @@ kwallet*
 kwin*
 kxkbrc
 krdcrc
+kio*
 lazygit
 libaccounts-glib
 menus
