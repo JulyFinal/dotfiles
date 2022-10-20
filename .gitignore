@@ -37,6 +37,7 @@ ksmserverrc
 ktimezonedrc
 kwallet*
 kwin*
+kwriterc
 kxkbrc
 krdcrc
 kio*
@@ -49,6 +50,7 @@ plasma*
 powermanagementprofilesrc
 pulse
 QtProject.conf
+qBittorrent
 session
 systemsettingsrc
 trashrc

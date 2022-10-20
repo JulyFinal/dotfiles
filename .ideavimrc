@@ -1,0 +1,73 @@
+set showmode
+set number
+set history=2000
+set nocompatible
+syntax enable
+syntax on
+set showmatch
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+set wildmenu
+set laststatus=2
+set ruler
+set cursorline
+set nowrap
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set foldmethod=indent
+set foldmethod=syntax
+set nofoldenable
+set surround
+set easymotion
+set commentary
+set so 5
+set keep-english-in-normal-and-restore-in-insert
+set timeout timeoutlen=300
+
+
+" 设置leader键
+let mapleader=" "
+
+" find in files
+nnoremap <space>ff :action FindInPath<cr>
+" find usages
+nnoremap <space>u :action FindUsages<cr>
+" find class
+nnoremap <space>f :action GotoClass<cr>
+
+" Press `f` to activate AceJump
+nnoremap f :action AceAction<CR>
+" Press `F` to activate Target Mode
+nnoremap F :action AceTargetAction<CR>
+" go to declaration
+nnoremap <space>d :action AceDeclarationAction<cr>
+
+" refactor element
+nnoremap <leader>n :action RenameElement<cr>
+" reformat code
+nnoremap <leader>g :action ReformatCode<CR>
+" introduce variable
+nnoremap <leader>v :action IntroduceVariable<cr>
+
+" go to  implementation
+nnoremap gi :action GotoImplementation<cr>
+" go back
+nnoremap gb :action Back<cr>
+" go forward
+nnoremap gf :action Forward<cr>
+" go to head of line
+nnoremap gh 0w
+
+" show structure
+nnoremap <leader>ss :action FileStructurePopup<cr>
+" close readonly editors
+nnoremap <leader>er :action CloseAllReadonly<cr>
+" close editors but active
+nnoremap <leader>ea :action CloseAllEditorsButActive<cr>
+
+inoremap <C-a> <esc>I<cr>
+inoremap <C-e> <esc>A<cr>
