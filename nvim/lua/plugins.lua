@@ -96,8 +96,20 @@ return packer.startup({ function()
   end
 end,
   config = {
+    max_jobs = 30,
+    git = { 
+      clone_timeout = 240,
+      default_url_format = "git@github.com:%s", 
+      -- default_url_format = "https://hub.fastgit.xyz/%s",
+      -- default_url_format = "https://mirror.ghproxy.com/https://github.com/%s",
+    },
     display = {
-      open_fn = require('packer.util').float,
-    }
+      open_fn = function()
+			  return require("packer.util").float({ border = "single" }) -- single rounded
+		  end,
+      prompt_border = 'rounded'
+    },
+    auto_clean = true,
+    compile_on_sync = true,
   }
 })
