@@ -1,7 +1,7 @@
 local outline = require("symbols-outline")
 
 local opts = {
-  width = 20,
+  width = 10,
 }
 
 outline.setup({
