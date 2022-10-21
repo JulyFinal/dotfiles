@@ -7,16 +7,13 @@ local map = vim.api.nvim_set_keymap -- 复用 opt 参数
 local opt = { noremap = true, silent = true }
 
 
+-- ESC
+map("i", "jk", "<ESC>", opt)
 -- windows 分屏快捷键
 map("n", "<leader>v", ":vsp<CR>", opt)
 map("n", "<leader>h", ":sp<CR>", opt)
 -- 关闭当前
 map("n", "<leader>x", "<C-w>c", opt)
--- Alt + hjkl  窗口之间跳转
-map("n", "<A-h>", "<C-w>h", opt)
-map("n", "<A-j>", "<C-w>j", opt)
-map("n", "<A-k>", "<C-w>k", opt)
-map("n", "<A-l>", "<C-w>l", opt)
 
 -- Save file
 map("n", "<C-s>", "<cmd> w <CR>", opt)
