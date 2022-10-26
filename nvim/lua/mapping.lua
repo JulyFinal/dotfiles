@@ -58,6 +58,7 @@ map("i", "<C-b>", "<ESC>ha", opt)
 
 -- nvim-tree
 map("n", "<leader>e", ":NvimTreeToggle<CR>", opt)
+map("n", "<leader>i", "gg=G", opt)
 
 
 -- bufferline
