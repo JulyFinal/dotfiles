@@ -27,6 +27,7 @@ set commentary
 set so 5
 set keep-english-in-normal-and-restore-in-insert
 set timeout timeoutlen=300
+set clipboard+=unnamed
 
 
 " 设置leader键
