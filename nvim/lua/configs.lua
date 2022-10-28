@@ -78,9 +78,7 @@ end
 
 local default_providers = {
   "node",
-  "perl",
   "python3",
-  "ruby",
 }
 
 for _, provider in ipairs(default_providers) do

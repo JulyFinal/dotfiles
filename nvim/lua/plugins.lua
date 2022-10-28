@@ -36,19 +36,7 @@ return packer.startup({ function()
   })
 
   -- nvim-cmp
-  use 'hrsh7th/cmp-nvim-lsp' -- { name = nvim_lsp }
-  use 'hrsh7th/cmp-buffer' -- { name = 'buffer' },
-  use 'hrsh7th/cmp-path' -- { name = 'path' }
-  use 'hrsh7th/cmp-cmdline' -- { name = 'cmdline' }
-  use { 'hrsh7th/nvim-cmp' }
   -- lspkind
-  use 'onsails/lspkind-nvim'
-  use { 'rafamadriz/friendly-snippets', module = { "cmp", "cmp_nvim_lsp" }, event = "InsertEnter", }
-
-  -- For luasnip users.
-  use 'L3MON4D3/LuaSnip'
-  use { 'saadparwaiz1/cmp_luasnip', after = "LuaSnip" }
-
 
   use 'nvim-treesitter/nvim-treesitter'
 
@@ -60,8 +48,18 @@ return packer.startup({ function()
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig",
   }
-
   use "jose-elias-alvarez/null-ls.nvim"
+
+  -- cmp configs
+  use 'onsails/lspkind-nvim'
+  use { 'rafamadriz/friendly-snippets', module = { "cmp", "cmp_nvim_lsp" }, event = "InsertEnter" }
+  use { "hrsh7th/nvim-cmp" }
+  use { "L3MON4D3/LuaSnip" }
+  use { "saadparwaiz1/cmp_luasnip" }
+  use { "hrsh7th/cmp-nvim-lua" }
+  use { "hrsh7th/cmp-nvim-lsp" }
+  use { "hrsh7th/cmp-buffer" }
+  use { "hrsh7th/cmp-path" }
 
   use {
     'nvim-telescope/telescope.nvim', tag = '0.1.0',
@@ -82,6 +80,8 @@ return packer.startup({ function()
   use "simrat39/symbols-outline.nvim"
   -- easymotion
   use { 'phaazon/hop.nvim', branch = 'v2' }
+  -- todo
+  use { 'folke/todo-comments.nvim' }
 
   -- line
   use({
@@ -97,16 +97,16 @@ return packer.startup({ function()
 end,
   config = {
     max_jobs = 30,
-    git = { 
+    git = {
       clone_timeout = 240,
-      default_url_format = "git@github.com:%s", 
+      default_url_format = "git@github.com:%s",
       -- default_url_format = "https://hub.fastgit.xyz/%s",
       -- default_url_format = "https://mirror.ghproxy.com/https://github.com/%s",
     },
     display = {
       open_fn = function()
-			  return require("packer.util").float({ border = "single" }) -- single rounded
-		  end,
+        return require("packer.util").float({ border = "single" }) -- single rounded
+      end,
       prompt_border = 'rounded'
     },
     auto_clean = true,
