@@ -74,5 +74,5 @@ fish
 raycast
 thefuck
 .DS_Store
-packer_compiled.lua
+nvim/plugin/packer_compiled.lua
 syncthing
