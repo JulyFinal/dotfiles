@@ -1,22 +1,21 @@
+# My zsh config
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
 
-# ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-# mkdir -p "$(dirname $ZINIT_HOME)"
-# git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+if [ -d "$HOME/.cargo/bin" ] ; then
+    PATH="$HOME/.cargo/bin:$PATH"
+   
+fi
 
-# zinit
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+# eval
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
 
-source "${ZINIT_HOME}/zinit.zsh"
-
-zinit light spaceship-prompt/spaceship-prompt
-
-zinit wait lucid for \
-    light-mode \
-  zsh-users/zsh-autosuggestions \
-    light-mode \
-  zsh-users/zsh-completions \
-    light-mode \
-  zdharma-continuum/fast-syntax-highlighting \
+# source plugins
+source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOME/.zsh/fsh/fast-syntax-highlighting.plugin.zsh
+source $HOME/.zsh/zsh-completions/zsh-completions.plugin.zsh
 
 # zsh config
 HISTFILE=~/.histfile
@@ -32,17 +31,4 @@ alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
 alias tree="lsd --tree"
 alias cat='bat -pp --theme="Nord"'
-
-
-# eval
-eval "$(zoxide init zsh)"
-
-# set PATH so it includes user's private ~/.local/bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
-
-if [ -d "$HOME/miniforge3/bin" ] ; then
-    PATH="$HOME/miniforge3/bin:$PATH"
-fi
 

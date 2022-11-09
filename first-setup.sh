@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+# bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+
+git clone git@github.com:zsh-users/zsh-autosuggestions $HOME/.zsh/zsh-autosuggestions
+git clone git@github.com:zdharma-continuum/fast-syntax-highlighting $HOME/.zsh/fsh
+git clone git@github.com:zsh-users/zsh-completions $HOME/.zsh/zsh-completions
+
+cargo install starship
 
 ## install base pkg
 sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzip
