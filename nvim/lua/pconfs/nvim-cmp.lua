@@ -1,11 +1,11 @@
 local lspkind = require('lspkind')
 
 local present, cmp = pcall(require, "cmp")
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 
 if not present then
   return
 end
-
 
 local function border(hl_name)
   return {
@@ -19,6 +19,11 @@ local function border(hl_name)
     { "│", hl_name },
   }
 end
+
+cmp.event:on(
+  'confirm_done',
+  cmp_autopairs.on_confirm_done()
+)
 
 cmp.setup {
   window = {

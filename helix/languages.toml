@@ -27,14 +27,15 @@ indent = { tab-width = 2, unit = "  " }
 name = "json"
 source = { git = "https://github.com/tree-sitter/tree-sitter-json", rev = "65bceef69c3b0f24c0b19ce67d79f57c96e90fcb" }
 
-
+# sudo npm install -g pyright@latest
 [[language]]
 name = "python"
 scope = "source.python"
 injection-regex = "python"
 file-types = ["py"]
 shebangs = ["python"]
-roots = ["pyproject.toml", "setup.py", "Poetry.lock"]
+# roots = ["pyproject.toml", "setup.py", "Poetry.lock"]
+roots = ["pyproject.toml", "pdm.lock"]
 comment-token = "#"
 language-server = { command = "pyright-langserver", args = ["--stdio"] }
 formatter = { command = "black", args = ["-q", "-"] }
