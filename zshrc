@@ -11,6 +11,7 @@ fi
 # eval
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
+eval "$(direnv hook zsh)"
 
 # source plugins
 source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -27,8 +28,10 @@ bindkey -e
 alias vi="nvim"
 alias pc4="proxychains4"
 alias setproxy="export ALL_PROXY=socks5://finalserver:7890; echo 'SET PROXY SUCCESS!!!'"
+alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY SUCCESS!!!'"
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
+alias pp="export PYTHONPATH=$(pwd)"
 alias tree="lsd --tree"
 alias cat='bat -pp --theme="Nord"'
 
