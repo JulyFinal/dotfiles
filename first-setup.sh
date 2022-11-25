@@ -7,7 +7,7 @@ git clone git@github.com:zsh-users/zsh-completions $HOME/.zsh/zsh-completions
 cargo install starship
 
 ## install base pkg
-sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzip
+sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzip direnv
 
 sudo pacman -S neovim lazygit proxychains-ng
 
