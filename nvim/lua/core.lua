@@ -11,6 +11,7 @@ require('pconfs.telescope')
 require('pconfs.outline')
 require('pconfs.hop')
 require('pconfs.todo-comments')
+require("pconfs.toggleterm")
 
 -- back cmd
 vim.cmd [[colorscheme moonlight]]

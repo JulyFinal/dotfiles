@@ -31,7 +31,7 @@ map("n", "<C-Up>", ":resize -2<CR>", opt)
 -- Terminal相关
 map("n", "<leader>tt", ":sp | terminal<CR>", opt)
 map("n", "<leader>vt", ":vsp | terminal<CR>", opt)
-map("t", "<Esc>", "<C-\\><C-n>", opt)
+map("t", "<Esc>", [[ <C-\><C-n> ]], opt)
 map("t", "<A-h>", [[ <C-\><C-N><C-w>h ]], opt)
 map("t", "<A-j>", [[ <C-\><C-N><C-w>j ]], opt)
 map("t", "<A-k>", [[ <C-\><C-N><C-w>k ]], opt)
@@ -58,8 +58,6 @@ map("i", "<C-b>", "<ESC>ha", opt)
 
 -- nvim-tree
 map("n", "<leader>e", ":NvimTreeToggle<CR>", opt)
-map("n", "<leader>i", "gg=G", opt)
-
 
 -- bufferline
 map("n", "ge", ":BufferLineCycleNext<cr>", opt)

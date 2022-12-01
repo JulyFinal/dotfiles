@@ -90,6 +90,8 @@ return packer.startup({ function()
       require("galaxyline.themes.eviline")
     end,
   })
+  -- terminal
+  use { "akinsho/toggleterm.nvim", tag = '*' }
 
   if packer_bootstrap then
     require('packer').sync()
