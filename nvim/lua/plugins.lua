@@ -47,8 +47,9 @@ return packer.startup({ function()
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig",
+    "jose-elias-alvarez/null-ls.nvim",
+    "jayp0521/mason-null-ls.nvim",
   }
-  use "jose-elias-alvarez/null-ls.nvim"
 
   -- cmp configs
   use 'onsails/lspkind-nvim'
