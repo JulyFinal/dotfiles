@@ -6,14 +6,13 @@ vim.g.maplocalleader = " "
 local map = vim.api.nvim_set_keymap -- 复用 opt 参数
 local opt = { noremap = true, silent = true }
 
-
 -- ESC
 map("i", "jk", "<ESC>", opt)
 -- windows 分屏快捷键
 map("n", "<leader>v", ":vsp<CR>", opt)
 map("n", "<leader>h", ":sp<CR>", opt)
 -- 关闭当前
-map("n", "<leader>x", "<C-w>c", opt)
+map("n", "<leader>x", ":bdelete!<CR>", opt)
 
 -- Save file
 map("n", "<C-s>", "<cmd> w <CR>", opt)
@@ -56,7 +55,6 @@ map("n", "<leader>e", ":NvimTreeToggle<CR>", opt)
 -- bufferline
 map("n", "ge", ":BufferLineCycleNext<cr>", opt)
 map("n", "gq", ":BufferLineCyclePrev<cr>", opt)
-
 
 map("n", "<leader>1", '<cmd>lua require("bufferline").go_to_buffer(1, true)<cr>', opt)
 map("n", "<leader>2", '<cmd>lua require("bufferline").go_to_buffer(2, true)<cr>', opt)
