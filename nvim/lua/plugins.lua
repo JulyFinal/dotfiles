@@ -1,118 +1,102 @@
-local packer = require('packer')
-
-local ensure_packer = function()
-  local fn = vim.fn
-  local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-  if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path })
-    vim.cmd [[packadd packer.nvim]]
-    return true
-  end
-  return false
+-- bootstrap lazy
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"--single-branch",
+		"https://github.com/folke/lazy.nvim.git",
+		lazypath,
+	})
 end
+vim.opt.runtimepath:prepend(lazypath)
 
-local packer_bootstrap = ensure_packer()
+-- install plugins
+local plugins = {
+	"nvim-lua/plenary.nvim",
 
-return packer.startup({ function()
-  use 'wbthomason/packer.nvim'
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		config = function()
+			require("indent_blankline").setup()
+		end,
+	},
 
-  use 'nvim-lua/plenary.nvim'
+	{
+		"windwp/nvim-autopairs",
+		config = function()
+			require("nvim-autopairs").setup()
+		end,
+	},
 
-  use {
-    "lukas-reineke/indent-blankline.nvim",
-    config = function() require("indent_blankline").setup {} end
-  }
+	{
+		"kylechui/nvim-surround",
+		config = function()
+			require("nvim-surround").setup()
+		end,
+	},
 
-  use {
-    "windwp/nvim-autopairs",
-    config = function() require("nvim-autopairs").setup {} end
-  }
+	"nvim-treesitter/nvim-treesitter",
+	"kyazdani42/nvim-web-devicons",
+	"kyazdani42/nvim-tree.lua",
 
-  use({
-    "kylechui/nvim-surround",
-    config = function()
-      require("nvim-surround").setup {}
-    end
-  })
+	-- nvim-cmp
+	"williamboman/mason.nvim",
+	"williamboman/mason-lspconfig.nvim",
+	"neovim/nvim-lspconfig",
+	"jose-elias-alvarez/null-ls.nvim",
+	"jayp0521/mason-null-ls.nvim",
 
-  -- nvim-cmp
-  -- lspkind
+	-- cmp configs
+	"onsails/lspkind-nvim",
 
-  use 'nvim-treesitter/nvim-treesitter'
+	{
+		"hrsh7th/nvim-cmp",
+		event = "InsertEnter",
+		dependencies = {
+			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip",
+			"hrsh7th/cmp-nvim-lua",
+			"hrsh7th/cmp-nvim-lsp",
+			"rafamadriz/friendly-snippets",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-path",
+		},
+	},
 
-  use 'kyazdani42/nvim-web-devicons'
-  use 'kyazdani42/nvim-tree.lua'
+	{
+		"nvim-telescope/telescope.nvim",
+		tag = "0.1.0",
+	},
 
-  use {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
-    "neovim/nvim-lspconfig",
-    "jose-elias-alvarez/null-ls.nvim",
-    "jayp0521/mason-null-ls.nvim",
-  }
+	{
+		"numToStr/Comment.nvim",
+		config = function()
+			require("Comment").setup()
+		end,
+	},
 
-  -- cmp configs
-  use 'onsails/lspkind-nvim'
-  use { 'rafamadriz/friendly-snippets', module = { "cmp", "cmp_nvim_lsp" }, event = "InsertEnter" }
-  use { "hrsh7th/nvim-cmp" }
-  use { "L3MON4D3/LuaSnip" }
-  use { "saadparwaiz1/cmp_luasnip" }
-  use { "hrsh7th/cmp-nvim-lua" }
-  use { "hrsh7th/cmp-nvim-lsp" }
-  use { "hrsh7th/cmp-buffer" }
-  use { "hrsh7th/cmp-path" }
+	"shaunsingh/moonlight.nvim",
 
-  use {
-    'nvim-telescope/telescope.nvim', tag = '0.1.0',
-  }
+	-- using packer.nvim
+	{ "akinsho/bufferline.nvim", tag = "v3.1.0" },
+	-- outline
+	"simrat39/symbols-outline.nvim",
+	-- easymotion
+	{ "phaazon/hop.nvim", branch = "v2" },
+	-- todo
+	"folke/todo-comments.nvim",
 
-  use {
-    'numToStr/Comment.nvim',
-    config = function()
-      require('Comment').setup()
-    end
-  }
+	-- line
+	{
+		"NTBBloodbath/galaxyline.nvim",
+		config = function()
+			require("galaxyline.themes.eviline")
+		end,
+	},
+	-- terminal
+	"akinsho/toggleterm.nvim",
+}
 
-  use 'shaunsingh/moonlight.nvim'
-
-  -- using packer.nvim
-  use { 'akinsho/bufferline.nvim', tag = "v2.*", }
-  -- outline
-  use "simrat39/symbols-outline.nvim"
-  -- easymotion
-  use { 'phaazon/hop.nvim', branch = 'v2' }
-  -- todo
-  use { 'folke/todo-comments.nvim' }
-
-  -- line
-  use({
-    "NTBBloodbath/galaxyline.nvim",
-    config = function()
-      require("galaxyline.themes.eviline")
-    end,
-  })
-  -- terminal
-  use { "akinsho/toggleterm.nvim", tag = '*' }
-
-  if packer_bootstrap then
-    require('packer').sync()
-  end
-end,
-  config = {
-    max_jobs = 30,
-    git = {
-      clone_timeout = 240,
-      default_url_format = "git@github.com:%s",
-      -- default_url_format = "https://hub.fastgit.xyz/%s",
-      -- default_url_format = "https://mirror.ghproxy.com/https://github.com/%s",
-    },
-    display = {
-      open_fn = function()
-        return require("packer.util").float({ border = "single" }) -- single rounded
-      end,
-      prompt_border = 'rounded'
-    },
-    auto_clean = true,
-    compile_on_sync = true,
-  }
-})
+require("lazy").setup(plugins)
