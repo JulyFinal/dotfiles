@@ -79,8 +79,7 @@ local plugins = {
 
 	"shaunsingh/moonlight.nvim",
 
-	-- using packer.nvim
-	{ "akinsho/bufferline.nvim", tag = "v3.1.0" },
+	{ "akinsho/bufferline.nvim", version = "v3.*" },
 	-- outline
 	"simrat39/symbols-outline.nvim",
 	-- easymotion
