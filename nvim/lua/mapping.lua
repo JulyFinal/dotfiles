@@ -19,7 +19,7 @@ map("n", "<C-s>", "<cmd> w <CR>", opt)
 -- exit
 map("n", "<C-q>", "<cmd> wqall! <CR>", opt)
 -- update packer
-map("n", "<leader>uu", "<cmd> PackerSync <CR>", opt)
+map("n", "<leader>uu", "<cmd> Lazy <CR>", opt)
 
 -- 比例控制
 map("n", "<C-Left>", ":vertical resize -2<CR>", opt)
