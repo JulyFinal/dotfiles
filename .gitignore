@@ -78,3 +78,9 @@ nvim/plugin/packer_compiled.lua
 syncthing
 neofetch
 *.kdl
+kmail2rc
+knfsshare
+okularpartrc
+powerdevilrc
+spectaclerc
+webengineurlinterceptoradblockrc
