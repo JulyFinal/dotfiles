@@ -76,3 +76,5 @@ thefuck
 .DS_Store
 nvim/plugin/packer_compiled.lua
 syncthing
+neofetch
+*.kdl
