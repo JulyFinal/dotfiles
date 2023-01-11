@@ -14,6 +14,16 @@ vim.opt.runtimepath:prepend(lazypath)
 
 -- install plugins
 local plugins = {
+	-- theme
+	{
+		"folke/tokyonight.nvim",
+		lazy = false, -- make sure we load this during startup if it is your main colorscheme
+		priority = 1000, -- make sure to load this before all the other start plugins
+		config = function()
+			-- load the colorscheme here
+			vim.cmd([[colorscheme tokyonight]])
+		end,
+	},
 	"nvim-lua/plenary.nvim",
 
 	{
@@ -77,8 +87,6 @@ local plugins = {
 		end,
 	},
 
-	"shaunsingh/moonlight.nvim",
-
 	{ "akinsho/bufferline.nvim", version = "v3.*" },
 	-- outline
 	"simrat39/symbols-outline.nvim",
@@ -99,6 +107,26 @@ local plugins = {
 }
 
 local opts = {
+	defaults = { lazy = true },
+	install = { colorscheme = { "tokyonight-night" } },
+	-- checker = { enabled = true },
+	change_detection = {
+		notify = false,
+	},
+	performance = {
+		rtp = {
+			disabled_plugins = {
+				"gzip",
+				"matchit",
+				"matchparen",
+				"netrwPlugin",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
+	},
 	git = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 120, -- kill processes that take more than 2 minutes
