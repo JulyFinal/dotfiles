@@ -28,6 +28,7 @@ local plugins = {
 
 	{
 		"lukas-reineke/indent-blankline.nvim",
+		lazy = false,
 		config = function()
 			require("indent_blankline").setup()
 		end,
@@ -42,6 +43,7 @@ local plugins = {
 
 	{
 		"kylechui/nvim-surround",
+		lazy = false,
 		config = function()
 			require("nvim-surround").setup()
 		end,
@@ -82,6 +84,7 @@ local plugins = {
 
 	{
 		"numToStr/Comment.nvim",
+		lazy = false,
 		config = function()
 			require("Comment").setup()
 		end,
@@ -108,7 +111,7 @@ local plugins = {
 
 local opts = {
 	defaults = { lazy = true },
-	install = { colorscheme = { "tokyonight-night" } },
+	install = { colorscheme = { "tokyonight-moon" } },
 	-- checker = { enabled = true },
 	change_detection = {
 		notify = false,
