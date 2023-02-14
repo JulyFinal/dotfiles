@@ -22,11 +22,6 @@ local on_attach = function(client, bufnr)
 	vks("n", "K", "<cmd>lua vim.lsp.buf.hover<cr>")
 	vks("n", "gi", "<cmd>lua vim.lsp.buf.implementation<cr>")
 	vks("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help<cr>")
-	vks("n", "<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder<cr>")
-	vks("n", "<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder<cr>")
-	vks("n", "<space>wl", function()
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-	end)
 	vks("n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition<cr>")
 	vks("n", "<space>rn", "<cmd>lua vim.lsp.buf.rename<cr>")
 	vks("n", "gr", "<cmd>lua vim.lsp.buf.references<cr>")
@@ -54,7 +49,7 @@ capabilities.textDocument.completion.completionItem = {
 }
 
 mason_lspconfig.setup({
-	ensure_installed = { "sumneko_lua", "pyright", "bashls" },
+	ensure_installed = { "lua_ls", "pyright", "bashls" },
 	automatic_installation = true,
 })
 
@@ -65,25 +60,26 @@ mason_lspconfig.setup_handlers({
 			capabilities = capabilities,
 		})
 	end,
-
-	["sumneko_lua"] = function()
-		lspconfig.sumneko_lua.setup({
+	["lua_ls"] = function()
+		lspconfig.lua_ls.setup({
 			settings = {
 				Lua = {
+					runtime = {
+						version = "LuaJIT",
+					},
 					diagnostics = {
 						globals = { "vim" },
 					},
 					workspace = {
-						library = {
-							[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-							[vim.fn.stdpath("config") .. "/lua"] = true,
-						},
+						library = vim.api.nvim_get_runtime_file("", true),
+					},
+					telemetry = {
+						enable = false,
 					},
 				},
 			},
 		})
 	end,
-
 	["pyright"] = function()
 		lspconfig.pyright.setup({
 			settings = {
@@ -96,8 +92,8 @@ mason_lspconfig.setup_handlers({
 			},
 		})
 	end,
-	["bash-language-server"] = function()
-		lspconfig.bashls.setup({})
+	["bashls"] = function()
+		lspconfig.bashls.setup()
 	end,
 })
 
@@ -137,11 +133,9 @@ require("mason-null-ls").setup_handlers({
 	stylua = function(source_name, methods)
 		null_ls.register(null_ls.builtins.formatting.stylua)
 	end,
-
 	black = function(source_name, methods)
 		null_ls.register(null_ls.builtins.formatting.black)
 	end,
-
 	beautysh = function(source_name, methods)
 		null_ls.register(null_ls.builtins.formatting.black)
 	end,
