@@ -4,10 +4,11 @@ local mason_lspconfig = require("mason-lspconfig")
 local lspconfig = require("lspconfig")
 
 local opts = { noremap = true, silent = true }
-vim.keymap.set("n", "<space>w", vim.diagnostic.open_float, opts)
+
+vim.keymap.set("n", "<leader>w", vim.diagnostic.open_float, opts)
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, opts)
+vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, opts)
 
 local on_attach = function(client, bufnr)
 	-- Enable completion triggered by <c-x><c-o>
@@ -17,13 +18,13 @@ local on_attach = function(client, bufnr)
 	local vks = function(mode, keys, cmd)
 		vim.keymap.set(mode, keys, cmd, opts)
 	end
-	vks("n", "gD", "<cmd>lua vim.lsp.buf.declaration<cr>")
+	vks("n", "ge", "<cmd>lua vim.lsp.buf.declaration<cr>")
 	vks("n", "gd", "<cmd>lua vim.lsp.buf.definition<cr>")
-	vks("n", "K", "<cmd>lua vim.lsp.buf.hover<cr>")
+	vks("n", "<leader>h", "<cmd>lua vim.lsp.buf.hover<cr>")
 	vks("n", "gi", "<cmd>lua vim.lsp.buf.implementation<cr>")
 	vks("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help<cr>")
-	vks("n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition<cr>")
-	vks("n", "<space>rn", "<cmd>lua vim.lsp.buf.rename<cr>")
+	vks("n", "<leader>d", "<cmd>lua vim.lsp.buf.type_definition<cr>")
+	vks("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename<cr>")
 	vks("n", "gr", "<cmd>lua vim.lsp.buf.references<cr>")
 end
 
@@ -65,14 +66,18 @@ mason_lspconfig.setup_handlers({
 			settings = {
 				Lua = {
 					runtime = {
+						-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
 						version = "LuaJIT",
 					},
 					diagnostics = {
+						-- Get the language server to recognize the `vim` global
 						globals = { "vim" },
 					},
 					workspace = {
+						-- Make the server aware of Neovim runtime files
 						library = vim.api.nvim_get_runtime_file("", true),
 					},
+					-- Do not send telemetry data containing a randomized but unique identifier
 					telemetry = {
 						enable = false,
 					},
@@ -93,7 +98,7 @@ mason_lspconfig.setup_handlers({
 		})
 	end,
 	["bashls"] = function()
-		lspconfig.bashls.setup()
+		lspconfig.bashls.setup({})
 	end,
 })
 
