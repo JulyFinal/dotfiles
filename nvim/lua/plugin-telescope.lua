@@ -6,3 +6,9 @@ map("n", "<leader>ff", builtin.find_files, {})
 map("n", "<leader>fg", builtin.live_grep, {})
 map("n", "<leader>fb", builtin.buffers, {})
 map("n", "<leader>fh", builtin.help_tags, {})
+
+local tc = require("todo-comments")
+
+tc.setup({})
+
+map("n", "<leader>ft", "<cmd> TodoTelescope <cr>", {})
