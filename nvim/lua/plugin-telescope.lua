@@ -1,14 +1,16 @@
-local builtin = require("telescope.builtin")
+return function()
+	local builtin = require("telescope.builtin")
 
-local map = vim.keymap.set -- 复用 opt 参数
+	local map = vim.keymap.set -- 复用 opt 参数
 
-map("n", "<leader>ff", builtin.find_files, {})
-map("n", "<leader>fg", builtin.live_grep, {})
-map("n", "<leader>fb", builtin.buffers, {})
-map("n", "<leader>fh", builtin.help_tags, {})
+	map("n", "<leader>ff", builtin.find_files, {})
+	map("n", "<leader>fg", builtin.live_grep, {})
+	map("n", "<leader>fb", builtin.buffers, {})
+	map("n", "<leader>fh", builtin.help_tags, {})
 
-local tc = require("todo-comments")
+	local tc = require("todo-comments")
 
-tc.setup({})
+	tc.setup({})
 
-map("n", "<leader>ft", "<cmd> TodoTelescope <cr>", {})
+	map("n", "<leader>ft", "<cmd> TodoTelescope <cr>", {})
+end

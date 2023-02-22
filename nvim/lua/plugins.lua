@@ -49,12 +49,16 @@ local plugins = {
 		end,
 	},
 
-	"nvim-treesitter/nvim-treesitter",
+	{ "nvim-treesitter/nvim-treesitter", config = require("plugin-nvim-treesitter") },
 	"kyazdani42/nvim-web-devicons",
-	"kyazdani42/nvim-tree.lua",
+	{
+		"kyazdani42/nvim-tree.lua",
+		lazy = false,
+		config = require("plugin-nvim-tree"),
+	},
 
 	-- nvim-cmp
-	"williamboman/mason.nvim",
+	{ "williamboman/mason.nvim", lazy = false, config = require("plugin-mason") },
 	-- "WhoIsSethDaniel/mason-tool-installer.nvim",
 	"williamboman/mason-lspconfig.nvim",
 	"neovim/nvim-lspconfig",
@@ -76,11 +80,14 @@ local plugins = {
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 		},
+		config = require("plugin-nvim-cmp"),
 	},
 
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.0",
+		lazy = false,
+		config = require("plugin-telescope"),
 	},
 
 	{
@@ -91,13 +98,18 @@ local plugins = {
 		end,
 	},
 
-	{ "akinsho/bufferline.nvim", version = "v3.*" },
+	{ "akinsho/bufferline.nvim", version = "v3.*", config = require("plugin-bufferline") },
 	-- outline
-	"simrat39/symbols-outline.nvim",
+	{ "simrat39/symbols-outline.nvim", config = require("plugin-outline") },
 	-- easymotion
-	{ "phaazon/hop.nvim", branch = "v2" },
+	{
+		"phaazon/hop.nvim",
+		branch = "v2",
+		lazy = false,
+		config = require("plugin-hop"),
+	},
 	-- todo
-	"folke/todo-comments.nvim",
+	{ "folke/todo-comments.nvim", event = "InsertEnter" },
 
 	-- line
 	{

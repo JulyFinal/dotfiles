@@ -1,12 +1,3 @@
 require("configs")
 require("mapping")
 require("plugins")
-
-require("plugin-mason")
-require("plugin-nvim-cmp")
-require("plugin-nvim-treesitter")
-require("plugin-nvim-tree")
-require("plugin-bufferline")
-require("plugin-telescope")
-require("plugin-outline")
-require("plugin-hop")
