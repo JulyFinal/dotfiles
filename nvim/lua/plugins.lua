@@ -23,7 +23,6 @@ local plugins = {
 			vim.cmd([[colorscheme tokyonight]])
 		end,
 	},
-	{ "nvim-lua/plenary.nvim" },
 
 	{
 		"lukas-reineke/indent-blankline.nvim",
@@ -74,7 +73,7 @@ local plugins = {
 	},
 
 	-- cmp configs
-	"onsails/lspkind-nvim",
+	{ "onsails/lspkind-nvim" },
 
 	{
 		"hrsh7th/nvim-cmp",
@@ -93,14 +92,14 @@ local plugins = {
 
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.0",
+		tag = "0.1.1",
+		dependencies = { "nvim-lua/plenary.nvim" },
 		keys = {
-			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files<cr>", desc = "find_files" },
-			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep<cr>", desc = "live_grep" },
-			{ "<leader>fb", "<cmd>lua require('telescope.builtin').buffers<cr>", desc = "buffers" },
-			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags<cr>", desc = "help_tags" },
+			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = "find_files" },
+			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = "live_grep" },
+			{ "<leader>fb", "<cmd>lua require('telescope.builtin').buffers()<cr>", desc = "buffers" },
+			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<cr>", desc = "help_tags" },
 		},
-		config = function() end,
 	},
 
 	{
@@ -128,12 +127,6 @@ local plugins = {
 		end,
 	},
 	-- easymotion
-	-- {
-	-- 	"phaazon/hop.nvim",
-	-- 	branch = "v2",
-	-- 	lazy = false,
-	-- 	config = require("plugin-hop"),
-	-- },
 	{
 		"ggandor/flit.nvim",
 		dependencies = { "ggandor/leap.nvim" },
@@ -144,9 +137,10 @@ local plugins = {
 	-- todo
 	{
 		"folke/todo-comments.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim" },
 		keys = { { "<leader>ft", "<cmd> TodoTelescope <cr>", desc = "TodoTelescope" } },
 		config = function()
-			require("todo-comments").setup({})
+			require("todo-comments").setup()
 		end,
 	},
 
