@@ -14,7 +14,7 @@ return function()
 			null_ls.register(null_ls.builtins.formatting.black)
 		end,
 		beautysh = function(source_name, methods)
-			null_ls.register(null_ls.builtins.formatting.black)
+			null_ls.register(null_ls.builtins.formatting.beautysh)
 		end,
 	})
 
