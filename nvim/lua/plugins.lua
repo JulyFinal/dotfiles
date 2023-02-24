@@ -17,18 +17,18 @@ local plugins = {
 	-- theme
 	{
 		"folke/tokyonight.nvim",
-		lazy = false, -- make sure we load this during startup if it is your main colorscheme
-		priority = 1000, -- make sure to load this before all the other start plugins
+		lazy = false,
+		priority = 1000,
 		config = function()
-			-- load the colorscheme here
 			vim.cmd([[colorscheme tokyonight]])
 		end,
 	},
-	"nvim-lua/plenary.nvim",
+	{ "nvim-lua/plenary.nvim" },
 
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		lazy = false,
+		priority = 1000,
 		config = function()
 			require("indent_blankline").setup()
 		end,
@@ -50,20 +50,28 @@ local plugins = {
 	},
 
 	{ "nvim-treesitter/nvim-treesitter", config = require("plugin-nvim-treesitter") },
-	"kyazdani42/nvim-web-devicons",
+
 	{
 		"kyazdani42/nvim-tree.lua",
-		lazy = false,
+		dependencies = { "kyazdani42/nvim-web-devicons" },
+		keys = { { "<leader>e", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" } },
 		config = require("plugin-nvim-tree"),
 	},
 
 	-- nvim-cmp
-	{ "williamboman/mason.nvim", lazy = false, config = require("plugin-mason") },
-	-- "WhoIsSethDaniel/mason-tool-installer.nvim",
-	"williamboman/mason-lspconfig.nvim",
-	"neovim/nvim-lspconfig",
-	"jose-elias-alvarez/null-ls.nvim",
-	"jayp0521/mason-null-ls.nvim",
+	{
+		"williamboman/mason.nvim",
+		lazy = false,
+		config = require("plugin-mason"),
+	},
+	{ "williamboman/mason-lspconfig.nvim", dependencies = { "neovim/nvim-lspconfig" } },
+
+	{
+		"jayp0521/mason-null-ls.nvim",
+		dependencies = { "jose-elias-alvarez/null-ls.nvim" },
+		event = "InsertEnter",
+		config = require("plugin-null-ls"),
+	},
 
 	-- cmp configs
 	"onsails/lspkind-nvim",
@@ -86,30 +94,61 @@ local plugins = {
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.0",
-		lazy = false,
-		config = require("plugin-telescope"),
+		keys = {
+			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files<cr>", desc = "find_files" },
+			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep<cr>", desc = "live_grep" },
+			{ "<leader>fb", "<cmd>lua require('telescope.builtin').buffers<cr>", desc = "buffers" },
+			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags<cr>", desc = "help_tags" },
+		},
+		config = function() end,
 	},
 
 	{
 		"numToStr/Comment.nvim",
 		lazy = false,
+		priority = 1000,
 		config = function()
 			require("Comment").setup()
 		end,
 	},
 
-	{ "akinsho/bufferline.nvim", version = "v3.*", config = require("plugin-bufferline") },
-	-- outline
-	{ "simrat39/symbols-outline.nvim", config = require("plugin-outline") },
-	-- easymotion
 	{
-		"phaazon/hop.nvim",
-		branch = "v2",
+		"akinsho/bufferline.nvim",
+		version = "v3.*",
 		lazy = false,
-		config = require("plugin-hop"),
+		priority = 100,
+		config = require("plugin-bufferline"),
+	},
+	-- outline
+	{
+		"simrat39/symbols-outline.nvim",
+		keys = { { "<leader>l", "<cmd>SymbolsOutline<CR>", desc = "SymbolsOutline" } },
+		config = function()
+			require("symbols-outline").setup({ { width = 10 } })
+		end,
+	},
+	-- easymotion
+	-- {
+	-- 	"phaazon/hop.nvim",
+	-- 	branch = "v2",
+	-- 	lazy = false,
+	-- 	config = require("plugin-hop"),
+	-- },
+	{
+		"ggandor/flit.nvim",
+		dependencies = { "ggandor/leap.nvim" },
+		lazy = false,
+		priority = 100,
+		config = require("plugin-flit"),
 	},
 	-- todo
-	{ "folke/todo-comments.nvim", event = "InsertEnter" },
+	{
+		"folke/todo-comments.nvim",
+		keys = { { "<leader>ft", "<cmd> TodoTelescope <cr>", desc = "TodoTelescope" } },
+		config = function()
+			require("todo-comments").setup({})
+		end,
+	},
 
 	-- line
 	{

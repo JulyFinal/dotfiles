@@ -49,9 +49,6 @@ map("i", "<C-p>", "<ESC>ka", opt)
 map("i", "<C-f>", "<ESC>la", opt)
 map("i", "<C-b>", "<ESC>ha", opt)
 
--- nvim-tree
-map("n", "<leader>e", ":NvimTreeToggle<CR>", opt)
-
 -- bufferline
 map("n", "ge", ":BufferLineCycleNext<cr>", opt)
 map("n", "gq", ":BufferLineCyclePrev<cr>", opt)
