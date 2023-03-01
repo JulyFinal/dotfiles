@@ -81,11 +81,13 @@ local plugins = {
 		dependencies = {
 			"L3MON4D3/LuaSnip",
 			"saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-nvim-lua",
-			"hrsh7th/cmp-nvim-lsp",
+
+			-- "hrsh7th/cmp-nvim-lua",
+			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
+			"hrsh7th/cmp-buffer", -- { name = 'buffer' },
+			"hrsh7th/cmp-path", -- { name = 'path' }
+			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
 			"rafamadriz/friendly-snippets",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
 		},
 		config = require("plugin-nvim-cmp"),
 	},

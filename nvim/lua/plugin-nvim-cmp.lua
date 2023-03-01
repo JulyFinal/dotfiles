@@ -80,11 +80,32 @@ return function()
 		},
 		-- 来源
 		sources = cmp.config.sources({
-			{ name = "luasnip" },
 			{ name = "nvim_lsp" },
+			{ name = "luasnip" },
+			-- { name = "path" },
+		}, {
 			{ name = "buffer" },
-			{ name = "nvim_lua" },
 			{ name = "path" },
-		}, { { name = "buffer" }, { name = "path" } }),
+		}),
 	})
+
+	-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+	cmp.setup.cmdline({ "/", "?" }, {
+		mapping = cmp.mapping.preset.cmdline(),
+		sources = {
+			{ name = "buffer" },
+		},
+	})
+
+	-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+	cmp.setup.cmdline(":", {
+		mapping = cmp.mapping.preset.cmdline(),
+		sources = cmp.config.sources({
+			{ name = "path" },
+		}, {
+			{ name = "cmdline" },
+		}),
+	})
+
+	require("luasnip/loaders/from_vscode").lazy_load()
 end
