@@ -16,3 +16,4 @@ sudo pacman -S zip unzip
 # yay -S clash-for-windows-bin
 
 # yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
+#
