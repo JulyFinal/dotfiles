@@ -1,4 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/sh
+
+[ "${SHELL##/*/}" != "zsh" ] && echo 'You might need to change default shell to zsh: `chsh -s /bin/zsh`'
+
+dir="$HOME"
+
+git clone https://github.com/JulyFinal/dotfiles.git
+# git clone git@github.com:JulyFinal/dotfiles.git
 
 git clone git@github.com:zsh-users/zsh-autosuggestions $HOME/.zsh/zsh-autosuggestions
 git clone git@github.com:zdharma-continuum/fast-syntax-highlighting $HOME/.zsh/fsh
@@ -8,12 +15,11 @@ cargo install starship
 
 ## install base pkg
 sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzip direnv
-
 sudo pacman -S neovim lazygit proxychains-ng
-
 sudo pacman -S zip unzip
-
 # yay -S clash-for-windows-bin
-
 # yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
-#
+
+cd dotfiles
+
+sh symlink-dotfiles.sh
