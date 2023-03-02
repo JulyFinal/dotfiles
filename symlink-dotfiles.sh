@@ -34,6 +34,7 @@ link() {
 #     link "$dotfiles/home/$name" "$HOME/$name"
 # done
 link "$dotfiles/home/zshrc" "$HOME/.zshrc"
+link "$dotfiles/home/ideavimrc" "$HOME/.ideavimrc"
 
 for name in `ls config`; do
     link "$dotfiles/config/$name" "$config/$name"
