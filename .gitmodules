@@ -2,7 +2,7 @@
   path = config/alacritty/catppuccin
   url = https://github.com/catppuccin/alacritty.git
 
-[submodule "tmux/catppuccin"]
+[submodule "tmux/tpm"]
   path = config/tmux/plugins/tpm
   url = https://github.com/tmux-plugins/tpm.git
 
