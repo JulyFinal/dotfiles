@@ -1,0 +1,4 @@
+[submodule "alacritty/catppuccin"]
+  path = config/alacritty/catppuccin
+  url = https://github.com/catppuccin/alacritty.git
+
