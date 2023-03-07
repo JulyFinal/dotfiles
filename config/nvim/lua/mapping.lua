@@ -50,9 +50,6 @@ map("i", "<C-f>", "<ESC>la", opt)
 map("i", "<C-b>", "<ESC>ha", opt)
 
 -- bufferline
-map("n", "ge", ":BufferLineCycleNext<cr>", opt)
-map("n", "gq", ":BufferLineCyclePrev<cr>", opt)
-
 map("n", "<leader>1", '<cmd>lua require("bufferline").go_to_buffer(1, true)<cr>', opt)
 map("n", "<leader>2", '<cmd>lua require("bufferline").go_to_buffer(2, true)<cr>', opt)
 map("n", "<leader>3", '<cmd>lua require("bufferline").go_to_buffer(3, true)<cr>', opt)

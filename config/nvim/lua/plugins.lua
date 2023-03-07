@@ -168,12 +168,13 @@ local plugins = {
 		end,
 	},
 
-	-- line
+	-- statusline
 	{
-		"NTBBloodbath/galaxyline.nvim",
-		config = function()
-			require("galaxyline.themes.eviline")
-		end,
+		"nvim-lualine/lualine.nvim",
+		lazy = false,
+		priority = 1000,
+		dependencies = { "kyazdani42/nvim-web-devicons" },
+		config = require("plugin-lualine"),
 	},
 }
 
