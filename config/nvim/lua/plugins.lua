@@ -168,18 +168,6 @@ local plugins = {
 		end,
 	},
 
-	-- cmd
-	{
-		"folke/noice.nvim",
-		lazy = false,
-		priority = 1000,
-		dependencies = {
-			"MunifTanjim/nui.nvim",
-			"rcarriga/nvim-notify",
-		},
-		config = require("plugin-noice"),
-	},
-
 	-- line
 	{
 		"NTBBloodbath/galaxyline.nvim",
