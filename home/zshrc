@@ -35,8 +35,14 @@ alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY S
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
 alias pp="export PYTHONPATH=$(pwd)"
-alias tree="lsd --tree"
-alias cat='bat -pp --theme="Nord"'
+
+if command -v lsd >/dev/null 2>&1; then
+    alias tree="lsd --tree"
+fi
+
+if command -v bat >/dev/null 2>&1; then
+    alias cat='bat -pp --theme="Nord"'
+fi
 
 # fzf theme
 export FZF_DEFAULT_OPTS=" \
@@ -47,14 +53,14 @@ export FZF_DEFAULT_OPTS=" \
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/final/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('~/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/home/final/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "/home/final/miniforge3/etc/profile.d/conda.sh"
+    if [ -f "~/miniforge3/etc/profile.d/conda.sh" ]; then
+        . "~/miniforge3/etc/profile.d/conda.sh"
     else
-        export PATH="/home/final/miniforge3/bin:$PATH"
+        export PATH="~/miniforge3/bin:$PATH"
     fi
 fi
 unset __conda_setup
