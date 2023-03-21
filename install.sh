@@ -10,6 +10,9 @@ git clone https://github.com/JulyFinal/dotfiles.git
 git clone git@github.com:zsh-users/zsh-autosuggestions $HOME/.zsh/zsh-autosuggestions
 git clone git@github.com:zdharma-continuum/fast-syntax-highlighting $HOME/.zsh/fsh
 git clone git@github.com:zsh-users/zsh-completions $HOME/.zsh/zsh-completions
+# git clone https://ghproxy.com/https://github.com/zsh-users/zsh-autosuggestions.git $HOME/.zsh/zsh-autosuggestions
+# git clone https://ghproxy.com/https://github.com/fast-syntax-highlighting $HOME/.zsh/fsh
+# git clone https://ghproxy.com/https://github.com/zsh-completions $HOME/.zsh/zsh-completions
 
 cargo install starship
 
