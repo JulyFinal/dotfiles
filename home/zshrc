@@ -1,5 +1,4 @@
 # My zsh config
-
 if [ -e /home/final/.nix-profile/etc/profile.d/nix.sh ]; then . /home/final/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 if [ -d "$HOME/.local/bin" ] ; then
@@ -15,10 +14,6 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
 
-# source plugins
-source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $HOME/.zsh/fsh/fast-syntax-highlighting.plugin.zsh
-source $HOME/.zsh/zsh-completions/zsh-completions.plugin.zsh
 
 # zsh config
 HISTFILE=~/.histfile
@@ -95,3 +90,8 @@ ex ()
         echo "'$1' is not a valid file"
     fi
 }
+
+# source plugins
+source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOME/.zsh/fsh/fast-syntax-highlighting.plugin.zsh
+source $HOME/.zsh/zsh-completions/zsh-completions.plugin.zsh
