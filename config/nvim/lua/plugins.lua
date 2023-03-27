@@ -203,7 +203,7 @@ local opts = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 120, -- kill processes that take more than 2 minutes
 		-- url_format = "https://github.com/%s.git",
-		url_format = "git@github.com:%s",
+		-- url_format = "git@github.com:%s",
 		-- url_format = "https://hub.fastgit.xyz/%s",
 		-- url_format = "https://ghproxy.com/https://github.com/%s",
 	},
