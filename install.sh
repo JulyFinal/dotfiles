@@ -6,6 +6,8 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
 cargo install starship
 
+# if git is fail
+# git config --global url."https://ghproxy.com/https://github.com".insteadOf "https://github.com"
 git clone https://github.com/JulyFinal/dotfiles.git
 # git clone git@github.com:JulyFinal/dotfiles.git
 

@@ -22,6 +22,7 @@ SAVEHIST=1000
 bindkey -e
 
 
+# custom alias
 alias vi="nvim"
 alias pc4="proxychains4"
 alias setproxy="export ALL_PROXY=socks5://finalserver:7890; echo 'SET PROXY SUCCESS!!!'"
@@ -29,6 +30,10 @@ alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY S
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
 alias pp="export PYTHONPATH=$(pwd)"
+alias ll="ls -l"
+alias la="ls -al"
+alias h5="head -n 5"
+alias h10="head -n 10"
 
 if command -v fzf >/dev/null 2>&1; then
     # fzf theme
