@@ -46,7 +46,7 @@ return function()
 		-- 指定 snippet 引擎
 		snippet = {
 			expand = function(args)
-				require("luasnip").lsp_expand(args.body)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
 			end,
 		},
 		formatting = {

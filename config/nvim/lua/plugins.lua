@@ -68,8 +68,11 @@ local plugins = {
 
 	{
 		"jayp0521/mason-null-ls.nvim",
-		dependencies = { "jose-elias-alvarez/null-ls.nvim" },
-		event = "InsertEnter",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			"williamboman/mason.nvim",
+			"jose-elias-alvarez/null-ls.nvim",
+		},
 		config = require("plugin-null-ls"),
 	},
 
@@ -80,8 +83,8 @@ local plugins = {
 		dependencies = {
 			"onsails/lspkind-nvim",
 
-      "hrsh7th/cmp-vsnip",
-      "hrsh7th/vim-vsnip",
+			"hrsh7th/cmp-vsnip",
+			"hrsh7th/vim-vsnip",
 
 			-- "hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
@@ -202,8 +205,8 @@ local opts = {
 	git = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 120, -- kill processes that take more than 2 minutes
-		-- url_format = "https://github.com/%s.git",
-		url_format = "git@github.com:%s",
+		url_format = "https://github.com/%s.git",
+		-- url_format = "git@github.com:%s",
 		-- url_format = "https://hub.fastgit.xyz/%s",
 		-- url_format = "https://ghproxy.com/https://github.com/%s",
 	},
