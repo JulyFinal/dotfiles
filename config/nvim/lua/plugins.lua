@@ -80,8 +80,8 @@ local plugins = {
 		dependencies = {
 			"onsails/lspkind-nvim",
 
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-vsnip",
+      "hrsh7th/vim-vsnip",
 
 			-- "hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
