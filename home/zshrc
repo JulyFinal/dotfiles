@@ -36,7 +36,7 @@ alias h5="head -n 5"
 alias h10="head -n 10"
 
 # >>> git command >>>
-alias gitmoinit = "git submodule update --init --recursive"
+alias gitmoinit="git submodule update --init --recursive"
 
 
 if command -v fzf >/dev/null 2>&1; then
