@@ -32,9 +32,12 @@ alias av="source .venv/bin/activate"
 alias pp="export PYTHONPATH=$(pwd)"
 alias ll="ls -l"
 alias la="ls -al"
+
+# custom
 alias h5="head -n 5"
 alias h10="head -n 10"
 alias du="du -sh"
+alias w="watch -n"
 
 # >>> git command >>>
 alias gitmoinit="git submodule update --init --recursive"
