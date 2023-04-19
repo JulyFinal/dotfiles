@@ -127,3 +127,7 @@ opt.pumheight = 10
 opt.showtabline = 1
 -- 使用增强状态栏插件后不再需要 vim 的模式提示
 opt.showmode = false
+
+-- nvim-tree-config
+g.loaded_netrw = 1
+g.loaded_netrwPlugin = 1
