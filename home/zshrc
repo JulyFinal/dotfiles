@@ -30,14 +30,15 @@ alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY S
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
 alias pp="export PYTHONPATH=$(pwd)"
-alias ll="ls -l"
+alias l="ls -l"
 alias la="ls -al"
-
-# custom
 alias h5="head -n 5"
 alias h10="head -n 10"
 alias du="du -sh"
 alias w="watch -n"
+alias tf="tail -f"
+alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
+alias preview="fzf --preview 'bat --color \"always\" {}'"
 
 # >>> git command >>>
 alias gitmoinit="git submodule update --init --recursive"
@@ -103,6 +104,8 @@ ex ()
         echo "'$1' is not a valid file"
     fi
 }
+## 天气
+weather() { curl -s --connect-timeout 3 -m 5 http://wttr.in/$1; }
 
 # source plugins
 source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
