@@ -30,7 +30,7 @@ alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY S
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
 alias penv="export PYTHONPATH=$(pwd)"
-alias pipcn="pip -i https://pypi.tuna.tsinghua.edu.cn/simple"
+alias pipcn='pip install -i https://pypi.tuna.tsinghua.edu.cn/simple'
 alias l="ls -l"
 alias la="ls -al"
 alias h5="head -n 5"
