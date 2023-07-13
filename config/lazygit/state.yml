@@ -1,6 +1,7 @@
 lastupdatecheck: 0
 recentrepos:
 - /home/final/dotfiles
+- /home/final/dotfiles/config/alacritty/catppuccin
 - /home/final/workspace/intelligent-bidding
 - /home/final/workspace/intelligent-bidding/models/m3e-base
 - /home/final/workspace/gw
