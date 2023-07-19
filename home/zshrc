@@ -44,7 +44,7 @@ alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
 
 
 # >>> git command >>>
-alias gitmoinit="git submodule update --init --recursive"
+alias gitsubinit="git submodule update --init --recursive"
 
 
 if command -v fzf >/dev/null 2>&1; then
