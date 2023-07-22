@@ -72,14 +72,14 @@ fi
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('~/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/final/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "~/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "~/miniforge3/etc/profile.d/conda.sh"
+    if [ -f "/home/final/miniforge3/etc/profile.d/conda.sh" ]; then
+        . "/home/final/miniforge3/etc/profile.d/conda.sh"
     else
-        export PATH="~/miniforge3/bin:$PATH"
+        export PATH="/home/final/miniforge3/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -87,7 +87,7 @@ unset __conda_setup
 
 # custom command
 ## 解压缩
-ex ()
+ex()
 {
     if [ -f $1 ] ; then
         case $1 in
@@ -120,10 +120,17 @@ source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 source $HOME/.zsh/zsh-completions/zsh-completions.plugin.zsh
 
-# >>> cude config >>>
-#
-if [ -d "/usr/local/cuda-11.6" ] ; then
-    export PATH=/usr/local/cuda-11.6/bin${PATH:+:${PATH}}
-    export LD_LIBRARY_PATH=/usr/local/cuda-11.6/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+# >>> cuda config >>>
+
+
+if [ -d "/usr/local/cuda-12.2" ] ; then
+    export PATH=/usr/local/cuda-12.2/bin${PATH:+:${PATH}}
+    export LD_LIBRARY_PATH=/usr/local/cuda-12.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 fi
-# <<< cude config <<<
+
+if [ -d "/usr/local/cuda-11.6" ] ; then
+    export path=/usr/local/cuda-11.6/bin${path:+:${path}}
+    export ld_library_path=/usr/local/cuda-11.6/lib64${ld_library_path:+:${ld_library_path}}
+fi
+
+# <<< cuda config <<<
