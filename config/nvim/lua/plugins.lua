@@ -108,7 +108,7 @@ local plugins = {
 		keys = {
 			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = "find_files" },
 			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = "live_grep" },
-			{ "<leader>fb", "<cmd>lua require('telescope.builtin').buffers()<cr>", desc = "buffers" },
+			{ "<leader>b", "<cmd>lua require('telescope.builtin').buffers()<cr>", desc = "buffers" },
 			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<cr>", desc = "help_tags" },
 		},
 	},
