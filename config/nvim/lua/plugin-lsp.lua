@@ -12,19 +12,19 @@ return function()
 			vim.keymap.set(mode, keys, cmd, opts)
 		end
 
-    vks('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
-    vks('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>')
-    vks('n', 'gr', '<cmd>Telescope lsp_references<CR>')
-    vks('n', 'gd', '<cmd>Telescope lsp_definitions<CR>')
-    vks('n', 'gi', '<cmd>Telescope lsp_implementations<CR>')
-    vks('n', 'gt', '<cmd>Telescope lsp_type_definitions<CR>')
-    vks('n', '<leader>rn', vim.lsp.buf.rename)
-    vks('n', '<leader>ca', vim.lsp.buf.code_action)
+		vks("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
+		vks("n", "K", "<Cmd>lua vim.lsp.buf.hover()<CR>")
+		vks("n", "gr", require("telescope.builtin").lsp_references({}))
+		vks("n", "gd", require("telescope.builtin").lsp_definitions({}))
+		vks("n", "gi", require("telescope.builtin").lsp_implementations({}))
+		vks("n", "gt", require("telescope.builtin").lsp_type_definitions({}))
+		vks("n", "<leader>cr", vim.lsp.buf.rename)
+		vks("n", "<leader>ca", vim.lsp.buf.code_action)
 
-    vks('n', '[d', vim.diagnostic.goto_prev)
-    vks('n', ']d', vim.diagnostic.goto_next)
-    vks('n', '[e', vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR }))
-    vks('n', ']e', vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR }))
+		vks("n", "[d", vim.diagnostic.goto_prev)
+		vks("n", "]d", vim.diagnostic.goto_next)
+		vks("n", "[e", vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR }))
+		vks("n", "]e", vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR }))
 	end
 
 	-- Set up lspconfig.

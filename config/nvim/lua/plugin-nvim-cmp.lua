@@ -1,27 +1,27 @@
 return function()
-	local lspkind = require("lspkind")
+  local lspkind = require("lspkind")
 
-	local present, cmp = pcall(require, "cmp")
-	local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+  local present, cmp = pcall(require, "cmp")
+  local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 
-	if not present then
-		return
-	end
+  if not present then
+    return
+  end
 
-	local function border(hl_name)
-		return {
-			{ "╭", hl_name },
-			{ "─", hl_name },
-			{ "╮", hl_name },
-			{ "│", hl_name },
-			{ "╯", hl_name },
-			{ "─", hl_name },
-			{ "╰", hl_name },
-			{ "│", hl_name },
-		}
-	end
+  local function border(hl_name)
+    return {
+      { "╭", hl_name },
+      { "─", hl_name },
+      { "╮", hl_name },
+      { "│", hl_name },
+      { "╯", hl_name },
+      { "─", hl_name },
+      { "╰", hl_name },
+      { "│", hl_name },
+    }
+  end
 
-	cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+  cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 
   local has_words_before = function()
     unpack = unpack or table.unpack
@@ -33,39 +33,40 @@ return function()
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
   end
 
-	cmp.setup({
-		window = {
-			completion = {
-				border = border("CmpBorder"),
-				winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
-			},
-			documentation = {
-				border = border("CmpDocBorder"),
-			},
-		},
-		-- 指定 snippet 引擎
-		snippet = {
-			expand = function(args)
+  cmp.setup({
+    window = {
+      completion = {
+        border = border("CmpBorder"),
+        winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
+      },
+      documentation = {
+        border = border("CmpDocBorder"),
+      },
+    },
+    -- 指定 snippet 引擎
+    snippet = {
+      expand = function(args)
         vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-			end,
-		},
-		formatting = {
-			format = lspkind.cmp_format({
-				with_text = true, -- do not show text alongside icons
-				before = function(entry, vim_item)
-					vim_item.menu = "[" .. string.upper(entry.source.name) .. "]"
-					return vim_item
-				end,
-			}),
-		},
-		mapping = {
-			["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
-			["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
+      end,
+    },
+    formatting = {
+      format = lspkind.cmp_format({
+        with_text = true, -- do not show text alongside icons
+        before = function(entry, vim_item)
+          vim_item.menu = "[" .. string.upper(entry.source.name) .. "]"
+          return vim_item
+        end,
+      }),
+    },
+    mapping = {
+      ["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
+      ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
 
-			["<CR>"] = cmp.mapping.confirm({
-				behavior = cmp.ConfirmBehavior.Replace,
-				select = false,
-			}),
+      ["<CR>"] = cmp.mapping.confirm({
+        behavior = cmp.ConfirmBehavior.Replace,
+        select = false,
+      }),
+
       ["<Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
@@ -85,33 +86,32 @@ return function()
           feedkey("<Plug>(vsnip-jump-prev)", "")
         end
       end, { "i", "s" }),
-		},
-		-- 来源
-		sources = cmp.config.sources({
-			{ name = "nvim_lsp" },
-			{ name = "vsnip" },
-		}, {
-			{ name = "buffer" },
-			{ name = "path" },
-		}),
-	})
+    },
+    -- 来源
+    sources = cmp.config.sources({
+      { name = "nvim_lsp" },
+      { name = "vsnip" },
+    }, {
+      { name = "buffer" },
+      { name = "path" },
+    }),
+  })
 
-	-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-	cmp.setup.cmdline({ "/", "?" }, {
-		mapping = cmp.mapping.preset.cmdline(),
-		sources = {
-			{ name = "buffer" },
-		},
-	})
+  -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline({ "/", "?" }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = "buffer" },
+    },
+  })
 
-	-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-	cmp.setup.cmdline(":", {
-		mapping = cmp.mapping.preset.cmdline(),
-		sources = cmp.config.sources({
-			{ name = "path" },
-		}, {
-			{ name = "cmdline" },
-		}),
-	})
-
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(":", {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = "path" },
+    }, {
+      { name = "cmdline" },
+    }),
+  })
 end
