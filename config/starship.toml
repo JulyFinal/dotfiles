@@ -6,7 +6,7 @@ palette = "catppuccin_macchiato"
 # success_symbol = "[[♥](green) ❯](maroon)"
 # success_symbol = "[[](green) ❯](maroon)"
 # success_symbol = "[[](green) ❯](maroon)"
-success_symbol = "[[](green) ❯](maroon)"
+success_symbol = "[❯](maroon)"
 error_symbol = "[❯](red)"
 vicmd_symbol = "[❮](green)"
 
