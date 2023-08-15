@@ -97,6 +97,18 @@ local plugins = {
 	},
 
 	{
+		"folke/neodev.nvim",
+		event = "InsertEnter",
+		dependencies = {
+			"hrsh7th/nvim-cmp",
+		},
+		opts = {},
+		config = function()
+			require("neodev").setup()
+		end,
+	},
+
+	{
 		"lewis6991/gitsigns.nvim",
 		event = "InsertEnter",
 		config = require("plugin-gitsigns"),

@@ -16,8 +16,6 @@ map("n", "<leader>x", ":bdelete!<CR>", opt)
 
 -- Save file
 map("n", "<C-s>", "<cmd> w <CR>", opt)
--- exit
-map("n", "q", "<cmd> wqall! <CR>", opt)
 -- update packer
 map("n", "<leader>uu", "<cmd> Lazy <CR>", opt)
 
