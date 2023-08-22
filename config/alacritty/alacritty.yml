@@ -29,8 +29,6 @@ shell:
   program: /bin/zsh
   args:
     - -l
-    # - -c
-    # - 'zellij attach --index 0 --create'
 
 scrolling:
   # 历史保留行数

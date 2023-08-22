@@ -2,9 +2,9 @@
   path = config/alacritty/catppuccin
   url = https://github.com/catppuccin/alacritty.git
 
-[submodule "tmux/tpm"]
-  path = config/tmux/plugins/tpm
-  url = https://github.com/tmux-plugins/tpm.git
+; [submodule "tmux/tpm"]
+;   path = config/tmux/plugins/tpm
+;   url = https://github.com/tmux-plugins/tpm.git
 
 [submodule "zsh/zsh-autosuggestions"]
   path = home/zsh/zsh-autosuggestions
