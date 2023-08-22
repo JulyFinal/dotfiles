@@ -3,6 +3,32 @@ return function()
 
 	local lspconfig = require("lspconfig")
 
+	local neodev = require("neodev")
+
+	neodev.setup({
+		library = {
+			enabled = true, -- when not enabled, neodev will not change any settings to the LSP server
+			-- these settings will be used for your Neovim config directory
+			runtime = true, -- runtime path
+			types = true, -- full signature, docs and completion of vim.api, vim.treesitter, vim.lsp and others
+			plugins = true, -- installed opt or start plugins in packpath
+			-- you can also specify the list of plugins to make available as a workspace library
+			-- plugins = { "nvim-treesitter", "plenary.nvim", "telescope.nvim" },
+		},
+		setup_jsonls = true, -- configures jsonls to provide completion for project specific .luarc.json files
+		-- for your Neovim config directory, the config.library settings will be used as is
+		-- for plugin directories (root_dirs having a /lua directory), config.library.plugins will be disabled
+		-- for any other directory, config.library.enabled will be set to false
+		override = function(root_dir, options) end,
+		-- With lspconfig, Neodev will automatically setup your lua-language-server
+		-- If you disable this, then you have to set {before_init=require("neodev.lsp").before_init}
+		-- in your lsp start options
+		lspconfig = true,
+		-- much faster, but needs a recent built of lua-language-server
+		-- needs lua-language-server >= 3.6.0
+		pathStrict = true,
+	})
+
 	local on_attach = function(client, bufnr)
 		-- Enable completion triggered by <c-x><c-o>
 		vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
@@ -51,10 +77,15 @@ return function()
 	local servers = {
 		["pyright"] = {
 			python = {
+				filetypes = { "python" },
 				analysis = {
 					-- Disable strict type checking
+					autoSearchPaths = true,
+					diagnosticMode = "workspace",
 					typeCheckingMode = "basic",
+					useLibraryCodeForTypes = true,
 				},
+				single_file_support = true,
 			},
 		},
 		["bashls"] = {
@@ -84,6 +115,14 @@ return function()
 			capabilities = capabilities,
 			settings = settings,
 		})
+
+		-- vim.lsp.start({
+		-- 	name = lsp,
+		-- 	cmd = { lsp },
+		-- 	before_init = require("neodev.lsp").before_init,
+		-- 	root_dir = vim.fn.getcwd(),
+		-- 	settings = settings,
+		-- })
 	end
 
 	local sign = function(opts)

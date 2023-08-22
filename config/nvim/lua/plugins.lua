@@ -59,9 +59,12 @@ local plugins = {
 
 	{
 		"neovim/nvim-lspconfig",
-		event = "InsertEnter",
+		-- event = "InsertEnter",
+		lazy = false,
+		priority = 2000,
 		dependencies = {
 			"williamboman/mason.nvim",
+			"folke/neodev.nvim",
 		},
 		config = require("plugin-lsp"),
 	},
@@ -91,21 +94,10 @@ local plugins = {
 			"hrsh7th/cmp-buffer", -- { name = 'buffer' },
 			"hrsh7th/cmp-path", -- { name = 'path' }
 			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
+
 			"rafamadriz/friendly-snippets",
 		},
 		config = require("plugin-nvim-cmp"),
-	},
-
-	{
-		"folke/neodev.nvim",
-		event = "InsertEnter",
-		dependencies = {
-			"hrsh7th/nvim-cmp",
-		},
-		opts = {},
-		config = function()
-			require("neodev").setup()
-		end,
 	},
 
 	{
