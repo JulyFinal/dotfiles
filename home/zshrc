@@ -24,6 +24,7 @@ bindkey -e
 
 # custom alias
 alias vi="nvim"
+alias t="tmux a -t 0"
 alias pc4="proxychains4"
 alias setproxy="export ALL_PROXY=socks5://finalserver:7890; echo 'SET PROXY SUCCESS!!!'"
 alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY SUCCESS!!!'"
