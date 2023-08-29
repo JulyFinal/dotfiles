@@ -58,6 +58,7 @@ return function()
 				end,
 			}),
 		},
+
 		mapping = {
 			["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
 			["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),

@@ -70,13 +70,9 @@ local plugins = {
 	},
 
 	{
-		"jayp0521/mason-null-ls.nvim",
+		"nvimdev/guard.nvim",
 		event = { "BufReadPre", "BufNewFile" },
-		dependencies = {
-			"williamboman/mason.nvim",
-			"jose-elias-alvarez/null-ls.nvim",
-		},
-		config = require("plugin-null-ls"),
+		config = require("plugin-format"),
 	},
 
 	-- cmp configs
@@ -98,6 +94,14 @@ local plugins = {
 			"rafamadriz/friendly-snippets",
 		},
 		config = require("plugin-nvim-cmp"),
+	},
+
+	{
+		"L3MON4D3/LuaSnip",
+		-- follow latest release.
+		version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+		-- install jsregexp (optional!).
+		build = "make install_jsregexp",
 	},
 
 	{

@@ -4,6 +4,11 @@ sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzi
 sudo pacman -S neovim lazygit proxychains-ng
 sudo pacman -S zip unzip
 
-git clone https://aur.archlinux.org/paru.git && cd paru &&makepkg -si
+# install paru
+git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si
+
+## SSH
 paru -S clash-for-windows-bin
+
+# WPS
 # paru -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
