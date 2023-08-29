@@ -149,6 +149,11 @@ local plugins = {
 		event = "VeryLazy",
 		---@type Flash.Config
 		opts = {
+			label = {
+				rainbow = {
+					enabled = true,
+				},
+			},
 			modes = {
 				char = { enabled = false },
 			},
