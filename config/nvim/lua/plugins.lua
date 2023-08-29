@@ -75,6 +75,16 @@ local plugins = {
 		config = require("plugin-format"),
 	},
 
+	{
+		"L3MON4D3/LuaSnip",
+		-- follow latest release.
+		version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+		-- install jsregexp (optional!).
+		dependencies = {
+			"rafamadriz/friendly-snippets",
+		},
+		build = "make install_jsregexp",
+	},
 	-- cmp configs
 	{
 		"hrsh7th/nvim-cmp",
@@ -82,26 +92,19 @@ local plugins = {
 		dependencies = {
 			"onsails/lspkind-nvim",
 
-			"hrsh7th/cmp-vsnip",
-			"hrsh7th/vim-vsnip",
+			-- "hrsh7th/cmp-vsnip",
+			-- "hrsh7th/vim-vsnip",
+
+			-- For luasnip users.
+			"L3MON4D3/LuaSnip", -- { name = 'luasnip' }
 
 			-- "hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
-			"hrsh7th/cmp-buffer", -- { name = 'buffer' },
+			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
 			"hrsh7th/cmp-path", -- { name = 'path' }
 			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
-
-			"rafamadriz/friendly-snippets",
 		},
 		config = require("plugin-nvim-cmp"),
-	},
-
-	{
-		"L3MON4D3/LuaSnip",
-		-- follow latest release.
-		version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
-		-- install jsregexp (optional!).
-		build = "make install_jsregexp",
 	},
 
 	{

@@ -1,5 +1,11 @@
 return function()
+	local has_words_before = function()
+		unpack = unpack or table.unpack
+		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+		return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+	end
 	local lspkind = require("lspkind")
+	local luasnip = require("luasnip")
 
 	local present, cmp = pcall(require, "cmp")
 	local cmp_autopairs = require("nvim-autopairs.completion.cmp")
@@ -23,12 +29,6 @@ return function()
 
 	cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 
-	local has_words_before = function()
-		unpack = unpack or table.unpack
-		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-		return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-	end
-
 	local feedkey = function(key, mode)
 		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
 	end
@@ -46,7 +46,7 @@ return function()
 		-- 指定 snippet 引擎
 		snippet = {
 			expand = function(args)
-				vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+				luasnip.lsp_expand(args.body) -- For `luasnip` users.
 			end,
 		},
 		formatting = {
@@ -71,27 +71,31 @@ return function()
 			["<Tab>"] = cmp.mapping(function(fallback)
 				if cmp.visible() then
 					cmp.select_next_item()
-				elseif vim.fn["vsnip#available"](1) == 1 then
-					feedkey("<Plug>(vsnip-expand-or-jump)", "")
+				-- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
+				-- they way you will only jump inside the snippet region
+				elseif luasnip.expand_or_jumpable() then
+					luasnip.expand_or_jump()
 				elseif has_words_before() then
 					cmp.complete()
 				else
-					fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+					fallback()
 				end
 			end, { "i", "s" }),
 
-			["<S-Tab>"] = cmp.mapping(function()
+			["<S-Tab>"] = cmp.mapping(function(fallback)
 				if cmp.visible() then
 					cmp.select_prev_item()
-				elseif vim.fn["vsnip#jumpable"](-1) == 1 then
-					feedkey("<Plug>(vsnip-jump-prev)", "")
+				elseif luasnip.jumpable(-1) then
+					luasnip.jump(-1)
+				else
+					fallback()
 				end
 			end, { "i", "s" }),
 		},
 		-- 来源
 		sources = cmp.config.sources({
 			{ name = "nvim_lsp" },
-			{ name = "vsnip" },
+			{ name = "luasnip" },
 		}, {
 			{ name = "buffer" },
 			{ name = "path" },

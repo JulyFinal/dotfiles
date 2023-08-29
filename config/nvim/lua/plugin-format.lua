@@ -1,5 +1,6 @@
 return function()
 	local ft = require("guard.filetype")
+
 	ft("lua"):fmt("stylua")
 	ft("python"):fmt("black")
 	ft("sh"):fmt("shfmt")
