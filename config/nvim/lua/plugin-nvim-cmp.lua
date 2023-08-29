@@ -4,6 +4,7 @@ return function()
 		local line, col = unpack(vim.api.nvim_win_get_cursor(0))
 		return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 	end
+
 	local lspkind = require("lspkind")
 	local luasnip = require("luasnip")
 
@@ -28,10 +29,6 @@ return function()
 	end
 
 	cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-
-	local feedkey = function(key, mode)
-		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
-	end
 
 	cmp.setup({
 		window = {
@@ -71,8 +68,6 @@ return function()
 			["<Tab>"] = cmp.mapping(function(fallback)
 				if cmp.visible() then
 					cmp.select_next_item()
-				-- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-				-- they way you will only jump inside the snippet region
 				elseif luasnip.expand_or_jumpable() then
 					luasnip.expand_or_jump()
 				elseif has_words_before() then

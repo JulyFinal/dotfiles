@@ -59,7 +59,6 @@ local plugins = {
 
 	{
 		"neovim/nvim-lspconfig",
-		-- event = "InsertEnter",
 		lazy = false,
 		priority = 2000,
 		dependencies = {
@@ -80,10 +79,7 @@ local plugins = {
 		-- follow latest release.
 		version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
 		-- install jsregexp (optional!).
-		dependencies = {
-			"rafamadriz/friendly-snippets",
-		},
-		build = "make install_jsregexp",
+		-- build = "make install_jsregexp",
 	},
 	-- cmp configs
 	{
@@ -91,9 +87,6 @@ local plugins = {
 		event = "InsertEnter",
 		dependencies = {
 			"onsails/lspkind-nvim",
-
-			-- "hrsh7th/cmp-vsnip",
-			-- "hrsh7th/vim-vsnip",
 
 			-- For luasnip users.
 			"L3MON4D3/LuaSnip", -- { name = 'luasnip' }

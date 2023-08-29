@@ -115,14 +115,6 @@ return function()
 			capabilities = capabilities,
 			settings = settings,
 		})
-
-		-- vim.lsp.start({
-		-- 	name = lsp,
-		-- 	cmd = { lsp },
-		-- 	before_init = require("neodev.lsp").before_init,
-		-- 	root_dir = vim.fn.getcwd(),
-		-- 	settings = settings,
-		-- })
 	end
 
 	local sign = function(opts)
