@@ -180,6 +180,9 @@ local plugins = {
 				desc = "Jump to a line",
 			},
 		},
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+		},
 	},
 
 	-- todo
