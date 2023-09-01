@@ -50,3 +50,6 @@ map("i", "<C-b>", "<ESC>ha", opt)
 -- install mason
 map("n", "<leader>mi", ":MasonInstall pyright bash-language-server lua-language-server black shfmt stylua<cr>", opt)
 map("n", "<leader>ma", ":MasonUpdate<cr>", opt)
+
+-- format
+map("n", "<leader>fc", "<cmd>GuardFmt<CR>", opt)
