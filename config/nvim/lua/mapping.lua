@@ -52,4 +52,7 @@ map("n", "<leader>mi", ":MasonInstall pyright bash-language-server lua-language-
 map("n", "<leader>ma", ":MasonUpdate<cr>", opt)
 
 -- format
-map("n", "<leader>c", "<cmd>GuardFmt<CR>", opt)
+map("n", "q", "<cmd>GuardFmt<CR>", opt)
+
+map("n", "Q", ":wqa<CR>", opt)
+

@@ -15,7 +15,7 @@ opt.cursorline = true
 opt.fillchars = { eob = " " }
 opt.ignorecase = true
 opt.smartcase = true
-opt.mouse = ""
+opt.mouse = "nv"
 
 -- Numbers
 opt.number = true
