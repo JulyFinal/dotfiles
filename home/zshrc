@@ -20,6 +20,7 @@ HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
 bindkey -e
+setopt no_nomatch
 
 
 # custom alias
