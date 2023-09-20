@@ -52,6 +52,6 @@ map("n", "<leader>mi", ":MasonInstall pyright bash-language-server lua-language-
 map("n", "<leader>ma", ":MasonUpdate<cr>", opt)
 
 -- format
-map("n", "q", ":lua vim.lsp.buf.format()<CR>", opt)
+map("n", "q", ":lua require('conform').format()<CR>", opt)
 
 map("n", "Q", ":wqa<CR>", opt)
