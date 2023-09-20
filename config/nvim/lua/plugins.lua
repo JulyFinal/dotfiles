@@ -68,11 +68,7 @@ local plugins = {
 		config = require("plugin-lsp"),
 	},
 
-	{
-		"nvimdev/guard.nvim",
-		event = { "BufReadPre", "BufNewFile" },
-		config = require("plugin-format"),
-	},
+	{ "stevearc/conform.nvim", event = { "BufReadPre", "BufNewFile" }, config = require("plugin-format") },
 
 	{
 		"L3MON4D3/LuaSnip",

@@ -1,14 +1,12 @@
 return function()
-	local ft = require("guard.filetype")
-
-	ft("lua"):fmt("stylua")
-	ft("python"):fmt("black")
-	ft("sh"):fmt("shfmt")
-
-	require("guard").setup({
-		-- the only options for the setup function
-		fmt_on_save = false,
-		-- Use lsp if no formatter was defined for this filetype
-		lsp_as_default_formatter = false,
-	})
+  require("conform").setup({
+    formatters_by_ft = {
+      lua = { "stylua" },
+      -- Conform will run multiple formatters sequentially
+      python = { "black" },
+      -- Use a sub-list to run only the first available formatter
+      -- javascript = { { "prettierd", "prettier" } },
+      bash = { "shfmt" },
+    },
+  })
 end
