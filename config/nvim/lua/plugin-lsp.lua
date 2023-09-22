@@ -38,14 +38,16 @@ return function()
 			vim.keymap.set(mode, keys, cmd, opts)
 		end
 
-		vks("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
-		vks("n", "K", "<Cmd>lua vim.lsp.buf.hover()<CR>")
-		vks("n", "gr", require("telescope.builtin").lsp_references({}))
-		vks("n", "gd", require("telescope.builtin").lsp_definitions({}))
-		vks("n", "gi", require("telescope.builtin").lsp_implementations({}))
-		vks("n", "gt", require("telescope.builtin").lsp_type_definitions({}))
-		vks("n", "<leader>cr", vim.lsp.buf.rename)
-		vks("n", "<leader>ca", vim.lsp.buf.code_action)
+		vks("n", "gD", ":lua vim.lsp.buf.declaration()<CR>")
+		vks("n", "K", ":lua vim.lsp.buf.hover()<CR>")
+
+		vks("n", "gr", ":Telescope lsp_references<cr>")
+		vks("n", "gd", ":Telescope lsp_definitions<cr>")
+		vks("n", "gm", ":Telescope lsp_implementations<cr>")
+		vks("n", "gt", ":Telescope lsp_type_definitions<cr>")
+
+		vks("n", "<leader>cr", ":lua vim.lsp.buf.rename()<CR>")
+		vks("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>")
 
 		vks("n", "[d", vim.diagnostic.goto_prev)
 		vks("n", "]d", vim.diagnostic.goto_next)

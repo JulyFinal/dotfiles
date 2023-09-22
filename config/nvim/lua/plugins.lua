@@ -72,10 +72,7 @@ local plugins = {
 
 	{
 		"L3MON4D3/LuaSnip",
-		-- follow latest release.
-		version = "2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
-		-- install jsregexp (optional!).
-		-- build = "make install_jsregexp",
+		version = "2.*",
 	},
 	-- cmp configs
 	{
@@ -101,6 +98,7 @@ local plugins = {
 		event = "InsertEnter",
 		config = require("plugin-gitsigns"),
 	},
+
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.1",
@@ -134,12 +132,10 @@ local plugins = {
 	{
 		"simrat39/symbols-outline.nvim",
 		keys = { { "<leader>l", "<cmd>SymbolsOutline<CR>", desc = "SymbolsOutline" } },
-		config = function()
-			require("symbols-outline").setup({ { width = 10 } })
-		end,
+		opts = { width = 20 },
 	},
-	-- easymotion
 
+	-- easymotion
 	{
 		"folke/flash.nvim",
 		event = "VeryLazy",
