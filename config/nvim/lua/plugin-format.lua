@@ -7,6 +7,10 @@ return function()
 			-- Use a sub-list to run only the first available formatter
 			-- javascript = { { "prettierd", "prettier" } },
 			bash = { "shfmt" },
+			markdown = { "markdownlint" },
+			html = { "htmlbeautifier" },
+			json = { "jq" },
+			["*"] = { "codespell" },
 		},
 		-- format_on_save = {
 		--   -- These options will be passed to conform.format()
