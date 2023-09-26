@@ -25,8 +25,6 @@ return function()
 			width = 24,
 			-- 也可以 'right'
 			side = "left",
-			-- 隐藏根目录
-			hide_root_folder = false,
 			adaptive_size = true,
 			-- 不显示行数
 			number = false,
