@@ -7,6 +7,7 @@ return function()
 			enable = false,
 		},
 		sort_by = "case_sensitive",
+
 		-- project plugin 需要这样设置
 		update_cwd = true,
 		update_focused_file = {
@@ -16,14 +17,15 @@ return function()
 		renderer = {
 			group_empty = true,
 		},
+
 		-- 隐藏 .文件 和 node_modules 文件夹
 		filters = {
 			dotfiles = true,
 		},
+
 		view = {
 			-- 宽度
 			width = 24,
-			-- 也可以 'right'
 			side = "left",
 			adaptive_size = true,
 			-- 不显示行数
