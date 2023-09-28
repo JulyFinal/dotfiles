@@ -23,7 +23,13 @@ local plugins = {
 		end,
 	},
 
-	{ "lukas-reineke/indent-blankline.nvim", lazy = false, priority = 1000, opts = {} },
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		event = "BufEnter",
+		config = function()
+			require("ibl").setup()
+		end,
+	},
 
 	{
 		"windwp/nvim-autopairs",
@@ -35,7 +41,7 @@ local plugins = {
 
 	{
 		"kylechui/nvim-surround",
-		lazy = false,
+		event = "BufEnter",
 		config = function()
 			require("nvim-surround").setup()
 		end,
@@ -52,8 +58,9 @@ local plugins = {
 
 	{
 		"neovim/nvim-lspconfig",
-		lazy = false,
-		priority = 2000,
+		-- lazy = false,
+		-- priority = 2000,
+		event = "BufEnter",
 		dependencies = {
 			"williamboman/mason.nvim",
 			"folke/neodev.nvim",
@@ -88,7 +95,7 @@ local plugins = {
 
 	{
 		"lewis6991/gitsigns.nvim",
-		event = "InsertEnter",
+		event = "BufEnter",
 		config = require("plugin-gitsigns"),
 	},
 
@@ -107,8 +114,7 @@ local plugins = {
 
 	{
 		"numToStr/Comment.nvim",
-		lazy = false,
-		priority = 1000,
+		event = "BufEnter",
 		config = function()
 			require("Comment").setup()
 		end,
@@ -117,8 +123,7 @@ local plugins = {
 	{
 		"akinsho/bufferline.nvim",
 		version = "v3.*",
-		lazy = false,
-		priority = 100,
+		event = "BufEnter",
 		config = require("plugin-bufferline"),
 	},
 	-- outline
@@ -173,7 +178,7 @@ local plugins = {
 	-- todo
 	{
 		"folke/todo-comments.nvim",
-		dependencies = { "nvim-telescope/telescope.nvim" },
+		event = "BufReadPre",
 		keys = { { "<leader>ft", "<cmd> TodoTelescope <cr>", desc = "TodoTelescope" } },
 		config = function()
 			require("todo-comments").setup()
@@ -183,8 +188,10 @@ local plugins = {
 	-- statusline
 	{
 		"nvim-lualine/lualine.nvim",
-		lazy = false,
-		priority = 1000,
+
+		-- lazy = false,
+		-- priority = 1000,
+		event = "BufEnter",
 		dependencies = { "kyazdani42/nvim-web-devicons" },
 		config = require("plugin-lualine"),
 	},
