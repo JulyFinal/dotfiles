@@ -23,14 +23,7 @@ local plugins = {
 		end,
 	},
 
-	{
-		"lukas-reineke/indent-blankline.nvim",
-		lazy = false,
-		priority = 1000,
-		config = function()
-			require("indent_blankline").setup()
-		end,
-	},
+	{ "lukas-reineke/indent-blankline.nvim", lazy = false, priority = 1000, opts = {} },
 
 	{
 		"windwp/nvim-autopairs",
