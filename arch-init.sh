@@ -1,6 +1,6 @@
 ## install base pkg
 sudo pacman -S --needed base-devel
-sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzip direnv
+sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzip direnv openssl zlib xz tk
 sudo pacman -S neovim lazygit proxychains-ng
 sudo pacman -S zip unzip
 
