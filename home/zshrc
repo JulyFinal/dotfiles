@@ -9,12 +9,6 @@ if [ -d "$HOME/.cargo/bin" ] ; then
     PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
 # eval
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
@@ -31,15 +25,21 @@ setopt no_nomatch
 
 # custom alias
 alias vi="nvim"
-alias t="tmux a -t 0"
-alias pc4="proxychains4"
+alias at="tmux a -t 0"
+
+# PROXY
 alias setproxy="export ALL_PROXY=socks5://finalserver:7890; echo 'SET PROXY SUCCESS!!!'"
 alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:7890; echo 'SET PROXY SUCCESS!!!'"
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
+
+## python 
 alias av="source .venv/bin/activate"
 alias pp="export PYTHONPATH=$(pwd)"
 alias pipcn='pip install -i https://pypi.tuna.tsinghua.edu.cn/simple'
+alias pycv='f() {pyenv shell "$@" && python -m venv .venv && pyenv shell --unset}'
 # alias pipcn='f() { pip "$@" -i https://pypi.tuna.tsinghua.edu.cn/simple; unset -f f; }; f'
+
+# linux command
 alias ls="ls --color=auto"
 alias ll="ls -lh --color=auto"
 alias la="ls -alh --color=auto"
@@ -52,6 +52,7 @@ alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
 
 alias rezsh="source ~/.zshrc"
 
+# warp
 alias warpon="warp-cli connect"
 alias warpoff="warp-cli disconnect"
 
