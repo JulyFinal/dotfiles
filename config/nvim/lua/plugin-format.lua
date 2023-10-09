@@ -2,15 +2,16 @@ return function()
 	require("conform").setup({
 		formatters_by_ft = {
 			lua = { "stylua" },
-			-- Conform will run multiple formatters sequentially
 			python = { "black" },
-			-- Use a sub-list to run only the first available formatter
 			-- javascript = { { "prettierd", "prettier" } },
 			bash = { "shfmt" },
 			markdown = { "markdownlint" },
 			html = { "htmlbeautifier" },
 			json = { "jq" },
-			["*"] = { "codespell" },
+			nix = { "nixpkgs_fmt" },
+
+			["_"] = { "codespell" },
+			-- ["_"] = { "trim_whitespace" },
 		},
 		-- format_on_save = {
 		--   -- These options will be passed to conform.format()

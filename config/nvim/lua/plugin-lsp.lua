@@ -59,7 +59,7 @@ return function()
 	local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 	capabilities.textDocument.completion.completionItem = {
-		documentationFormat = { "markdown", "plaintext", "python", "lua", "sh", "html", "json" },
+		documentationFormat = { "markdown", "plaintext", "python", "lua", "sh", "html", "json", "nix" },
 		snippetSupport = true,
 		preselectSupport = true,
 		insertReplaceSupport = true,
@@ -109,6 +109,7 @@ return function()
 				},
 			},
 		},
+		["rnix"] = { filetypes = { "nix" } },
 	}
 
 	for lsp, settings in pairs(servers) do
