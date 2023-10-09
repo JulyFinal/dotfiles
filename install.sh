@@ -15,3 +15,8 @@ cargo install starship
 
 cd dotfiles
 sh symlink-dotfiles.sh
+
+
+## nvim
+# install nix format tool
+nix-env -iA nixpkgs-fmt
