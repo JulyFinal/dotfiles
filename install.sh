@@ -20,3 +20,10 @@ sh symlink-dotfiles.sh
 ## nvim
 # install nix format tool
 nix-env -iA nixpkgs-fmt
+
+
+## fonts
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.1/FiraMono.zip
+unzip FiraMono.zip -d FiraMono
+mv FiraMono /usr/share/fonts/
+fc-cache -fv
