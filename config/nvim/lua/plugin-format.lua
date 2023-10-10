@@ -8,7 +8,7 @@ return function()
 			markdown = { "markdownlint" },
 			html = { "htmlbeautifier" },
 			json = { "jq" },
-			nix = { "nixpkgs_fmt" },
+			nix = { "alejandra" },
 
 			["_"] = { "codespell" },
 			-- ["_"] = { "trim_whitespace" },
