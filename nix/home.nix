@@ -18,6 +18,7 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = [
+    pkgs.zsh
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -67,4 +68,21 @@
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+  home.programs = {
+    zsh = {
+      enable = true;
+      envExtra = ''
+        if [ -e /home/final/.nix-profile/etc/profile.d/nix.sh ]; then . /home/final/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+      '';
+      initExtraFirst = ''
+            '';
+      initExtra = ''
+            '';
+    };
+    git = {
+      enable = true;
+      userName = "JulyFinal";
+      userEmail = "julyfinal@outlook.com";
+    };
+  };
 }
