@@ -60,6 +60,7 @@ alias warpoff="warp-cli disconnect"
 
 # >>> git command >>>
 alias gitsubinit="git submodule update --init --recursive"
+alias gitforceinit="git fetch --all && git reset --hard origin/master && git pull"
 
 
 if command -v fzf >/dev/null 2>&1; then
