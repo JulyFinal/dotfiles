@@ -23,11 +23,51 @@ local plugins = {
 		end,
 	},
 
+	-- {
+	-- 	"lukas-reineke/indent-blankline.nvim",
+	-- 	event = "BufEnter",
+	-- 	config = function()
+	-- 		require("ibl").setup({
+	-- 			scope = { enabled = false },
+	-- 		})
+	-- 	end,
+	-- },
+
 	{
-		"lukas-reineke/indent-blankline.nvim",
+		"shellRaining/hlchunk.nvim",
 		event = "BufEnter",
 		config = function()
-			require("ibl").setup()
+			require("hlchunk").setup({
+				chunk = {
+					enable = true,
+					notify = true,
+					use_treesitter = false,
+					chars = {
+						horizontal_line = "─",
+						vertical_line = "│",
+						left_top = "╭",
+						left_bottom = "╰",
+						right_arrow = ">",
+					},
+				},
+
+				indent = {
+					enable = true,
+					use_treesitter = false,
+					chars = {
+						"│",
+					},
+				},
+
+				line_num = {
+					enable = true,
+					use_treesitter = false,
+				},
+
+				blank = {
+					enable = false,
+				},
+			})
 		end,
 	},
 
