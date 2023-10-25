@@ -17,6 +17,11 @@ opt.ignorecase = true
 opt.smartcase = true
 opt.mouse = "nv"
 
+-- fold
+opt.foldmethod = "indent"
+opt.foldcolumn = "0"
+opt.foldlevel = 99
+
 -- Numbers
 opt.number = true
 opt.numberwidth = 2
