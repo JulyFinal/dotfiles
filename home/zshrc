@@ -22,7 +22,6 @@ SAVEHIST=1000
 bindkey -e
 setopt no_nomatch
 
-
 # custom alias
 alias vi="nvim"
 alias at="tmux a -t 0"
@@ -56,11 +55,12 @@ alias rezsh="source ~/.zshrc"
 alias warpon="warp-cli connect"
 alias warpoff="warp-cli disconnect"
 
-
-
 # >>> git command >>>
 alias gitsubinit="git submodule update --init --recursive"
 alias gitforceinit="git fetch --all && git reset --hard origin/master && git pull"
+
+# browser in terminal
+alias browser="docker run --rm -ti fathyb/carbonyl"
 
 
 if command -v fzf >/dev/null 2>&1; then
