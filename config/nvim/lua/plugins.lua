@@ -140,7 +140,7 @@ local plugins = {
 	{
 		"simrat39/symbols-outline.nvim",
 		keys = { { "<leader>l", "<cmd>SymbolsOutline<CR>", desc = "SymbolsOutline" } },
-		opts = { width = 20 },
+		opts = { width = 20, autofold_depth = 0 },
 	},
 
 	-- easymotion
