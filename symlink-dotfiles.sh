@@ -22,8 +22,8 @@ link() {
 link "$dotfiles/home/zshrc" "$HOME/.zshrc"
 link "$dotfiles/home/bashrc" "$HOME/.bashrc"
 link "$dotfiles/home/zsh" "$HOME/.zsh"
+link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
 link "$dotfiles/home/emacs.d" "$HOME/.emacs.d"
-# link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
 
 for name in `ls config`; do
     link "$dotfiles/config/$name" "$config/$name"
