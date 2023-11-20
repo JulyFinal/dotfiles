@@ -9,13 +9,14 @@ if [ -d "$HOME/.cargo/bin" ] ; then
     PATH="$HOME/.cargo/bin:$PATH"
 fi
 
+if [ -d "$HOME/.rye/env" ] ; then
+    source "$HOME/.rye/env"
+fi
+
 # eval
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
-eval "$(pyenv init -)"
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
-
 
 # zsh config
 HISTFILE=~/.histfile
@@ -112,7 +113,7 @@ ex()
 }
 
 ## diff
-batdiff() { git diff --name-only --relative --diff-filter=d | xargs bat --diff; }
+gdiff() { git diff --name-only --relative --diff-filter=d | xargs bat --diff; }
 
 ## 天气
 weather() { curl -s --connect-timeout 3 -m 5 http://wttr.in/$1; }
