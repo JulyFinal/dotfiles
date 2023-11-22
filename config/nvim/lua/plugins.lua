@@ -23,19 +23,45 @@ local plugins = {
 		end,
 	},
 
+	-- {
+	-- 	"lukas-reineke/indent-blankline.nvim",
+	-- 	event = "BufEnter",
+	-- 	main = "ibl",
+	-- 	config = function()
+	-- 		require("ibl").setup({
+	-- 			scope = {
+	-- 				enabled = true,
+	-- 				show_start = false,
+	-- 				show_end = false,
+	-- 				include = {
+	-- 					node_type = { ["*"] = { "*" } },
+	-- 				},
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- },
+
 	{
-		"lukas-reineke/indent-blankline.nvim",
-		event = "BufEnter",
-		main = "ibl",
+		"shellRaining/hlchunk.nvim",
+		event = { "UIEnter" },
 		config = function()
-			require("ibl").setup({
-				scope = {
-					enabled = true,
-					show_start = false,
-					show_end = false,
-					include = {
-						node_type = { ["*"] = { "*" } },
+			require("hlchunk").setup({
+				chunk = {
+					error_sign = false,
+				},
+				indent = {
+					enable = true,
+					--use_treesitter = true
+				},
+				blank = {
+					enable = false,
+					-- use_treesitter = true,
+					chars = {
+						" ",
 					},
+					-- style = {
+					-- 	vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("Whitespace")), "fg", "gui"),
+					-- },
 				},
 			})
 		end,
