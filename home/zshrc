@@ -9,14 +9,13 @@ if [ -d "$HOME/.cargo/bin" ] ; then
     PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-if [ -d "$HOME/.rye/env" ] ; then
-    source "$HOME/.rye/env"
-fi
+source "$HOME/.rye/env"
 
 # eval
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
+# eval "$(pyenv init -)"
 
 # zsh config
 HISTFILE=~/.histfile
