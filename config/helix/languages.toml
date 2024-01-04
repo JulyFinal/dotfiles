@@ -1,47 +1,50 @@
-[[language]]
-name = "toml"
-scope = "source.toml"
-injection-regex = "toml"
-file-types = ["toml"]
-roots = []
-comment-token = "#"
-language-server = { command = "taplo", args = ["lsp", "stdio"] }
-indent = { tab-width = 2, unit = "  " }
-
-[[grammar]]
-name = "toml"
-source = { git = "https://github.com/ikatyang/tree-sitter-toml", rev = "7cff70bbcbbc62001b465603ca1ea88edd668704" }
-
-[[language]]
-name = "json"
-scope = "source.json"
-injection-regex = "json"
-file-types = ["json"]
-roots = []
-language-server = { command = "vscode-json-language-server", args = ["--stdio"] }
-auto-format = true
-config = { "provideFormatter" = true }
-indent = { tab-width = 2, unit = "  " }
-
-[[grammar]]
-name = "json"
-source = { git = "https://github.com/tree-sitter/tree-sitter-json", rev = "65bceef69c3b0f24c0b19ce67d79f57c96e90fcb" }
-
 # sudo npm install -g pyright@latest
+
 [[language]]
 name = "python"
 scope = "source.python"
 injection-regex = "python"
-file-types = ["py"]
+file-types = ["py","pyi","py3","pyw","ptl",".pythonstartup",".pythonrc","SConstruct"]
 shebangs = ["python"]
-roots = ["pyproject.toml", "pdm.lock", "setup.py", "Poetry.lock"]
-comment-token = "#"
-language-server = { command = "pyright-langserver", args = ["--stdio"] }
-auto-format = true
-formatter = { command = "black", args = ["-", "-q"] }
-indent = { tab-width = 4, unit = "  " }
-config = {}
+roots = ["setup.py", "setup.cfg", "pyproject.toml"]
+indent = { tab-width = 4, unit = "    " }
+language-servers = ["pyright", "ruff"]
+formatter = { command = "ruff", args = ["-"] }
+auto-format = false
 
-[[grammar]]
-name = "python"
-source = { git = "https://github.com/tree-sitter/tree-sitter-python", rev = "de221eccf9a221f5b85474a553474a69b4b5784d" }
+[language-server.pyright]
+command = "pyright-langserver"
+args = ["--stdio"]
+
+[language-server.ruff]
+command = "ruff-lsp"
+config = { settings = { run = "onSave" } }
+# config = { settings = { args = [] } }
+
+[[language]]
+name = "bash"
+file-types = [
+  "sh",
+  "bash",
+  "zsh",
+  ".bash_login",
+  ".bash_logout",
+  ".bash_profile",
+  ".bashrc",
+  ".profile",
+  ".zshenv",
+  ".zlogin",
+  ".zlogout",
+  ".zprofile",
+  ".zshrc",
+  ".bash_alias",
+  ".bash_path",
+  "host",
+]
+
+# dev
+[[language]]
+name = "markdown"
+indent = { tab-width = 4, unit = "    " }
+file-types = ["md", "markdown"]
+roots = [".git"]

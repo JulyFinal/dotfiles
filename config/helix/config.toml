@@ -1,15 +1,51 @@
-theme = "tokyonight"
+theme = "catppuccin_mocha"
 
 [editor]
 mouse = true
 cursorline = true
-auto-completion = true
+line-number = "relative"
+auto-format = false
+auto-save = true
+auto-info = true
+true-color = true
+bufferline = "multiple"
+color-modes = true
+
+[editor.soft-wrap]
+enable = true
+
+[editor.lsp]
+display-messages = true
+# display-signature-help-docs = false
+# LSP Type Hints default is false
+display-inlay-hints = true
 
 [editor.statusline]
-left = ["mode", "spinner"]
-center = ["file-name"]
-right =  ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
-separator = "|"
+left = [
+  "mode",
+  "spacer",
+  "spinner",
+  "spacer",
+  "version-control",
+  "spacer",
+  "read-only-indicator",
+  # "file-type-icon",
+  "file-name",
+  "file-modification-indicator",
+  "register"
+]
+center = ["diagnostics", "workspace-diagnostics"]
+right = [
+  "selections",
+  "primary-selection-length",
+  "position",
+  "position-percentage",
+  "file-encoding",
+  "file-line-ending",
+  "file-type",
+]
+separator = "│"
+
 
 [editor.cursor-shape]
 insert = "bar"
