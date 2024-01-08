@@ -23,24 +23,6 @@ local plugins = {
 		end,
 	},
 
-	-- {
-	-- 	"lukas-reineke/indent-blankline.nvim",
-	-- 	event = "BufEnter",
-	-- 	main = "ibl",
-	-- 	config = function()
-	-- 		require("ibl").setup({
-	-- 			scope = {
-	-- 				enabled = true,
-	-- 				show_start = false,
-	-- 				show_end = false,
-	-- 				include = {
-	-- 					node_type = { ["*"] = { "*" } },
-	-- 				},
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- },
-
 	{
 		"shellRaining/hlchunk.nvim",
 		event = { "UIEnter" },
@@ -140,11 +122,22 @@ local plugins = {
 		tag = "0.1.1",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		keys = {
+			{ "<leader>F", "<cmd>Telescope<cr>", desc = "find_files" },
 			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = "find_files" },
 			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = "live_grep" },
 			{ "<leader>b", "<cmd>lua require('telescope.builtin').buffers()<cr>", desc = "buffers" },
 			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<cr>", desc = "help_tags" },
 			{ "<leader>fe", "<cmd>lua require('telescope.builtin').keymaps()<cr>", desc = "keymappings" },
+			{
+				"<leader>s",
+				"<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>",
+				desc = "search symbols",
+			},
+			{
+				"<leader>fs",
+				"<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>",
+				desc = "search all symbols",
+			},
 		},
 	},
 
@@ -161,12 +154,6 @@ local plugins = {
 		version = "v3.*",
 		event = "BufEnter",
 		config = require("plugin-bufferline"),
-	},
-	-- outline
-	{
-		"simrat39/symbols-outline.nvim",
-		keys = { { "<leader>l", "<cmd>SymbolsOutline<CR>", desc = "SymbolsOutline" } },
-		opts = { width = 20, autofold_depth = 0 },
 	},
 
 	-- easymotion
