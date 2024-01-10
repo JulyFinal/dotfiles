@@ -78,7 +78,7 @@ local plugins = {
 			"MunifTanjim/nui.nvim",
 		},
 
-		keys = { { "<leader>e", "<cmd>Neotree<cr>", desc = "Neotree" } },
+		keys = { { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Neotree" } },
 		config = function()
 			require("neo-tree").setup({
 				filesystem = {
