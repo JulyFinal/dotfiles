@@ -51,7 +51,7 @@ map("i", "<C-b>", "<ESC>ha", opt)
 map(
 	"n",
 	"<leader>mi",
-	":MasonInstall pyright bash-language-server lua-language-server black shfmt stylua markdownlint htmlbeautifier jq codespell rnix-lsp<cr>",
+	":MasonInstall pyright ruff bash-language-server lua-language-server shfmt stylua markdownlint htmlbeautifier jq codespell<cr>",
 	opt
 )
 map("n", "<leader>ma", ":MasonUpdate<cr>", opt)
@@ -60,3 +60,7 @@ map("n", "<leader>ma", ":MasonUpdate<cr>", opt)
 map("n", "q", ":lua require('conform').format()<CR>", opt)
 
 map("n", "Q", ":wqa<CR>", opt)
+
+-- buffers
+map("n", "<s-Tab>", ":bp<CR>", opt)
+map("n", "<Tab>", ":bn<CR>", opt)

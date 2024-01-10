@@ -107,9 +107,11 @@ return function()
 				telemetry = {
 					enable = false,
 				},
+				completion = {
+					callSnippet = "Replace",
+				},
 			},
 		},
-		["rnix"] = { filetypes = { "nix" } },
 	}
 
 	for lsp, settings in pairs(servers) do

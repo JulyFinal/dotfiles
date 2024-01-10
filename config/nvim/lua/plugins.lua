@@ -19,7 +19,7 @@ local plugins = {
 		lazy = false,
 		priority = 1000,
 		config = function()
-			vim.cmd([[colorscheme tokyonight]])
+			vim.cmd([[colorscheme tokyonight-night]])
 		end,
 	},
 
@@ -70,7 +70,7 @@ local plugins = {
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		lazy = false,
-		priority = 1000,
+		priority = 500,
 		branch = "v3.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
@@ -81,15 +81,6 @@ local plugins = {
 		keys = { { "<leader>e", "<cmd>Neotree<cr>", desc = "Neotree" } },
 		config = function()
 			require("neo-tree").setup({
-				window = {
-					mappings = {
-						["<space>e"] = {
-							"toggle_node",
-							nowait = false, -- disable `nowait` if you have existing combos starting with this char that you want to use
-						},
-						["o"] = "open",
-					},
-				},
 				filesystem = {
 					follow_current_file = {
 						enabled = true,
@@ -178,7 +169,19 @@ local plugins = {
 		"akinsho/bufferline.nvim",
 		version = "v3.*",
 		event = "BufEnter",
-		config = require("plugin-bufferline"),
+		config = function()
+			require("bufferline").setup({
+				options = {
+					offsets = {
+						{
+							filetype = "neo-tree",
+							text = "File Explorer",
+							text_align = "left",
+						},
+					},
+				},
+			})
+		end,
 	},
 
 	-- easymotion
@@ -236,9 +239,6 @@ local plugins = {
 	-- statusline
 	{
 		"nvim-lualine/lualine.nvim",
-
-		-- lazy = false,
-		-- priority = 1000,
 		event = "BufEnter",
 		dependencies = { "kyazdani42/nvim-web-devicons" },
 		config = require("plugin-lualine"),
@@ -247,7 +247,7 @@ local plugins = {
 
 local opts = {
 	defaults = { lazy = true },
-	install = { colorscheme = { "tokyonight-moon" } },
+	install = { colorscheme = { "tokyonight" } },
 	-- checker = { enabled = true },
 	change_detection = {
 		notify = false,
