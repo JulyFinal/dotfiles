@@ -68,10 +68,35 @@ local plugins = {
 	{ "nvim-treesitter/nvim-treesitter", config = require("plugin-nvim-treesitter") },
 
 	{
-		"kyazdani42/nvim-tree.lua",
-		dependencies = { "kyazdani42/nvim-web-devicons" },
-		keys = { { "<leader>e", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" } },
-		config = require("plugin-nvim-tree"),
+		"nvim-neo-tree/neo-tree.nvim",
+		lazy = false,
+		priority = 1000,
+		branch = "v3.x",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+			"MunifTanjim/nui.nvim",
+		},
+
+		keys = { { "<leader>e", "<cmd>Neotree<cr>", desc = "Neotree" } },
+		config = function()
+			require("neo-tree").setup({
+				window = {
+					mappings = {
+						["<space>e"] = {
+							"toggle_node",
+							nowait = false, -- disable `nowait` if you have existing combos starting with this char that you want to use
+						},
+						["o"] = "open",
+					},
+				},
+				filesystem = {
+					follow_current_file = {
+						enabled = true,
+					},
+				},
+			})
+		end,
 	},
 
 	{
