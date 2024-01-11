@@ -127,6 +127,13 @@ local plugins = {
 		config = require("plugin-nvim-cmp"),
 	},
 
+	-- -- rust
+	-- {
+	-- 	"mrcjkb/rustaceanvim",
+	-- 	version = "^3", -- Recommended
+	-- 	ft = { "rust" },
+	-- },
+
 	{
 		"lewis6991/gitsigns.nvim",
 		event = "BufEnter",
