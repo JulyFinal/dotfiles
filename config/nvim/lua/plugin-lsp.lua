@@ -59,7 +59,7 @@ return function()
 	local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 	capabilities.textDocument.completion.completionItem = {
-		documentationFormat = { "markdown", "plaintext", "python", "lua", "sh", "html", "json", "nix" },
+		documentationFormat = { "markdown", "plaintext", "python", "lua", "sh", "html", "json", "nix", "rust" },
 		snippetSupport = true,
 		preselectSupport = true,
 		insertReplaceSupport = true,

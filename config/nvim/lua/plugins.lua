@@ -114,25 +114,24 @@ local plugins = {
 		event = "InsertEnter",
 		dependencies = {
 			"onsails/lspkind-nvim",
-
-			-- For luasnip users.
-			"L3MON4D3/LuaSnip", -- { name = 'luasnip' }
-
 			-- "hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
 			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
 			"hrsh7th/cmp-path", -- { name = 'path' }
 			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
+
+			-- For luasnip users.
+			"L3MON4D3/LuaSnip", -- { name = 'luasnip' }
 		},
 		config = require("plugin-nvim-cmp"),
 	},
 
-	-- -- rust
-	-- {
-	-- 	"mrcjkb/rustaceanvim",
-	-- 	version = "^3", -- Recommended
-	-- 	ft = { "rust" },
-	-- },
+	-- rust
+	{
+		"mrcjkb/rustaceanvim",
+		version = "^3", -- Recommended
+		ft = { "rust" },
+	},
 
 	{
 		"lewis6991/gitsigns.nvim",
@@ -142,7 +141,7 @@ local plugins = {
 
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.1",
+		tag = "0.1.5",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		keys = {
 			{ "<leader>F", "<cmd>Telescope<cr>", desc = "find_files" },
@@ -279,7 +278,7 @@ local opts = {
 		-- url_format = "https://github.com/%s.git",
 		url_format = "git@github.com:%s",
 		-- url_format = "https://hub.fastgit.xyz/%s",
-		-- url_format = "https://ghproxy.com/https://github.com/%s",
+		-- url_format = "https://mirror.ghproxy.com/https://github.com/%s",
 	},
 }
 

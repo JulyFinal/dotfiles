@@ -10,6 +10,7 @@ return function()
 				end
 			end,
 			-- javascript = { { "prettierd", "prettier" } },
+			rust = { "rustfmt" },
 			bash = { "shfmt" },
 			markdown = { "markdownlint" },
 			html = { "htmlbeautifier" },

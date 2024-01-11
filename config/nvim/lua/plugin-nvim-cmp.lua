@@ -46,9 +46,11 @@ return function()
 				luasnip.lsp_expand(args.body) -- For `luasnip` users.
 			end,
 		},
+
 		formatting = {
 			format = lspkind.cmp_format({
 				with_text = true, -- do not show text alongside icons
+				maxwidth = 50,
 				before = function(entry, vim_item)
 					vim_item.menu = "[" .. string.upper(entry.source.name) .. "]"
 					return vim_item
