@@ -54,7 +54,7 @@ map(
 	":MasonInstall pyright ruff bash-language-server lua-language-server shfmt stylua markdownlint htmlbeautifier jq codespell<cr>",
 	opt
 )
-map("n", "<leader>ma", ":MasonUpdate<cr>", opt)
+map("n", "<leader>mu", ":MasonUpdate<cr>", opt)
 
 -- format
 map("n", "q", ":lua require('conform').format()<CR>", opt)

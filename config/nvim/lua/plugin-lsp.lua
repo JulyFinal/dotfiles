@@ -46,8 +46,8 @@ return function()
 		vks("n", "gm", ":Telescope lsp_implementations<cr>")
 		vks("n", "gt", ":Telescope lsp_type_definitions<cr>")
 
-		vks("n", "<leader>cr", ":lua vim.lsp.buf.rename()<CR>")
-		vks("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>")
+		vks("n", "<leader>r", ":lua vim.lsp.buf.rename()<CR>")
+		vks("n", "<leader>a", ":lua vim.lsp.buf.code_action()<CR>")
 
 		vks("n", "[d", vim.diagnostic.goto_prev)
 		vks("n", "]d", vim.diagnostic.goto_next)
