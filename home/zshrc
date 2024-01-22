@@ -9,7 +9,7 @@ if [ -d "$HOME/.cargo/bin" ] ; then
     PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-source "$HOME/.rye/env"
+# source "$HOME/.rye/env"
 
 # eval
 eval "$(starship init zsh)"
@@ -117,9 +117,11 @@ gdiff() { git diff --name-only --relative --diff-filter=d | xargs bat --diff; }
 weather() { curl -s --connect-timeout 3 -m 5 http://wttr.in/$1; }
 
 # source plugins
-source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-source $HOME/.zsh/zsh-completions/zsh-completions.plugin.zsh
+if [ -d "$HOME/.zsh" ] ; then
+    source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+    source $HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+    source $HOME/.zsh/zsh-completions/zsh-completions.plugin.zsh
+fi
 
 # >>> cuda config >>>
 if [ -d "/usr/local/cuda-12.2" ] ; then
