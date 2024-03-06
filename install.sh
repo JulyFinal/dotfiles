@@ -9,6 +9,7 @@ git clone https://github.com/JulyFinal/dotfiles.git
 # git clone git@github.com:JulyFinal/dotfiles.git
 
 cd dotfiles
+git submodule update --init --recursive
 sh symlink-dotfiles.sh
 
 ## fonts
