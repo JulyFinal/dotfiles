@@ -141,6 +141,7 @@ local plugins = {
 
 	{
 		"nvim-telescope/telescope.nvim",
+		event = "BufEnter",
 		tag = "0.1.5",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		keys = {
