@@ -136,6 +136,7 @@ return function()
 	sign({ name = "DiagnosticSignInfo", text = "" })
 
 	vim.diagnostic.config({
+		underline = false,
 		virtual_text = true,
 		severity_sort = true,
 		float = {
