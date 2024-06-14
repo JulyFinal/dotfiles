@@ -175,7 +175,7 @@ local plugins = {
 
 	{
 		"akinsho/bufferline.nvim",
-		version = "v3.*",
+		version = "*",
 		event = "BufEnter",
 		config = function()
 			require("bufferline").setup({
