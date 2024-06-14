@@ -48,11 +48,6 @@ return function()
 
 		vks("n", "<leader>r", ":lua vim.lsp.buf.rename()<CR>")
 		vks("n", "<leader>a", ":lua vim.lsp.buf.code_action()<CR>")
-
-		vks("n", "[d", vim.diagnostic.goto_prev)
-		vks("n", "]d", vim.diagnostic.goto_next)
-		vks("n", "[e", vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR }))
-		vks("n", "]e", vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR }))
 	end
 
 	-- Set up lspconfig.
