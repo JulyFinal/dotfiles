@@ -124,6 +124,7 @@ weather() { curl -s --connect-timeout 3 -m 5 http://wttr.in/$1; }
 
 # source plugins
 if [ -d "$HOME/.zsh" ] ; then
+    source $HOME/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
     source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
     source $HOME/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
     source $HOME/.zsh/zsh-completions/zsh-completions.plugin.zsh
@@ -135,3 +136,6 @@ if [ -d "/usr/local/cuda-12.2" ] ; then
     export LD_LIBRARY_PATH=/usr/local/cuda-12.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 fi
 # <<< cuda config <<<
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
