@@ -21,7 +21,7 @@ link() {
 
 link "$dotfiles/home/zshrc" "$HOME/.zshrc"
 # link "$dotfiles/home/bashrc" "$HOME/.bashrc"
-if [! -f "$HOME/.zshrc" ]; then
+if [ ! -f "$HOME/.zshrc" ]; then
     touch $HOME/.zshrc
 fi
 echo "source $HOME/dotfiles/home/zshrc" >> $HOME/.zshrc
