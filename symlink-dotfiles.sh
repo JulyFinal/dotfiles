@@ -19,12 +19,10 @@ link() {
     ln -s "$from" "$to"
 }
 
-link "$dotfiles/home/zshrc" "$HOME/.zshrc"
-# link "$dotfiles/home/bashrc" "$HOME/.bashrc"
 if [ ! -f "$HOME/.zshrc" ]; then
     touch $HOME/.zshrc
 fi
-echo "source $HOME/dotfiles/home/zshrc" >> $HOME/.zshrc
+echo "source $dotfiles/home/zshrc" >> $HOME/.zshrc
 
 link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
 # link "$dotfiles/home/emacs.d" "$HOME/.emacs.d"
