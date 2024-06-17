@@ -24,7 +24,7 @@ link "$dotfiles/home/zshrc" "$HOME/.zshrc"
 if [! -f "$HOME/.zshrc" ]; then
     touch $HOME/.zshrc
 fi
-echo "source '$HOME/.zsh' >  $HOME/.zsh"
+echo "source $HOME/dotfiles/home/zshrc" >> $HOME/.zshrc
 
 link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
 # link "$dotfiles/home/emacs.d" "$HOME/.emacs.d"
