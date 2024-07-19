@@ -54,7 +54,22 @@ return function()
 	local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 	capabilities.textDocument.completion.completionItem = {
-		documentationFormat = { "markdown", "plaintext", "python", "lua", "sh", "html", "json", "nix", "rust" },
+		documentationFormat = {
+			"markdown",
+			"plaintext",
+			"python",
+			"lua",
+			"sh",
+			"html",
+			"json",
+			"nix",
+			"rust",
+			"toml",
+			"typescript",
+			"javascript",
+			"c",
+		},
+
 		snippetSupport = true,
 		preselectSupport = true,
 		insertReplaceSupport = true,
@@ -107,6 +122,23 @@ return function()
 				},
 			},
 		},
+		["harper-ls"] = {
+			linters = {
+				spell_check = true,
+				spelled_numbers = false,
+				an_a = true,
+				sentence_capitalization = true,
+				unclosed_quotes = true,
+				wrong_quotes = false,
+				long_sentences = true,
+				repeated_words = true,
+				spaces = true,
+				matcher = true,
+				correct_number_suffix = true,
+				number_suffix_capitalization = true,
+				multiple_sequential_pronouns = true,
+			},
+		},
 	}
 
 	for lsp, settings in pairs(servers) do
@@ -129,5 +161,4 @@ return function()
 	sign({ name = "DiagnosticSignWarn", text = "▲" })
 	sign({ name = "DiagnosticSignHint", text = "⚑" })
 	sign({ name = "DiagnosticSignInfo", text = "" })
-
 end
