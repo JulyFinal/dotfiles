@@ -145,16 +145,10 @@ return function()
 		})
 	end
 
-	local sign = function(opts)
-		vim.fn.sign_define(opts.name, {
-			texthl = opts.name,
-			text = opts.text,
-			numhl = "",
-		})
-	end
-
-	sign({ name = "DiagnosticSignError", text = "✘" })
-	sign({ name = "DiagnosticSignWarn", text = "▲" })
-	sign({ name = "DiagnosticSignHint", text = "⚑" })
-	sign({ name = "DiagnosticSignInfo", text = "" })
+	local x = vim.diagnostic.severity
+	vim.diagnostic.config({
+		virtual_text = { prefix = "" },
+		signs = { text = { [x.ERROR] = "✘", [x.WARN] = "▲", [x.INFO] = "⚑", [x.HINT] = "" } },
+		underline = true,
+	})
 end
