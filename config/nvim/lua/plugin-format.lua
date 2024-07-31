@@ -13,7 +13,6 @@ return function()
 			nix = { "alejandra" },
 
 			["_"] = { "codespell" },
-			-- ["_"] = { "trim_whitespace" },
 		},
 		-- format_on_save = {
 		--   -- These options will be passed to conform.format()

@@ -31,11 +31,16 @@ return function()
 
 	local on_attach = function(client, bufnr)
 		-- Enable completion triggered by <c-x><c-o>
-		vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+		vim.api.nvim_set_option_value("omnifunc", "v:lua.vim.lsp.omnifunc", { buf = bufnr })
 		-- Mappings.
 		local opts = { noremap = true, silent = true, buffer = bufnr }
 		local vks = function(mode, keys, cmd)
 			vim.keymap.set(mode, keys, cmd, opts)
+		end
+
+		if client.name == "ruff_lsp" then
+			-- Disable hover in favor of Pyright
+			client.server_capabilities.hoverProvider = false
 		end
 
 		vks("n", "gD", ":lua vim.lsp.buf.declaration()<CR>")
@@ -54,22 +59,7 @@ return function()
 	local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 	capabilities.textDocument.completion.completionItem = {
-		documentationFormat = {
-			"markdown",
-			"plaintext",
-			"python",
-			"lua",
-			"sh",
-			"html",
-			"json",
-			"nix",
-			"rust",
-			"toml",
-			"typescript",
-			"javascript",
-			"c",
-		},
-
+		documentationFormat = { "markdown", "plaintext" },
 		snippetSupport = true,
 		preselectSupport = true,
 		insertReplaceSupport = true,
@@ -87,15 +77,21 @@ return function()
 	}
 
 	local servers = {
+		["ruff_lsp"] = {},
 		["pyright"] = {
+			pyright = {
+				-- Using Ruff's import organizer
+				disableOrganizeImports = true,
+			},
 			python = {
 				filetypes = { "python" },
 				analysis = {
 					-- Disable strict type checking
-					autoSearchPaths = true,
-					diagnosticMode = "workspace",
-					typeCheckingMode = "basic",
-					useLibraryCodeForTypes = true,
+					-- autoSearchPaths = true,
+					-- diagnosticMode = "workspace",
+					-- typeCheckingMode = "basic",
+					-- useLibraryCodeForTypes = true,
+					ignore = { "*" },
 				},
 				single_file_support = true,
 			},
