@@ -228,6 +228,14 @@ local plugins = {
 				end,
 				desc = "Jump to a line",
 			},
+			{
+				"'",
+				mode = { "n", "x", "o" },
+				function()
+					require("flash").jump()
+				end,
+				desc = "Flash",
+			},
 		},
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter",
