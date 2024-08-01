@@ -4,7 +4,16 @@
 name = "python"
 scope = "source.python"
 injection-regex = "python"
-file-types = ["py","pyi","py3","pyw","ptl",".pythonstartup",".pythonrc","SConstruct"]
+file-types = [
+  "py",
+  "pyi",
+  "py3",
+  "pyw",
+  "ptl",
+  ".pythonstartup",
+  ".pythonrc",
+  "SConstruct",
+]
 shebangs = ["python"]
 roots = ["setup.py", "setup.cfg", "pyproject.toml"]
 indent = { tab-width = 4, unit = "    " }
@@ -18,8 +27,6 @@ args = ["--stdio"]
 
 [language-server.ruff]
 command = "ruff-lsp"
-config = { settings = { run = "onSave" } }
-# config = { settings = { args = [] } }
 
 [[language]]
 name = "bash"
