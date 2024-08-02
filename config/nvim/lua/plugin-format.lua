@@ -3,12 +3,12 @@ return function()
 		formatters_by_ft = {
 			lua = { "stylua" },
 			python = { "ruff_format" },
-			-- javascript = { { "prettierd", "prettier" } },
+			javascript = { "prettierd", "prettier", stop_after_first = true },
 			rust = { "rustfmt" },
 			bash = { "shfmt" },
 			markdown = { "markdownlint" },
 			toml = { "taplo" },
-			html = { "htmlbeautifier" },
+			html = { "prettierd", "prettier", stop_after_first = true },
 			json = { "jq" },
 			nix = { "alejandra" },
 

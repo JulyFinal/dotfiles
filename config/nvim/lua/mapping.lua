@@ -51,7 +51,7 @@ map("i", "<C-b>", "<ESC>ha", opt)
 map(
 	"n",
 	"<leader>mi",
-	":MasonInstall pyright ruff ruff-lsp bash-language-server lua-language-server shfmt stylua markdownlint htmlbeautifier jq taplo<cr>",
+	":MasonInstall pyright ruff ruff-lsp bash-language-server lua-language-server shfmt stylua markdownlint jq taplo<cr>",
 	opt
 )
 map("n", "<leader>mu", ":MasonUpdate<cr>", opt)
