@@ -66,12 +66,9 @@ return function()
 
 	local servers = {
 		["ruff_lsp"] = {},
-		["pyright"] = {
-			pyright = {
+		["basedpyright"] = {
+			basedpyright = {
 				disableOrganizeImports = true,
-			},
-			python = {
-				filetypes = { "python" },
 				analysis = {
 					-- Disable strict type checking
 					-- autoSearchPaths = true,
@@ -80,12 +77,17 @@ return function()
 					-- useLibraryCodeForTypes = true,
 					ignore = { "*" },
 				},
-				single_file_support = true,
+				-- single_file_support = true,
 			},
 		},
-		["bashls"] = {
-			filetypes = { "sh", "zsh" },
-		},
+		-- ["pylyzer"] = {
+		-- python = {
+		-- 	checkOnType = false,
+		-- 	diagnostics = false,
+		-- 	inlayHints = false,
+		-- 	smartCompletion = true,
+		-- },
+		-- },
 		["lua_ls"] = {
 			Lua = {
 				runtime = {
@@ -105,6 +107,7 @@ return function()
 				},
 			},
 		},
+		["htmx-lsp"] = {},
 	}
 
 	for lsp, settings in pairs(servers) do

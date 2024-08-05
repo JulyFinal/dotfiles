@@ -6,7 +6,7 @@ return function()
 			javascript = { "prettierd", "prettier", stop_after_first = true },
 			rust = { "rustfmt" },
 			bash = { "shfmt" },
-			markdown = { "markdownlint" },
+			markdown = { "prettierd" },
 			toml = { "taplo" },
 			html = { "prettierd", "prettier", stop_after_first = true },
 			json = { "jq" },
