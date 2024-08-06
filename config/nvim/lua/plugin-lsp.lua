@@ -107,7 +107,7 @@ return function()
 				},
 			},
 		},
-		["htmx-lsp"] = {},
+		["htmx"] = {},
 	}
 
 	for lsp, settings in pairs(servers) do
