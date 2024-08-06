@@ -133,9 +133,9 @@ return function()
 		sources = { "nvim_diagnostic" },
 		symbols = { error = " ", warn = " ", info = " " },
 		diagnostics_color = {
-			color_error = { fg = colors.red },
-			color_warn = { fg = colors.yellow },
-			color_info = { fg = colors.cyan },
+			error = { fg = colors.red },
+			warn = { fg = colors.yellow },
+			info = { fg = colors.cyan },
 		},
 	})
 
@@ -151,18 +151,16 @@ return function()
 		-- Lsp server name .
 		function()
 			local msg = "No Active Lsp"
-			local buf_ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
-			local clients = vim.lsp.get_clients()
-			if next(clients) == nil then
-				return msg
-			end
-			for _, client in ipairs(clients) do
-				local filetypes = client.config.filetypes
-				if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-					return client.name
-				end
-			end
-			return msg
+			local clients = vim.lsp.get_clients({ bufnr = 0 })
+
+			return #clients > 0
+					and table.concat(
+						vim.tbl_map(function(client)
+							return client.name
+						end, clients),
+						","
+					)
+				or msg
 		end,
 		icon = " LSP:",
 		color = { fg = "#ffffff", gui = "bold" },
