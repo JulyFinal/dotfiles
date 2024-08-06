@@ -70,24 +70,11 @@ return function()
 			basedpyright = {
 				disableOrganizeImports = true,
 				analysis = {
-					-- Disable strict type checking
-					-- autoSearchPaths = true,
-					-- diagnosticMode = "workspace",
-					-- typeCheckingMode = "basic",
-					-- useLibraryCodeForTypes = true,
 					ignore = { "*" },
 				},
-				-- single_file_support = true,
+				single_file_support = true,
 			},
 		},
-		-- ["pylyzer"] = {
-		-- python = {
-		-- 	checkOnType = false,
-		-- 	diagnostics = false,
-		-- 	inlayHints = false,
-		-- 	smartCompletion = true,
-		-- },
-		-- },
 		["lua_ls"] = {
 			Lua = {
 				runtime = {
@@ -107,7 +94,6 @@ return function()
 				},
 			},
 		},
-		["htmx"] = {},
 	}
 
 	for lsp, settings in pairs(servers) do
