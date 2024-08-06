@@ -31,13 +31,9 @@ return function()
 	-- Config
 	local config = {
 		options = {
-			-- Disable sections and component separators
 			component_separators = "",
 			section_separators = "",
 			theme = {
-				-- We are going to use lualine_c an lualine_x as left and
-				-- right section. Both are highlighted by c theme .  So we
-				-- are just setting default looks o statusline
 				normal = { c = { fg = colors.fg, bg = colors.bg } },
 				inactive = { c = { fg = colors.fg, bg = colors.bg } },
 			},
@@ -62,6 +58,7 @@ return function()
 			lualine_y = {},
 			lualine_z = {},
 		},
+		extensions = { "neo-tree" },
 	}
 
 	-- Inserts a component in lualine_c at left section
@@ -99,7 +96,6 @@ return function()
 				no = colors.red,
 				s = colors.orange,
 				S = colors.orange,
-				[""] = colors.orange,
 				ic = colors.yellow,
 				R = colors.violet,
 				Rv = colors.violet,
@@ -155,7 +151,7 @@ return function()
 		-- Lsp server name .
 		function()
 			local msg = "No Active Lsp"
-			local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
+			local buf_ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
 			local clients = vim.lsp.get_clients()
 			if next(clients) == nil then
 				return msg

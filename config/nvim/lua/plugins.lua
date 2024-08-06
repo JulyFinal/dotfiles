@@ -229,7 +229,7 @@ local plugins = {
 				desc = "Jump to a line",
 			},
 			{
-				"'",
+				";",
 				mode = { "n", "x", "o" },
 				function()
 					require("flash").jump()
