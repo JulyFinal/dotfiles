@@ -107,7 +107,7 @@ local plugins = {
 
 	{
 		"L3MON4D3/LuaSnip",
-		version = "2.*",
+		version = "v2.*",
 	},
 	-- cmp configs
 	{
@@ -130,7 +130,7 @@ local plugins = {
 	-- rust
 	{
 		"mrcjkb/rustaceanvim",
-		version = "^3", -- Recommended
+		version = "^5", -- Recommended
 		ft = { "rust" },
 	},
 
@@ -143,7 +143,7 @@ local plugins = {
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "BufEnter",
-		tag = "0.1.5",
+		tag = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		keys = {
 			{ "<leader>F", "<cmd>Telescope<cr>", desc = "find_files" },
