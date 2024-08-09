@@ -70,7 +70,8 @@ return function()
 			basedpyright = {
 				disableOrganizeImports = true,
 				analysis = {
-					ignore = { "*" },
+					typeCheckingMode = "basic",
+					-- ignore = { "*" },
 				},
 				single_file_support = true,
 			},
