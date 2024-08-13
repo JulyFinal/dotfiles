@@ -5,7 +5,6 @@ return function()
 		return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 	end
 
-	local lspkind = require("lspkind")
 	local luasnip = require("luasnip")
 
 	local present, cmp = pcall(require, "cmp")
@@ -15,30 +14,29 @@ return function()
 		return
 	end
 
-	local function border(hl_name)
-		return {
-			{ "╭", hl_name },
-			{ "─", hl_name },
-			{ "╮", hl_name },
-			{ "│", hl_name },
-			{ "╯", hl_name },
-			{ "─", hl_name },
-			{ "╰", hl_name },
-			{ "│", hl_name },
-		}
+	-- require("luasnip.loaders.from_snipmate").lazy_load()
+	-- set python 智能选择
+	local compare = require("cmp.config.compare")
+	compare.python_var = function(entry1, entry2)
+		if vim.o.filetype ~= "python" then
+			return
+		end
+		-- needed because cmp sometimes gives you the same entry and you must return nil in that case
+		if entry1:get_completion_item().label == entry2:get_completion_item().label then
+			return
+		end
+		if entry1:get_completion_item().label:match("%w*=") then
+			-- return true to pick entry1 over entry2
+			return true
+		end
 	end
 
 	cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 
 	cmp.setup({
 		window = {
-			completion = {
-				border = border("CmpBorder"),
-				winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
-			},
-			documentation = {
-				border = border("CmpDocBorder"),
-			},
+			completion = cmp.config.window.bordered(),
+			documentation = cmp.config.window.bordered(),
 		},
 		-- 指定 snippet 引擎
 		snippet = {
@@ -48,14 +46,22 @@ return function()
 		},
 
 		formatting = {
-			format = lspkind.cmp_format({
-				with_text = true, -- do not show text alongside icons
-				maxwidth = 50,
-				before = function(entry, vim_item)
-					vim_item.menu = "[" .. string.upper(entry.source.name) .. "]"
-					return vim_item
-				end,
-			}),
+			-- changing the order of fields so the icon is the first
+			fields = { "menu", "abbr", "kind" },
+
+			-- here is where the change happens
+			format = function(entry, item)
+				local menu_icon = {
+					nvim_lsp = "λ",
+					luasnip = "⋗",
+					buffer = "Ω",
+					path = "🖫",
+					nvim_lua = "Π",
+				}
+
+				item.menu = menu_icon[entry.source.name]
+				return item
+			end,
 		},
 
 		mapping = {
@@ -89,6 +95,7 @@ return function()
 				end
 			end, { "i", "s" }),
 		},
+
 		-- 来源
 		sources = cmp.config.sources({
 			{ name = "nvim_lsp" },
@@ -97,6 +104,15 @@ return function()
 			{ name = "buffer" },
 			{ name = "path" },
 		}),
+
+		preselect = "item",
+		completion = {
+			completeopt = "menu,menuone,noinsert",
+		},
+
+		sorting = {
+			comparators = compare,
+		},
 	})
 
 	-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
@@ -115,5 +131,6 @@ return function()
 		}, {
 			{ name = "cmdline" },
 		}),
+		matching = { disallow_symbol_nonprefix_matching = false },
 	})
 end

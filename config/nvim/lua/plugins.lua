@@ -112,9 +112,8 @@ local plugins = {
 	-- cmp configs
 	{
 		"hrsh7th/nvim-cmp",
-		event = "InsertEnter",
+		event = { "InsertEnter", "CmdlineEnter" },
 		dependencies = {
-			"onsails/lspkind-nvim",
 			-- "hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
 			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
