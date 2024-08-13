@@ -112,12 +112,4 @@ return function()
 		signs = { text = { [x.ERROR] = "✘", [x.WARN] = "▲", [x.INFO] = "⚑", [x.HINT] = "" } },
 		underline = true,
 	})
-
-	-- set hover style
-	vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-		-- Use a sharp border with `FloatBorder` highlights
-		border = "rounded",
-		-- add the title in hover float window
-		title = "hover",
-	})
 end

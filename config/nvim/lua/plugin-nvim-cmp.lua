@@ -31,6 +31,9 @@ return function()
 		end
 	end
 
+	-- set hover style
+	vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, cmp.config.window.bordered())
+
 	cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 
 	cmp.setup({
@@ -46,10 +49,7 @@ return function()
 		},
 
 		formatting = {
-			-- changing the order of fields so the icon is the first
 			fields = { "menu", "abbr", "kind" },
-
-			-- here is where the change happens
 			format = function(entry, item)
 				local menu_icon = {
 					nvim_lsp = "λ",
