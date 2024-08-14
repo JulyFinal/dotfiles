@@ -3,20 +3,6 @@ return function()
 
 	local lspconfig = require("lspconfig")
 
-	local neodev = require("neodev")
-
-	neodev.setup({
-		library = {
-			enabled = true, -- when not enabled, neodev will not change any settings to the LSP server
-			runtime = true, -- runtime path
-			types = true, -- full signature, docs and completion of vim.api, vim.treesitter, vim.lsp and others
-			plugins = true, -- installed opt or start plugins in packpath
-		},
-		setup_jsonls = true, -- configures jsonls to provide completion for project specific .luarc.json files
-		lspconfig = true,
-		pathStrict = true,
-	})
-
 	local on_attach = function(client, bufnr)
 		-- Enable completion triggered by <c-x><c-o>
 		vim.api.nvim_set_option_value("omnifunc", "v:lua.vim.lsp.omnifunc", { buf = bufnr })

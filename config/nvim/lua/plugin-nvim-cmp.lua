@@ -6,29 +6,13 @@ return function()
 	end
 
 	local luasnip = require("luasnip")
+	require("luasnip.loaders.from_vscode").lazy_load()
 
 	local present, cmp = pcall(require, "cmp")
 	local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 
 	if not present then
 		return
-	end
-
-	-- require("luasnip.loaders.from_snipmate").lazy_load()
-	-- set python 智能选择
-	local compare = require("cmp.config.compare")
-	compare.python_var = function(entry1, entry2)
-		if vim.o.filetype ~= "python" then
-			return
-		end
-		-- needed because cmp sometimes gives you the same entry and you must return nil in that case
-		if entry1:get_completion_item().label == entry2:get_completion_item().label then
-			return
-		end
-		if entry1:get_completion_item().label:match("%w*=") then
-			-- return true to pick entry1 over entry2
-			return true
-		end
 	end
 
 	-- set hover style
@@ -45,22 +29,6 @@ return function()
 		snippet = {
 			expand = function(args)
 				luasnip.lsp_expand(args.body) -- For `luasnip` users.
-			end,
-		},
-
-		formatting = {
-			fields = { "menu", "abbr", "kind" },
-			format = function(entry, item)
-				local menu_icon = {
-					nvim_lsp = "λ",
-					luasnip = "⋗",
-					buffer = "Ω",
-					path = "🖫",
-					nvim_lua = "Π",
-				}
-
-				item.menu = menu_icon[entry.source.name]
-				return item
 			end,
 		},
 
@@ -108,10 +76,6 @@ return function()
 		preselect = "item",
 		completion = {
 			completeopt = "menu,menuone,noinsert",
-		},
-
-		sorting = {
-			comparators = compare,
 		},
 	})
 

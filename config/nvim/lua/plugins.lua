@@ -4,8 +4,8 @@ if not vim.loop.fs_stat(lazypath) then
 		"git",
 		"clone",
 		"--filter=blob:none",
-		-- "https://github.moeyy.xyz/https://github.com/folke/lazy.nvim.git",
-		"https://github.com/folke/lazy.nvim.git",
+		"https://github.moeyy.xyz/https://github.com/folke/lazy.nvim.git",
+		-- "https://github.com/folke/lazy.nvim.git",
 		"--branch=stable", -- latest stable release
 		lazypath,
 	})
@@ -29,23 +29,23 @@ local plugins = {
 		event = { "UIEnter" },
 		config = function()
 			require("hlchunk").setup({
-				chunk = {
-					error_sign = false,
-				},
-				indent = {
-					enable = true,
-					--use_treesitter = true
-				},
-				blank = {
-					enable = false,
-					-- use_treesitter = true,
-					chars = {
-						" ",
-					},
-					-- style = {
-					-- 	vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("Whitespace")), "fg", "gui"),
-					-- },
-				},
+				-- chunk = {
+				-- 	error_sign = false,
+				-- },
+				-- indent = {
+				-- 	enable = true,
+				-- 	--use_treesitter = true
+				-- },
+				-- blank = {
+				-- 	enable = false,
+				-- 	-- use_treesitter = true,
+				-- 	chars = {
+				-- 		" ",
+				-- 	},
+				-- 	-- style = {
+				-- 	-- 	vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("Whitespace")), "fg", "gui"),
+				-- 	-- },
+				-- },
 			})
 		end,
 	},
@@ -75,7 +75,7 @@ local plugins = {
 		branch = "v3.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+			-- "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
 			"MunifTanjim/nui.nvim",
 		},
 
@@ -98,7 +98,6 @@ local plugins = {
 		event = "BufEnter",
 		dependencies = {
 			"williamboman/mason.nvim",
-			"folke/neodev.nvim",
 		},
 		config = require("plugin-lsp"),
 	},
@@ -107,7 +106,7 @@ local plugins = {
 
 	{
 		"L3MON4D3/LuaSnip",
-		version = "v2.*",
+		dependencies = { "rafamadriz/friendly-snippets" },
 	},
 	-- cmp configs
 	{
@@ -255,7 +254,6 @@ local plugins = {
 	{
 		"nvim-lualine/lualine.nvim",
 		event = "BufEnter",
-		dependencies = { "kyazdani42/nvim-web-devicons" },
 		config = require("plugin-lualine"),
 	},
 }
@@ -288,7 +286,7 @@ local opts = {
 		-- url_format = "git@github.com:%s",
 		-- url_format = "https://hub.fastgit.xyz/%s",
 		-- url_format = "https://mirror.ghproxy.com/https://github.com/%s",
-		-- url_format = "https://github.moeyy.xyz/https://github.com/%s",
+		url_format = "https://github.moeyy.xyz/https://github.com/%s",
 	},
 }
 
