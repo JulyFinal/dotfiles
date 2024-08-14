@@ -29,27 +29,6 @@ return function()
 		vks("n", "<leader>a", ":lua vim.lsp.buf.code_action()<CR>")
 	end
 
-	-- Set up lspconfig.
-	local capabilities = vim.lsp.protocol.make_client_capabilities()
-
-	capabilities.textDocument.completion.completionItem = {
-		documentationFormat = { "markdown", "plaintext" },
-		snippetSupport = true,
-		preselectSupport = true,
-		insertReplaceSupport = true,
-		labelDetailsSupport = true,
-		deprecatedSupport = true,
-		commitCharactersSupport = true,
-		tagSupport = { valueSet = { 1 } },
-		resolveSupport = {
-			properties = {
-				"documentation",
-				"detail",
-				"additionalTextEdits",
-			},
-		},
-	}
-
 	local servers = {
 		["ruff_lsp"] = {},
 		["basedpyright"] = {
@@ -82,6 +61,8 @@ return function()
 			},
 		},
 	}
+
+	local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 	for lsp, settings in pairs(servers) do
 		lspconfig[lsp].setup({

@@ -1,14 +1,18 @@
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.moeyy.xyz/https://github.com/folke/lazy.nvim.git",
-		-- "https://github.com/folke/lazy.nvim.git",
-		"--branch=stable", -- latest stable release
-		lazypath,
-	})
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+	-- local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+	local lazyrepo = "https://github.moeyy.xyz/https://github.com/folke/lazy.nvim.git"
+	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+	if vim.v.shell_error ~= 0 then
+		vim.api.nvim_echo({
+			{ "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+			{ out, "WarningMsg" },
+			{ "\nPress any key to exit..." },
+		}, true, {})
+		vim.fn.getchar()
+		os.exit(1)
+	end
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -29,23 +33,12 @@ local plugins = {
 		event = { "UIEnter" },
 		config = function()
 			require("hlchunk").setup({
-				-- chunk = {
-				-- 	error_sign = false,
-				-- },
-				-- indent = {
-				-- 	enable = true,
-				-- 	--use_treesitter = true
-				-- },
-				-- blank = {
-				-- 	enable = false,
-				-- 	-- use_treesitter = true,
-				-- 	chars = {
-				-- 		" ",
-				-- 	},
-				-- 	-- style = {
-				-- 	-- 	vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("Whitespace")), "fg", "gui"),
-				-- 	-- },
-				-- },
+				chunk = {
+					enable = true,
+				},
+				indent = {
+					enable = true,
+				},
 			})
 		end,
 	},
@@ -98,6 +91,7 @@ local plugins = {
 		event = "BufEnter",
 		dependencies = {
 			"williamboman/mason.nvim",
+			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
 		},
 		config = require("plugin-lsp"),
 	},
@@ -105,23 +99,26 @@ local plugins = {
 	{ "stevearc/conform.nvim", event = { "BufReadPre", "BufNewFile" }, config = require("plugin-format") },
 
 	{
-		"L3MON4D3/LuaSnip",
-		dependencies = { "rafamadriz/friendly-snippets" },
-	},
-	-- cmp configs
-	{
 		"hrsh7th/nvim-cmp",
 		event = { "InsertEnter", "CmdlineEnter" },
 		dependencies = {
-			-- "hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
 			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
 			"hrsh7th/cmp-path", -- { name = 'path' }
 			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
 
-			-- For luasnip users.
-			"L3MON4D3/LuaSnip", -- { name = 'luasnip' }
+			-- for luasnip
+			{
+				"L3MON4D3/LuaSnip",
+				build = "make install_jsregexp",
+				dependencies = { "rafamadriz/friendly-snippets" },
+				config = function()
+					require("luasnip.loaders.from_vscode").lazy_load()
+				end,
+			},
+			"saadparwaiz1/cmp_luasnip",
 		},
+
 		config = require("plugin-nvim-cmp"),
 	},
 
@@ -250,7 +247,6 @@ local plugins = {
 		end,
 	},
 
-	-- statusline
 	{
 		"nvim-lualine/lualine.nvim",
 		event = "BufEnter",
@@ -259,25 +255,12 @@ local plugins = {
 }
 
 local opts = {
+	spec = plugins,
 	defaults = { lazy = true },
 	install = { colorscheme = { "tokyonight" } },
 	-- checker = { enabled = true },
 	change_detection = {
 		notify = false,
-	},
-	performance = {
-		rtp = {
-			disabled_plugins = {
-				"gzip",
-				"matchit",
-				"matchparen",
-				"netrwPlugin",
-				"tarPlugin",
-				"tohtml",
-				"tutor",
-				"zipPlugin",
-			},
-		},
 	},
 	git = {
 		log = { "-10" }, -- show the last 10 commits
@@ -286,7 +269,7 @@ local opts = {
 		-- url_format = "git@github.com:%s",
 		-- url_format = "https://hub.fastgit.xyz/%s",
 		-- url_format = "https://mirror.ghproxy.com/https://github.com/%s",
-		url_format = "https://github.moeyy.xyz/https://github.com/%s",
+		-- url_format = "https://github.moeyy.xyz/https://github.com/%s",
 	},
 }
 
