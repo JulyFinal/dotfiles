@@ -17,14 +17,13 @@ return function()
 			client.server_capabilities.hoverProvider = false
 		end
 
-		vks("n", "gD", ":lua vim.lsp.buf.declaration()<CR>")
-		vks("n", "K", ":lua vim.lsp.buf.hover()<CR>")
-
 		vks("n", "gr", ":Telescope lsp_references<cr>")
 		vks("n", "gd", ":Telescope lsp_definitions<cr>")
 		vks("n", "gm", ":Telescope lsp_implementations<cr>")
 		vks("n", "gt", ":Telescope lsp_type_definitions<cr>")
 
+		vks("n", "gD", ":lua vim.lsp.buf.declaration()<CR>")
+		vks("n", "K", ":lua vim.lsp.buf.hover()<CR>")
 		vks("n", "<leader>r", ":lua vim.lsp.buf.rename()<CR>")
 		vks("n", "<leader>a", ":lua vim.lsp.buf.code_action()<CR>")
 	end

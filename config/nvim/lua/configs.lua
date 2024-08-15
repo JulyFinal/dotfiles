@@ -46,49 +46,6 @@ opt.whichwrap:append("<>[]hl")
 
 g.mapleader = " "
 
--- disable some builtin vim plugins
-local default_plugins = {
-	"2html_plugin",
-	"getscript",
-	"getscriptPlugin",
-	"gzip",
-	"logipat",
-	"netrw",
-	"netrwPlugin",
-	"netrwSettings",
-	"netrwFileHandlers",
-	"matchit",
-	"tar",
-	"tarPlugin",
-	"rrhelper",
-	"spellfile_plugin",
-	"vimball",
-	"vimballPlugin",
-	"zip",
-	"zipPlugin",
-	"tutor",
-	"rplugin",
-	"syntax",
-	"synmenu",
-	"optwin",
-	"compiler",
-	"bugreport",
-	"ftplugin",
-}
-
-for _, plugin in pairs(default_plugins) do
-	g["loaded_" .. plugin] = 1
-end
-
-local default_providers = {
-	"node",
-	"python3",
-}
-
-for _, provider in ipairs(default_providers) do
-	vim.g["loaded_" .. provider .. "_provider"] = 0
-end
-
 -- utf8
 g.encoding = "UTF-8"
 opt.fileencoding = "utf-8"
@@ -132,7 +89,3 @@ opt.pumheight = 10
 opt.showtabline = 1
 -- 使用增强状态栏插件后不再需要 vim 的模式提示
 opt.showmode = false
-
--- nvim-tree-config
-g.loaded_netrw = 1
-g.loaded_netrwPlugin = 1
