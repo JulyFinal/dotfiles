@@ -102,6 +102,8 @@ local plugins = {
 		"hrsh7th/nvim-cmp",
 		event = { "InsertEnter", "CmdlineEnter" },
 		dependencies = {
+			"onsails/lspkind.nvim",
+
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
 			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
 			"hrsh7th/cmp-path", -- { name = 'path' }
@@ -120,6 +122,15 @@ local plugins = {
 				end,
 			},
 			"saadparwaiz1/cmp_luasnip",
+
+			{
+				"luozhiya/fittencode.nvim",
+				config = function()
+					require("fittencode").setup({
+						completion_mode = "source",
+					})
+				end,
+			},
 		},
 
 		config = require("plugin-nvim-cmp"),

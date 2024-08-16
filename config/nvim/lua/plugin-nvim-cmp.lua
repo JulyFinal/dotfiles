@@ -3,6 +3,8 @@ return function()
 	if not present then
 		return
 	end
+
+	local lspkind = require("lspkind")
 	local luasnip = require("luasnip")
 
 	local cmp_autopairs = require("nvim-autopairs.completion.cmp")
@@ -17,6 +19,7 @@ return function()
 		["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
 		["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
 		["<CR>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true }),
+		["<c-y>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = false }),
 
 		-- ["<Tab>"] = cmp.mapping(function(fallback)
 		-- 	if cmp.visible() then
@@ -51,6 +54,15 @@ return function()
 			end,
 		},
 
+		formatting = {
+			fields = { "kind", "abbr", "menu" },
+			format = lspkind.cmp_format({
+				mode = "symbol",
+				max_width = 50,
+				symbol_map = { FittenCode = "" },
+			}),
+		},
+
 		mapping = mapping,
 		completion = { completeopt = "menu,menuone,noinsert" },
 
@@ -59,6 +71,7 @@ return function()
 		},
 
 		sources = cmp.config.sources({
+			{ name = "fittencode", group_index = 1 },
 			{ name = "nvim_lsp" },
 			{ name = "luasnip" },
 			{ name = "buffer" },
