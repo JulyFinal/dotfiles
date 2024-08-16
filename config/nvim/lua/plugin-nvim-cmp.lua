@@ -11,6 +11,34 @@ return function()
 	-- set hover style
 	vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, cmp.config.window.bordered())
 
+	local mapping = {
+		["<Tab>"] = cmp.mapping.select_next_item(),
+		["<S-Tab>"] = cmp.mapping.select_prev_item(),
+		["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
+		["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
+		["<CR>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true }),
+
+		-- ["<Tab>"] = cmp.mapping(function(fallback)
+		-- 	if cmp.visible() then
+		-- 		cmp.select_next_item()
+		-- 	elseif luasnip.locally_jumpable(1) then
+		-- 		luasnip.jump(1)
+		-- 	else
+		-- 		fallback()
+		-- 	end
+		-- end, { "i", "s" }),
+		--
+		-- ["<S-Tab>"] = cmp.mapping(function(fallback)
+		-- 	if cmp.visible() then
+		-- 		cmp.select_prev_item()
+		-- 	elseif luasnip.locally_jumpable(-1) then
+		-- 		luasnip.jump(-1)
+		-- 	else
+		-- 		fallback()
+		-- 	end
+		-- end, { "i", "s" }),
+	}
+
 	cmp.setup({
 		window = {
 			completion = cmp.config.window.bordered(),
@@ -23,34 +51,7 @@ return function()
 			end,
 		},
 
-		mapping = {
-			-- ["<Tab>"] = cmp.mapping.select_next_item(),
-			-- ["<S-Tab>"] = cmp.mapping.select_prev_item(),
-			["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
-			["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
-			["<CR>"] = cmp.mapping.confirm({ select = true }),
-
-			["<Tab>"] = cmp.mapping(function(fallback)
-				if cmp.visible() then
-					cmp.select_next_item()
-				elseif luasnip.locally_jumpable(1) then
-					luasnip.jump(1)
-				else
-					fallback()
-				end
-			end, { "i", "s" }),
-
-			["<S-Tab>"] = cmp.mapping(function(fallback)
-				if cmp.visible() then
-					cmp.select_prev_item()
-				elseif luasnip.locally_jumpable(-1) then
-					luasnip.jump(-1)
-				else
-					fallback()
-				end
-			end, { "i", "s" }),
-		},
-
+		mapping = mapping,
 		completion = { completeopt = "menu,menuone,noinsert" },
 
 		experimental = {
