@@ -1,0 +1,6 @@
+{
+  "Pretty rich print": {
+    "prefix": "rprint",
+    "body": "__import__('rich').print(${1:expression})$0"
+  }
+}
