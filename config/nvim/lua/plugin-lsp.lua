@@ -33,10 +33,6 @@ return function()
 		["basedpyright"] = {
 			basedpyright = {
 				disableOrganizeImports = true,
-				analysis = {
-					typeCheckingMode = "basic",
-					-- ignore = { "*" },
-				},
 				single_file_support = true,
 			},
 		},
