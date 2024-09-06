@@ -10,6 +10,9 @@ eval "$(starship init bash)"
 eval "$(zoxide init bash)"
 eval "$(direnv hook bash)"
 
+# ble config
+source "$(blesh-share)"/ble.sh --attach=none # does not work currently
+
 # custom alias
 alias vi="nvim"
 alias at="tmux a -t 0"
@@ -38,7 +41,6 @@ alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
 alias rebash="source ~/.bashrc"
 
 # >>> git command >>>
-alias gitsubinit="git submodule update --init --recursive"
 alias gitforceinit="git fetch --all && git reset --hard origin/master && git pull"
 
 # browser in terminal
@@ -92,3 +94,5 @@ gdiff() { git diff --name-only --relative --diff-filter=d | xargs bat --diff; }
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+[[ ! ${BLE_VERSION-} ]] || ble-attach

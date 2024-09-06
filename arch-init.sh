@@ -7,8 +7,5 @@ sudo pacman -S zip unzip
 # install paru
 git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si
 
-## SSH
-paru -S clash-for-windows-bin
-
 # WPS
 # paru -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
