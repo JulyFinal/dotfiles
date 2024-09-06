@@ -11,7 +11,7 @@ eval "$(zoxide init bash)"
 eval "$(direnv hook bash)"
 
 # ble config
-source "$(blesh-share)"/ble.sh --attach=none # does not work currently
+[[ $- == *i* ]] && source "$(blesh-share)"/ble.sh --noattach
 
 # custom alias
 alias vi="nvim"
