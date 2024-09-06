@@ -6,7 +6,7 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon
 nix-env -iA nixpkgs.blesh
 
 # uv
-brew install uv 
+brew install uv
 cargo install --git https://github.com/astral-sh/uv uv
 
 # git config --global url."https://ghproxy.com/https://github.com".insteadOf "https://github.com"
