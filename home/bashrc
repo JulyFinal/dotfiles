@@ -5,17 +5,10 @@ if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
 # eval
-eval "$(uv generate-shell-completion zsh)"
-eval "$(starship init zsh)"
-eval "$(zoxide init zsh)"
-eval "$(direnv hook zsh)"
-
-# zsh config
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
-bindkey -e
-setopt no_nomatch
+eval "$(uv generate-shell-completion bash)"
+eval "$(starship init bash)"
+eval "$(zoxide init bash)"
+eval "$(direnv hook bash)"
 
 # custom alias
 alias vi="nvim"
@@ -30,7 +23,6 @@ alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias av="source .venv/bin/activate"
 alias pp="export PYTHONPATH=$(pwd)"
 alias pipcn='pip install -i https://pypi.tuna.tsinghua.edu.cn/simple'
-# alias pipcn='f() { pip "$@" -i https://pypi.tuna.tsinghua.edu.cn/simple; unset -f f; }; f'
 
 # linux command
 alias ls="ls --color=auto"
@@ -43,11 +35,7 @@ alias w="watch -n"
 alias tf="tail -f"
 alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
 
-alias rezsh="source ~/.zshrc"
-
-# warp
-alias warpon="warp-cli connect"
-alias warpoff="warp-cli disconnect"
+alias rebash="source ~/.bashrc"
 
 # >>> git command >>>
 alias gitsubinit="git submodule update --init --recursive"
@@ -69,9 +57,6 @@ if command -v fzf >/dev/null 2>&1; then
 
 fi
 
-if command -v lsd >/dev/null 2>&1; then
-  alias tree="lsd --tree"
-fi
 
 if command -v bat >/dev/null 2>&1; then
   alias cat='bat -pp --theme="Nord"'
@@ -103,25 +88,6 @@ ex() {
 
 ## diff
 gdiff() { git diff --name-only --relative --diff-filter=d | xargs bat --diff; }
-
-## 天气
-weather() { curl -s --connect-timeout 3 -m 5 http://wttr.in/$1; }
-
-# source plugins
-ZSH_EX=$HOME/dotfiles/home/zsh
-if [ -d ${ZSH_EX} ]; then
-  source ${ZSH_EX}/catppuccin_mocha-zsh-syntax-highlighting.zsh
-  source ${ZSH_EX}/zsh-autosuggestions/zsh-autosuggestions.zsh
-  source ${ZSH_EX}/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-  source ${ZSH_EX}/zsh-completions/zsh-completions.plugin.zsh
-fi
-
-# >>> cuda config >>>
-if [ -d "/usr/local/cuda-12.2" ]; then
-  export PATH=/usr/local/cuda-12.2/bin${PATH:+:${PATH}}
-  export LD_LIBRARY_PATH=/usr/local/cuda-12.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-fi
-# <<< cuda config <<<
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
