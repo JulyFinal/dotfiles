@@ -17,7 +17,9 @@ cd dotfiles && sh symlink-dotfiles.sh
 
 ## install base pkg
 sudo pacman -S --needed base-devel
-sudo pacman -S fd ripgrep xsel fzf bat bottom fd lsd sd tealdeer zoxide zip unzip direnv openssl zlib xz tk
+sudo pacman -S fd ripgrep fzf fd sd openssl
+sudo pacman -S xsel 
+sudo pacman -S zip unzip zlib xz
 sudo pacman -S neovim lazygit proxychains-ng
 
 
@@ -25,6 +27,9 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon  # install nix
 
 # bash ble
 nix-env -iA nixpkgs.blesh
+
+# tools
+nix-env -iA nixpkgs.bat nixpkgs.bottom nixpkgs.tealdeer zoxide direnv 
 
 # rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # install rustup
