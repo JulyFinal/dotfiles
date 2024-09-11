@@ -57,7 +57,3 @@ hidden = false
 
 [editor.indent-guides]
 render = true
-
-[keys.normal]
-C-s = ":w"
-C-q = ":write-quit-all!"
