@@ -15,14 +15,14 @@ file-types = [
   "SConstruct",
 ]
 shebangs = ["python"]
-roots = ["setup.py", "setup.cfg", "pyproject.toml"]
+roots = ["pyproject.toml"]
 indent = { tab-width = 4, unit = "    " }
-language-servers = ["pyright", "ruff"]
+language-servers = ["basedpyright", "ruff"]
 formatter = { command = "ruff", args = ["-"] }
 auto-format = false
 
-[language-server.pyright]
-command = "pyright-langserver"
+[language-server.basedpyright]
+command = "basedpyright-langserver"
 args = ["--stdio"]
 
 [language-server.ruff]
@@ -49,7 +49,6 @@ file-types = [
   "host",
 ]
 
-# dev
 [[language]]
 name = "markdown"
 indent = { tab-width = 4, unit = "    " }
