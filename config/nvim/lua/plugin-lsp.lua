@@ -1,6 +1,4 @@
 return function()
-	require("mason").setup()
-
 	local lspconfig = require("lspconfig")
 
 	local on_attach = function(client, bufnr)
