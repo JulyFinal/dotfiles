@@ -47,10 +47,6 @@ map("i", "<C-p>", "<ESC>ka", opt)
 map("i", "<C-f>", "<ESC>la", opt)
 map("i", "<C-b>", "<ESC>ha", opt)
 
--- install mason
-map("n", "<leader>mi", ":MasonInstall basedpyright ruff ruff-lsp lua-language-server shfmt stylua jq taplo<cr>", opt)
-map("n", "<leader>mu", ":MasonUpdate<cr>", opt)
-
 -- format
 map("n", "q", ":lua require('conform').format()<CR>", opt)
 
