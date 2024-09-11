@@ -90,7 +90,6 @@ local plugins = {
 		-- priority = 2000,
 		event = "BufEnter",
 		dependencies = {
-			"williamboman/mason.nvim",
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
 		},
 		config = require("plugin-lsp"),
@@ -116,9 +115,6 @@ local plugins = {
 				dependencies = { "rafamadriz/friendly-snippets" },
 				config = function()
 					require("luasnip.loaders.from_vscode").lazy_load()
-					require("luasnip.loaders.from_vscode").lazy_load({
-						paths = { vim.fn.stdpath("config") .. "/snippets" },
-					})
 				end,
 			},
 			"saadparwaiz1/cmp_luasnip",
