@@ -1,10 +1,6 @@
-# Sets user-defined palette
 palette = "catppuccin_mocha"
 
 [character]
-# Note the use of Catppuccin color 'maroon'
-# success_symbol = "[[](green) ❯](maroon)"
-# success_symbol = "[[](green) ❯](maroon)"
 success_symbol = "[❯](maroon)"
 error_symbol = "[❯](red)"
 vicmd_symbol = "[❮](green)"
