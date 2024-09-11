@@ -1,4 +1,4 @@
-theme = "jellybeans"
+theme = "molokai"
 
 [editor]
 mouse = true
@@ -21,30 +21,8 @@ display-messages = true
 display-inlay-hints = true
 
 [editor.statusline]
-left = [
-  "mode",
-  "spacer",
-  "spinner",
-  "spacer",
-  "version-control",
-  "spacer",
-  "read-only-indicator",
-  # "file-type-icon",
-  "file-name",
-  "file-modification-indicator",
-  "register"
-]
-center = ["diagnostics", "workspace-diagnostics"]
-right = [
-  "selections",
-  "primary-selection-length",
-  "position",
-  "position-percentage",
-  "file-encoding",
-  "file-line-ending",
-  "file-type",
-]
-separator = "│"
+left = ["mode", "spacer", "version-control", "file-name", "spinner", "diagnostics"]
+right = ["position", "primary-selection-length", "total-line-numbers", "file-encoding", "file-line-ending", "file-type"]
 
 
 [editor.cursor-shape]
@@ -52,8 +30,10 @@ insert = "bar"
 normal = "block"
 select = "underline"
 
-[editor.file-picker]
-hidden = false
-
+# 缩进提示线
 [editor.indent-guides]
 render = true
+skip-levels = 1
+
+[editor.file-picker]
+hidden = false
