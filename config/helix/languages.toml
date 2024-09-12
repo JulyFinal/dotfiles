@@ -1,6 +1,13 @@
 [language-server.scls]
 command = "simple-completion-language-server"
 
+[language-server.harper-ls]
+command = "harper-ls"
+args = ["--stdio"]
+
+[language-server.harper-ls.config.harper-ls.linters]
+spaces = false
+
 [language-server.basedpyright]
 command = "basedpyright-langserver"
 args = ["--stdio"]
@@ -35,7 +42,7 @@ roots = [
 ]
 comment-token = "#"
 indent = { tab-width = 4, unit = "    " }
-language-servers = ["scls", "basedpyright", "ruff"]
+language-servers = ["scls", "harper-ls", "basedpyright", "ruff"]
 formatter = { command = "ruff", args = ["format", "--line-length", "88", "-"] }
 auto-format = false
 
