@@ -1,17 +1,24 @@
-# My zsh config
 if [ -e /home/final/.nix-profile/etc/profile.d/nix.sh ]; then . /home/final/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 if [ -d "$HOME/.local/bin" ]; then PATH="$HOME/.local/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
 # eval
-eval "$(uv generate-shell-completion bash)"
-eval "$(starship init bash)"
-eval "$(zoxide init bash)"
-eval "$(direnv hook bash)"
-
-# ble config
-[[ $- == *i* ]] && source "$(blesh-share)"/ble.sh --noattach
+if [ -n "$BASH_VERSION" ]; then
+  eval "$(uv generate-shell-completion bash)"
+  eval "$(starship init bash)"
+  eval "$(zoxide init bash)"
+  eval "$(direnv hook bash)"
+  # ble config
+  [[ $- == *i* ]] && source "$(blesh-share)"/ble.sh --noattach
+elif [ -n "$ZSH_VERSION" ]; then
+  eval "$(uv generate-shell-completion zsh)"
+  eval "$(starship init zsh)"
+  eval "$(zoxide init zsh)"
+  eval "$(direnv hook zsh)"
+else
+  echo "must be zsh or bash"
+fi
 
 # custom alias
 alias vi="nvim"
@@ -38,7 +45,8 @@ alias w="watch -n"
 alias tf="tail -f"
 alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
 
-alias rebash="source ~/.bashrc"
+alias rebash="source ~/.profile"
+alias rezsh="source ~/.zshrc"
 
 # >>> git command >>>
 alias gitforceinit="git fetch --all && git reset --hard origin/master && git pull"
@@ -65,7 +73,6 @@ if command -v bat >/dev/null 2>&1; then
   alias tailf='f() { tail -f "$1" | bat --paging=never -l log; unset -f f; }; f'
 fi
 
-# custom command
 ## 解压缩
 ex() {
   if [ -f $1 ]; then
@@ -95,4 +102,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
-[[ ! ${BLE_VERSION-} ]] || ble-attach
+
+if [ -n "$BASH_VERSION" ]; then
+  [[ ! ${BLE_VERSION-} ]] || ble-attach
+fi
