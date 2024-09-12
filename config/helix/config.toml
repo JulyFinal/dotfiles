@@ -1,4 +1,4 @@
-theme = "molokai"
+theme = "jellybeans"
 
 [editor]
 mouse = true
@@ -18,22 +18,26 @@ enable = true
 
 [editor.lsp]
 display-messages = true
-# display-signature-help-docs = false
-# LSP Type Hints default is false
 display-inlay-hints = true
+auto-signature-help = true
+display-signature-help-docs = true
 
 [editor.statusline]
-left = ["mode", "spacer", "version-control", "file-name", "spinner"]
-center = ["diagnostics"]
+left = ["mode", "spinner", "version-control"]
+center = ["file-name"]
 right = [
+  "diagnostics",
+  "selections",
   "position",
-  "primary-selection-length",
   "total-line-numbers",
   "file-encoding",
   "file-line-ending",
   "file-type",
 ]
-
+separator = "│"
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
 
 [editor.cursor-shape]
 normal = "block"
