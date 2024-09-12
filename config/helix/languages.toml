@@ -9,9 +9,9 @@ args = ["--stdio"]
 python.analysis.venvPath = "."
 python.analysis.venv = ".venv"
 basedpyright.analysis.autoSearchPaths = true
-basedpyright.analysis.diagnosticMode = "workspace"
+# basedpyright.analysis.diagnosticMode = "workspace"
 basedpyright.analysis.useLibraryCodeForType = true
-basedpyright.analysis.logLevel = "Error"
+# basedpyright.analysis.logLevel = "Error"
 basedpyright.analysis.typeCheckingMode = "basic"
 basedpyright.analysis.autoImoprtCompletion = true
 
