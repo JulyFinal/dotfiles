@@ -5,15 +5,15 @@ args = ["--stdio"]
 [language-server.basedpyright.config.python.analysis]
 typeCheckingMode = "basic"
 
-[language-server.ruff-lsp]
-command = "ruff-lsp"
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
 
 [[language]]
 name = "python"
 roots = ["pyproject.toml"]
 indent = { tab-width = 4, unit = "    " }
-language-servers = ["basedpyright", "ruff-lsp"]
-formatter = { command = "ruff", args = ["-"] }
+language-servers = ["basedpyright", "ruff"]
 auto-format = false
 
 
