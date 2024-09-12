@@ -38,6 +38,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # install rustup
 
 # python
 cargo install --git https://github.com/astral-sh/uv uv # or use brew: brew install uv
+cargo install --git https://github.com/estin/simple-completion-language-server.git # for helix
 
 # install paru
 git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si

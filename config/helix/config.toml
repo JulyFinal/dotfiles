@@ -4,9 +4,11 @@ theme = "molokai"
 mouse = true
 cursorline = true
 line-number = "relative"
+completion-trigger-len = 1 # 触发自动补全的最少字符数
 auto-format = false
 auto-save = true
 auto-info = true
+completion-timeout = 5
 true-color = true
 bufferline = "multiple"
 color-modes = true
@@ -21,14 +23,22 @@ display-messages = true
 display-inlay-hints = true
 
 [editor.statusline]
-left = ["mode", "spacer", "version-control", "file-name", "spinner", "diagnostics"]
-right = ["position", "primary-selection-length", "total-line-numbers", "file-encoding", "file-line-ending", "file-type"]
+left = ["mode", "spacer", "version-control", "file-name", "spinner"]
+center = ["diagnostics"]
+right = [
+  "position",
+  "primary-selection-length",
+  "total-line-numbers",
+  "file-encoding",
+  "file-line-ending",
+  "file-type",
+]
 
 
 [editor.cursor-shape]
-insert = "bar"
 normal = "block"
-select = "underline"
+insert = "bar"
+select = "block"
 
 # 缩进提示线
 [editor.indent-guides]
@@ -37,3 +47,11 @@ skip-levels = 1
 
 [editor.file-picker]
 hidden = false
+
+[keys.normal.space]
+m = ":fmt"
+e = ":wq"
+
+[keys.insert]
+"C-a" = "insert_at_line_start"
+"C-e" = "insert_at_line_end"

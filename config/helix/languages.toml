@@ -1,9 +1,19 @@
+[language-server.scls]
+command = "simple-completion-language-server"
+
 [language-server.basedpyright]
 command = "basedpyright-langserver"
 args = ["--stdio"]
 
-[language-server.basedpyright.config.python.analysis]
-typeCheckingMode = "basic"
+[language-server.basedpyright.config]
+python.analysis.venvPath = "."
+python.analysis.venv = ".venv"
+basedpyright.analysis.autoSearchPaths = true
+basedpyright.analysis.diagnosticMode = "workspace"
+basedpyright.analysis.useLibraryCodeForType = true
+basedpyright.analysis.logLevel = "Error"
+basedpyright.analysis.typeCheckingMode = "basic"
+basedpyright.analysis.autoImoprtCompletion = true
 
 [language-server.ruff]
 command = "ruff"
@@ -11,14 +21,27 @@ args = ["server"]
 
 [[language]]
 name = "python"
-roots = ["pyproject.toml"]
+scope = "source.python"
+injection-regex = "python"
+file-types = ["py", "pyi", "py3", "pyw", "ptl", "rpy", "cpy", "ipy", "pyt"]
+shebangs = ["python"]
+roots = [
+  "pyproject.toml",
+  "setup.py",
+  "poetry.lock",
+  "pyrightconfig.json",
+  "requirements.txt",
+  ".venv/",
+]
+comment-token = "#"
 indent = { tab-width = 4, unit = "    " }
-language-servers = ["basedpyright", "ruff"]
+language-servers = ["scls", "basedpyright", "ruff"]
 auto-format = false
 
 
 [[language]]
 name = "bash"
+language-servers = ["scls"]
 file-types = [
   "sh",
   "bash",
@@ -34,6 +57,7 @@ file-types = [
 
 [[language]]
 name = "markdown"
+language-servers = ["scls"]
 indent = { tab-width = 4, unit = "    " }
 file-types = ["md", "markdown"]
 roots = [".git"]
@@ -42,5 +66,19 @@ roots = [".git"]
 command = "clippy"
 
 [[language]]
+name = "rust"
+language-servers = ["scls", "rust-analyzer"]
+
+[[language]]
 name = "toml"
 formatter = { command = "taplo", args = ["fmt", "-"] }
+language-servers = ["scls"]
+
+[[language]]
+name = "stub"
+scope = "text.stub"
+file-types = []
+shebangs = []
+roots = []
+auto-format = false
+language-servers = ["scls"]
