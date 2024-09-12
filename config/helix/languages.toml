@@ -1,49 +1,32 @@
-# sudo npm install -g pyright@latest
-
-[[language]]
-name = "python"
-scope = "source.python"
-injection-regex = "python"
-file-types = [
-  "py",
-  "pyi",
-  "py3",
-  "pyw",
-  "ptl",
-  ".pythonstartup",
-  ".pythonrc",
-  "SConstruct",
-]
-shebangs = ["python"]
-roots = ["pyproject.toml"]
-indent = { tab-width = 4, unit = "    " }
-language-servers = ["basedpyright", "ruff"]
-formatter = { command = "ruff", args = ["-"] }
-auto-format = false
-
 [language-server.basedpyright]
 command = "basedpyright-langserver"
 args = ["--stdio"]
 
-[language-server.ruff]
+[language-server.basedpyright.config.python.analysis]
+typeCheckingMode = "basic"
+
+[language-server.ruff-lsp]
 command = "ruff-lsp"
+
+[[language]]
+name = "python"
+roots = ["pyproject.toml"]
+indent = { tab-width = 4, unit = "    " }
+language-servers = ["basedpyright", "ruff-lsp"]
+formatter = { command = "ruff", args = ["-"] }
+auto-format = false
+
 
 [[language]]
 name = "bash"
 file-types = [
   "sh",
   "bash",
-  "zsh",
   ".bash_login",
   ".bash_logout",
   ".bash_profile",
   ".bashrc",
   ".profile",
-  ".zshenv",
-  ".zlogin",
-  ".zlogout",
-  ".zprofile",
-  ".zshrc",
   ".bash_alias",
   ".bash_path",
   "host",
@@ -54,3 +37,10 @@ name = "markdown"
 indent = { tab-width = 4, unit = "    " }
 file-types = ["md", "markdown"]
 roots = [".git"]
+
+[language-server.rust-analyzer.config.check]
+command = "clippy"
+
+[[language]]
+name = "toml"
+formatter = { command = "taplo", args = ["fmt", "-"] }
