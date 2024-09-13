@@ -1,3 +1,6 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
 palette = "catppuccin_mocha"
 
 [character]
@@ -5,9 +8,11 @@ success_symbol = "[❯](maroon)"
 error_symbol = "[❯](red)"
 vicmd_symbol = "[❮](green)"
 
+[git_branch]
+style = "bold mauve"
+
 [directory]
 truncation_length = 4
-# Catppuccin 'lavender'
 style = "bold lavender"
 
 [palettes.catppuccin_mocha]
