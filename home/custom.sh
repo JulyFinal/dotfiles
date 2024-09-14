@@ -32,7 +32,7 @@ alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 ## python
 alias av="source .venv/bin/activate"
 alias pp="export PYTHONPATH=$(pwd)"
-alias pipcn='pip install -i https://pypi.tuna.tsinghua.edu.cn/simple'
+alias pipcn='uv pip install -i https://pypi.tuna.tsinghua.edu.cn/simple'
 
 # linux command
 alias ls="ls --color=auto"

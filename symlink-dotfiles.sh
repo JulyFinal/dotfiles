@@ -33,7 +33,6 @@ link() {
     ln -s "$from" "$to"
 }
 
-
 # 根据指定的 shell 类型执行配置操作
 case "$current_shell" in
   bash)
@@ -52,9 +51,7 @@ case "$current_shell" in
     ;;
 esac
 
-
 link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
-# link "$dotfiles/home/emacs.d" "$HOME/.emacs.d"
 
 for name in `ls config`; do
     link "$dotfiles/config/$name" "$config/$name"
