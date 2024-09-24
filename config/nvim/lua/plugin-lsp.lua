@@ -27,7 +27,7 @@ return function()
 	end
 
 	local servers = {
-		["ruff_lsp"] = {},
+		["ruff"] = {},
 		["basedpyright"] = {
 			basedpyright = {
 				disableOrganizeImports = true,
