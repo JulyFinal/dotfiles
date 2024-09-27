@@ -49,7 +49,8 @@ alias rebash="source ~/.profile"
 alias rezsh="source ~/.zshrc"
 
 # >>> git command >>>
-alias gitforceinit="git fetch --all && git reset --hard origin/master && git pull"
+alias gitforceinit="git fetch --all && git reset --hard origin/master && git pull" #强制覆盖
+alias gdiff="git diff --name-only --relative --diff-filter=d | xargs bat --diff"
 
 # browser in terminal
 alias browser="docker run --rm -ti fathyb/carbonyl"
@@ -67,36 +68,10 @@ if command -v fzf >/dev/null 2>&1; then
 
 fi
 
-
 if command -v bat >/dev/null 2>&1; then
   alias cat='bat -pp --theme="Nord"'
   alias tailf='f() { tail -f "$1" | bat --paging=never -l log; unset -f f; }; f'
 fi
-
-## 解压缩
-ex() {
-  if [ -f $1 ]; then
-    case $1 in
-    *.tar.bz2) tar xjf $1 ;;
-    *.tar.gz) tar xzf $1 ;;
-    *.bz2) bunzip2 $1 ;;
-    *.rar) unrar x $1 ;;
-    *.gz) gunzip $1 ;;
-    *.tar) tar xf $1 ;;
-    *.tbz2) tar xjf $1 ;;
-    *.tgz) tar xzf $1 ;;
-    *.zip) unzip $1 ;;
-    *.Z) uncompress $1 ;;
-    *.7z) 7z x $1 ;;
-    *) echo "'$1' cannot be extracted via ex()" ;;
-    esac
-  else
-    echo "'$1' is not a valid file"
-  fi
-}
-
-## diff
-gdiff() { git diff --name-only --relative --diff-filter=d | xargs bat --diff; }
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
