@@ -48,7 +48,7 @@ map("i", "<C-f>", "<ESC>la", opt)
 map("i", "<C-b>", "<ESC>ha", opt)
 
 -- format
-map("n", "q", ":lua require('conform').format()<CR>", opt)
+map("n", "<leader>f", ":lua require('conform').format()<CR>", opt)
 
 map("n", "Q", ":wqa<CR>", opt)
 
