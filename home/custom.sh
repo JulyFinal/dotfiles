@@ -12,6 +12,9 @@ if [ -n "$BASH_VERSION" ]; then
   # ble config
   [[ $- == *i* ]] && source "$(blesh-share)"/ble.sh --noattach
 elif [ -n "$ZSH_VERSION" ]; then
+  autoload compinit
+  compinit
+
   eval "$(uv generate-shell-completion zsh)"
   eval "$(starship init zsh)"
   eval "$(zoxide init zsh)"
