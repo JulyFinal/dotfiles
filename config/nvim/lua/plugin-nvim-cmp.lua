@@ -7,6 +7,7 @@ return function()
 	local lspkind = require("lspkind")
 	local luasnip = require("luasnip")
 
+	-- If you want insert `(` after select function or method item
 	local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 	cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 
@@ -14,6 +15,8 @@ return function()
 	vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, cmp.config.window.bordered())
 
 	local mapping = {
+		["<C-g>"] = cmp.mapping.complete(),
+		["<C-e>"] = cmp.mapping.abort(),
 		["<Tab>"] = cmp.mapping.select_next_item(),
 		["<S-Tab>"] = cmp.mapping.select_prev_item(),
 		["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
@@ -40,15 +43,19 @@ return function()
 		},
 
 		mapping = mapping,
-		completion = { completeopt = "menu,menuone,noinsert" },
+		completion = {
+			completeopt = "menu,menuone,noinsert",
+			keyword_length = 1,
+			keyword_pattern = ".*",
+		},
 
 		experimental = {
 			ghost_text = true,
 		},
 
 		sources = cmp.config.sources({
-			{ name = "nvim_lsp" },
-			{ name = "luasnip" },
+			{ name = "nvim_lsp", keyword_pattern = ".*", keyword_length = 1 },
+			-- { name = "luasnip" },
 			{ name = "buffer" },
 			{ name = "path" },
 		}),
@@ -59,6 +66,9 @@ return function()
 		mapping = cmp.mapping.preset.cmdline(),
 		sources = {
 			{ name = "buffer" },
+		},
+		view = {
+			entries = { name = "wildmenu", separator = "|" },
 		},
 	})
 

@@ -28,6 +28,7 @@ local plugins = {
 		end,
 	},
 
+	-- chunk
 	{
 		"shellRaining/hlchunk.nvim",
 		event = { "UIEnter" },
@@ -43,6 +44,7 @@ local plugins = {
 		end,
 	},
 
+	--- 自动括号
 	{
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
@@ -64,14 +66,12 @@ local plugins = {
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		lazy = false,
-		priority = 500,
 		branch = "v3.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
 			"MunifTanjim/nui.nvim",
 		},
-
 		keys = {
 			{ "<leader>e", ":Neotree float reveal<CR>", desc = "NeoTree [E]xplore" },
 			{ "<leader>E", ":Neotree right reveal<CR>", desc = "NeoTree [E]xplore Right" },
@@ -93,7 +93,7 @@ local plugins = {
 					},
 				},
 				filesystem = {
-					check_gitignore_in_search = false, -- Check gitignore status for files/directories when searching.
+					check_gitignore_in_search = true, -- Check gitignore status for files/directories when searching.
 					find_by_full_path_words = false,
 					follow_current_file = {
 						enabled = true,
@@ -116,9 +116,28 @@ local plugins = {
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
 		},
-		config = require("plugin-lsp"),
+		config = function()
+			require("conform").setup({
+				formatters_by_ft = {
+					lua = { "stylua" },
+					python = { "ruff_format" },
+					javascript = { "deno" },
+					rust = { "rustfmt" },
+					bash = { "shfmt" },
+					markdown = { "deno" },
+					toml = { "taplo" },
+					json = { "deno" },
+					jsonc = { "deno" },
+					nix = { "alejandra" },
+					html = { "deno" },
+
+					["_"] = { "trim_whitespace" },
+				},
+			})
+		end,
 	},
 
+	-- code format
 	{
 		"stevearc/conform.nvim",
 		keys = {
@@ -130,9 +149,28 @@ local plugins = {
 				desc = "format current file",
 			},
 		},
-		config = require("plugin-format"),
+		config = function()
+			require("conform").setup({
+				formatters_by_ft = {
+					lua = { "stylua" },
+					python = { "ruff_format" },
+					javascript = { "deno" },
+					rust = { "rustfmt" },
+					bash = { "shfmt" },
+					markdown = { "deno" },
+					toml = { "taplo" },
+					json = { "deno" },
+					jsonc = { "deno" },
+					nix = { "alejandra" },
+					html = { "deno" },
+
+					["_"] = { "trim_whitespace" },
+				},
+			})
+		end,
 	},
 
+	-- complete
 	{
 		"hrsh7th/nvim-cmp",
 		event = { "InsertEnter", "CmdlineEnter" },
@@ -272,6 +310,7 @@ local plugins = {
 		config = require("plugin-lualine"),
 	},
 
+	-- diagnostic
 	{
 		"rachartier/tiny-inline-diagnostic.nvim",
 		event = "VeryLazy", -- Or `LspAttach`
