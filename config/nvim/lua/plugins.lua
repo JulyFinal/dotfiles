@@ -246,6 +246,14 @@ local plugins = {
 		event = "BufEnter",
 		config = require("plugin-lualine"),
 	},
+
+	{
+		"rachartier/tiny-inline-diagnostic.nvim",
+		event = "VeryLazy", -- Or `LspAttach`
+		config = function()
+			require("tiny-inline-diagnostic").setup()
+		end,
+	},
 }
 
 local opts = {
