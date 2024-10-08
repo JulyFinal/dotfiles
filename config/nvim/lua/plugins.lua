@@ -68,17 +68,52 @@ local plugins = {
 		branch = "v3.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			-- "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
 			"MunifTanjim/nui.nvim",
 		},
 
-		keys = { { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Neotree" } },
+		keys = {
+			{ "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Neotree" },
+			{
+				"<leader>b",
+				function()
+					require("neo-tree.command").execute({
+						toggle = true,
+						source = "buffers",
+						position = "left",
+					})
+				end,
+				desc = "Buffers (root dir)",
+			},
+			{
+				"<leader>g",
+				function()
+					require("neo-tree.command").execute({
+						toggle = true,
+						source = "git_status",
+						position = "left",
+					})
+				end,
+				desc = "Git_status",
+			},
+		},
 		config = function()
 			require("neo-tree").setup({
 				filesystem = {
 					follow_current_file = {
 						enabled = true,
 					},
+				},
+				buffers = {
+					show_unloaded = true,
+					follow_current_file = {
+						enabled = true,
+					},
+				},
+				git_status = {},
+				source_selector = {
+					winbar = false,
+					statusline = false,
 				},
 			})
 		end,
@@ -139,7 +174,6 @@ local plugins = {
 			{ "<leader>F", "<cmd>Telescope<cr>", desc = "find_files" },
 			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = "find_files" },
 			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = "live_grep" },
-			{ "<leader>b", "<cmd>lua require('telescope.builtin').buffers()<cr>", desc = "buffers" },
 			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<cr>", desc = "help_tags" },
 			{ "<leader>fe", "<cmd>lua require('telescope.builtin').keymaps()<cr>", desc = "keymappings" },
 			{
@@ -173,8 +207,10 @@ local plugins = {
 					offsets = {
 						{
 							filetype = "neo-tree",
-							text = "File Explorer",
-							text_align = "left",
+							text = 'Neo-tree',
+              text_align = "center",
+							highlight = { sep = { link = "WinSeparator" } },
+							separator = "┃",
 						},
 					},
 				},
@@ -252,7 +288,7 @@ local plugins = {
 		event = "VeryLazy", -- Or `LspAttach`
 		config = function()
 			require("tiny-inline-diagnostic").setup()
-      vim.diagnostic.config({ virtual_text = false })
+			vim.diagnostic.config({ virtual_text = false })
 		end,
 	},
 }
