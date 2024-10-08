@@ -122,7 +122,13 @@ local plugins = {
 	{
 		"stevearc/conform.nvim",
 		keys = {
-			{ "<leader>m", ":lua require('conform').format()<CR>", desc = "format current file" },
+			{
+				"<leader>m",
+				function()
+					require("conform").format()
+				end,
+				desc = "format current file",
+			},
 		},
 		config = require("plugin-format"),
 	},
