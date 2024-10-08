@@ -73,56 +73,45 @@ local plugins = {
 		},
 
 		keys = {
-			{ "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Neotree" },
-			{
-				"<leader>b",
-				function()
-					require("neo-tree.command").execute({
-						toggle = true,
-						source = "buffers",
-						position = "left",
-					})
-				end,
-				desc = "Buffers (root dir)",
-			},
-			{
-				"<leader>g",
-				function()
-					require("neo-tree.command").execute({
-						toggle = true,
-						source = "git_status",
-						position = "left",
-					})
-				end,
-				desc = "Git_status",
-			},
+			{ "<leader>e", ":Neotree float reveal<CR>", desc = "NeoTree [E]xplore" },
+			{ "<leader>E", ":Neotree right reveal<CR>", desc = "NeoTree [E]xplore Right" },
+			{ "<leader>b", ":Neotree float buffers<CR>", desc = "NeoTree [O]pen Buffers" },
+			{ "<leader>g", ":Neotree float git_status<CR>", desc = "NeoTree [O]pen Git Status" },
 		},
 		config = function()
 			require("neo-tree").setup({
+				popup_border_style = "rounded",
+				sources = { "filesystem", "buffers", "git_status" },
+				source_selector = {
+					winbar = true,
+					content_layout = "center",
+					sources = {
+						{ source = "filesystem" },
+						{ source = "buffers" },
+						{ source = "git_status" },
+						{ source = "document_symbols" },
+					},
+				},
 				filesystem = {
+					check_gitignore_in_search = false, -- Check gitignore status for files/directories when searching.
+					find_by_full_path_words = false,
 					follow_current_file = {
 						enabled = true,
 					},
 				},
 				buffers = {
-					show_unloaded = true,
+					leave_dirs_open = false,
 					follow_current_file = {
 						enabled = true,
 					},
 				},
 				git_status = {},
-				source_selector = {
-					winbar = false,
-					statusline = false,
-				},
 			})
 		end,
 	},
 
 	{
 		"neovim/nvim-lspconfig",
-		-- lazy = false,
-		-- priority = 2000,
 		event = "BufEnter",
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
@@ -130,7 +119,13 @@ local plugins = {
 		config = require("plugin-lsp"),
 	},
 
-	{ "stevearc/conform.nvim", event = { "BufReadPre", "BufNewFile" }, config = require("plugin-format") },
+	{
+		"stevearc/conform.nvim",
+		keys = {
+			{ "<leader>m", ":lua require('conform').format()<CR>", desc = "format current file" },
+		},
+		config = require("plugin-format"),
+	},
 
 	{
 		"hrsh7th/nvim-cmp",
@@ -202,19 +197,7 @@ local plugins = {
 		version = "*",
 		event = "BufEnter",
 		config = function()
-			require("bufferline").setup({
-				options = {
-					offsets = {
-						{
-							filetype = "neo-tree",
-							text = 'Neo-tree',
-              text_align = "center",
-							highlight = { sep = { link = "WinSeparator" } },
-							separator = "┃",
-						},
-					},
-				},
-			})
+			require("bufferline").setup()
 		end,
 	},
 

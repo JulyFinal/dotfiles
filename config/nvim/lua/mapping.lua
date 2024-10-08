@@ -47,9 +47,6 @@ map("i", "<C-p>", "<ESC>ka", opt)
 map("i", "<C-f>", "<ESC>la", opt)
 map("i", "<C-b>", "<ESC>ha", opt)
 
--- format
-map("n", "<leader>f", ":lua require('conform').format()<CR>", opt)
-
 map("n", "Q", ":wqa<CR>", opt)
 
 -- buffers
