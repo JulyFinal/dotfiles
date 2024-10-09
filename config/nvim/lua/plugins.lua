@@ -265,7 +265,7 @@ local plugins = {
 	-- todo
 	{
 		"folke/todo-comments.nvim",
-		event = "BufReadPre",
+		event = "VimEnter",
 		keys = { { "<leader>ft", "<cmd> TodoTelescope <cr>", desc = "TodoTelescope" } },
 		config = function()
 			require("todo-comments").setup()
@@ -385,6 +385,21 @@ local plugins = {
 
 		config = require("plugin-nvim-cmp"),
 	},
+
+	-- LSP Plugins
+	{
+		-- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+		-- used for completion, annotations and signatures of Neovim apis
+		"folke/lazydev.nvim",
+		ft = "lua",
+		opts = {
+			library = {
+				-- Load luvit types when the `vim.uv` word is found
+				{ path = "luvit-meta/library", words = { "vim%.uv" } },
+			},
+		},
+	},
+	{ "Bilal2453/luvit-meta", lazy = true },
 
 	-- rust
 	{

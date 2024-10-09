@@ -8,6 +8,9 @@ local opt = { noremap = true, silent = true }
 
 -- ESC
 map("i", "jk", "<ESC>", opt)
+vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+
 -- windows 分屏快捷键
 map("n", "<leader>v", ":vsp<CR>", opt)
 map("n", "<leader>h", ":sp<CR>", opt)
@@ -47,8 +50,6 @@ map("i", "<C-p>", "<ESC>ka", opt)
 map("i", "<C-f>", "<ESC>la", opt)
 map("i", "<C-b>", "<ESC>ha", opt)
 
-map("n", "Q", ":wqa<CR>", opt)
-
 -- buffers
-map("n", "<s-Tab>", ":bp<CR>", opt)
-map("n", "<Tab>", ":bn<CR>", opt)
+map("n", "gn", ":bn<CR>", opt)
+map("n", "gnn", ":bp<CR>", opt)

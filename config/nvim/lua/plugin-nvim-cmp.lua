@@ -70,22 +70,15 @@ return function()
 		},
 
 		sources = cmp.config.sources({
+			{
+				name = "lazydev",
+				-- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
+				group_index = 0,
+			},
 			{ name = "nvim_lsp" },
 			{ name = "luasnip" },
-			{ name = "buffer" },
 			{ name = "path" },
 		}),
-	})
-
-	-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-	cmp.setup.cmdline({ "/", "?" }, {
-		mapping = cmp.mapping.preset.cmdline(),
-		sources = {
-			{ name = "buffer" },
-		},
-		view = {
-			entries = { name = "wildmenu", separator = "|" },
-		},
 	})
 
 	-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
