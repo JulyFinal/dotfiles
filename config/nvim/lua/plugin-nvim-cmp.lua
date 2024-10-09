@@ -7,21 +7,38 @@ return function()
 	local lspkind = require("lspkind")
 	local luasnip = require("luasnip")
 
-	-- If you want insert `(` after select function or method item
-	local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-	cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-
 	-- set hover style
 	vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, cmp.config.window.bordered())
 
 	local mapping = {
 		["<C-g>"] = cmp.mapping.complete(),
 		["<C-e>"] = cmp.mapping.abort(),
-		["<Tab>"] = cmp.mapping.select_next_item(),
+		-- ["<Tab>"] = cmp.mapping.select_next_item(),
+		["<Tab>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				cmp.select_next_item()
+			elseif luasnip.locally_jumpable(1) then
+				luasnip.jump(1)
+			else
+				fallback()
+			end
+		end, { "i", "s" }),
 		["<S-Tab>"] = cmp.mapping.select_prev_item(),
 		["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
 		["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
-		["<CR>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true }),
+		["<CR>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				if luasnip.expandable() then
+					luasnip.expand()
+				else
+					cmp.confirm({
+						select = true,
+					})
+				end
+			else
+				fallback()
+			end
+		end),
 		["<C-y>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true }),
 	}
 
@@ -44,9 +61,8 @@ return function()
 
 		mapping = mapping,
 		completion = {
+			-- autocomplete = false,
 			completeopt = "menu,menuone,noinsert",
-			keyword_length = 1,
-			keyword_pattern = ".*",
 		},
 
 		experimental = {
@@ -54,12 +70,8 @@ return function()
 		},
 
 		sources = cmp.config.sources({
-			{
-				name = "lazydev",
-				group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-			},
-			{ name = "nvim_lsp", keyword_pattern = ".*", keyword_length = 1 },
-			-- { name = "luasnip" },
+			{ name = "nvim_lsp" },
+			{ name = "luasnip" },
 			{ name = "buffer" },
 			{ name = "path" },
 		}),
