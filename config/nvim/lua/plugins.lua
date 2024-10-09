@@ -44,6 +44,31 @@ local plugins = {
 		end,
 	},
 
+	-- telescope
+	{
+		"nvim-telescope/telescope.nvim",
+		event = "BufEnter",
+		tag = "0.1.8",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		keys = {
+			{ "<leader>F", "<cmd>Telescope<cr>", desc = "find_files" },
+			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = "find_files" },
+			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = "live_grep" },
+			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<cr>", desc = "help_tags" },
+			{ "<leader>fe", "<cmd>lua require('telescope.builtin').keymaps()<cr>", desc = "keymappings" },
+			{
+				"<leader>s",
+				"<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>",
+				desc = "search symbols",
+			},
+			{
+				"<leader>fs",
+				"<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>",
+				desc = "search all symbols",
+			},
+		},
+	},
+
 	--- 自动括号
 	{
 		"windwp/nvim-autopairs",
@@ -61,12 +86,36 @@ local plugins = {
 		end,
 	},
 
-	{ "nvim-treesitter/nvim-treesitter", config = require("plugin-nvim-treesitter") },
+	{
+		"nvim-treesitter/nvim-treesitter",
+		config = function()
+			for _, config in pairs(require("nvim-treesitter.parsers").get_parser_configs()) do
+				config.install_info.url = config.install_info.url:gsub(
+					"https://github.com/",
+					"https://mirror.ghproxy.com/https://github.com/"
+				)
+			end
+			require("nvim-treesitter.configs").setup({
+				ensure_installed = { "lua", "python", "toml", "bash", "markdown", "json" },
+				sync_install = true,
+				auto_install = true,
+				ignore_install = {},
+				highlight = {
+					enable = true,
+					disable = {},
+					additional_vim_regex_highlighting = false,
+				},
+				indent = {
+					enable = true,
+				},
+			})
+		end,
+	},
 
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		lazy = false,
-		branch = "v3.x",
+		-- branch = "v3.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
@@ -74,14 +123,11 @@ local plugins = {
 		},
 		keys = {
 			{ "<leader>e", ":Neotree float reveal<CR>", desc = "NeoTree [E]xplore" },
-			{ "<leader>E", ":Neotree right reveal<CR>", desc = "NeoTree [E]xplore Right" },
-			{ "<leader>b", ":Neotree float buffers<CR>", desc = "NeoTree [O]pen Buffers" },
-			{ "<leader>g", ":Neotree float git_status<CR>", desc = "NeoTree [O]pen Git Status" },
 		},
 		config = function()
 			require("neo-tree").setup({
 				popup_border_style = "rounded",
-				sources = { "filesystem", "buffers", "git_status" },
+				sources = { "filesystem", "buffers", "git_status", "document_symbols" },
 				source_selector = {
 					winbar = true,
 					content_layout = "center",
@@ -106,33 +152,6 @@ local plugins = {
 					},
 				},
 				git_status = {},
-			})
-		end,
-	},
-
-	{
-		"neovim/nvim-lspconfig",
-		event = "BufEnter",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
-		},
-		config = function()
-			require("conform").setup({
-				formatters_by_ft = {
-					lua = { "stylua" },
-					python = { "ruff_format" },
-					javascript = { "deno" },
-					rust = { "rustfmt" },
-					bash = { "shfmt" },
-					markdown = { "deno" },
-					toml = { "taplo" },
-					json = { "deno" },
-					jsonc = { "deno" },
-					nix = { "alejandra" },
-					html = { "deno" },
-
-					["_"] = { "trim_whitespace" },
-				},
 			})
 		end,
 	},
@@ -170,64 +189,7 @@ local plugins = {
 		end,
 	},
 
-	-- complete
-	{
-		"hrsh7th/nvim-cmp",
-		event = { "InsertEnter", "CmdlineEnter" },
-		dependencies = {
-			"onsails/lspkind.nvim",
-
-			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
-			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
-			"hrsh7th/cmp-path", -- { name = 'path' }
-			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
-
-			-- for luasnip
-			{
-				"L3MON4D3/LuaSnip",
-				build = "make install_jsregexp",
-				dependencies = { "rafamadriz/friendly-snippets" },
-				config = function()
-					require("luasnip.loaders.from_vscode").lazy_load()
-				end,
-			},
-			"saadparwaiz1/cmp_luasnip",
-		},
-
-		config = require("plugin-nvim-cmp"),
-	},
-
-	-- rust
-	{
-		"mrcjkb/rustaceanvim",
-		version = "^5", -- Recommended
-		ft = { "rust" },
-	},
-
-	{
-		"nvim-telescope/telescope.nvim",
-		event = "BufEnter",
-		tag = "0.1.8",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		keys = {
-			{ "<leader>F", "<cmd>Telescope<cr>", desc = "find_files" },
-			{ "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = "find_files" },
-			{ "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<cr>", desc = "live_grep" },
-			{ "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<cr>", desc = "help_tags" },
-			{ "<leader>fe", "<cmd>lua require('telescope.builtin').keymaps()<cr>", desc = "keymappings" },
-			{
-				"<leader>s",
-				"<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>",
-				desc = "search symbols",
-			},
-			{
-				"<leader>fs",
-				"<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>",
-				desc = "search all symbols",
-			},
-		},
-	},
-
+	-- comment
 	{
 		"numToStr/Comment.nvim",
 		event = "BufEnter",
@@ -308,6 +270,120 @@ local plugins = {
 		"nvim-lualine/lualine.nvim",
 		event = "BufEnter",
 		config = require("plugin-lualine"),
+	},
+
+	-- lsp dev
+	{
+		"neovim/nvim-lspconfig",
+		event = "BufEnter",
+		keys = {
+			{ "gr", ":Telescope lsp_references<cr>", mode = { "n" } },
+			{ "gd", ":Telescope lsp_definitions<cr>", mode = { "n" } },
+			{ "gm", ":Telescope lsp_implementations<cr>", mode = { "n" } },
+			{ "gt", ":Telescope lsp_type_definitions<cr>", mode = { "n" } },
+
+			{ "gD", ":lua vim.lsp.buf.declaration()<CR>", mode = { "n" } },
+			{ "K", ":lua vim.lsp.buf.hover()<CR>", mode = { "n" } },
+			{ "<leader>r", ":lua vim.lsp.buf.rename()<CR>", mode = { "n" } },
+			{ "<leader>a", ":lua vim.lsp.buf.code_action()<CR>", mode = { "n" } },
+		},
+		dependencies = {
+			"hrsh7th/cmp-nvim-lsp",
+			"nvim-telescope/telescope.nvim",
+		},
+		config = function()
+			local lspconfig = require("lspconfig")
+
+			local on_attach = function(client, bufnr)
+				-- Enable completion triggered by <c-x><c-o>
+				vim.api.nvim_set_option_value("omnifunc", "v:lua.vim.lsp.omnifunc", { buf = bufnr })
+				if client.name == "ruff_lsp" then
+					-- Disable hover in favor of Pyright
+					client.server_capabilities.hoverProvider = false
+				end
+			end
+
+			local servers = {
+				["ruff"] = {},
+				["basedpyright"] = {
+					basedpyright = {
+						disableOrganizeImports = true,
+						single_file_support = true,
+					},
+				},
+				["lua_ls"] = {
+					Lua = {
+						runtime = {
+							version = "LuaJIT",
+						},
+						diagnostics = {
+							globals = { "vim" },
+						},
+						workspace = {
+							library = vim.api.nvim_get_runtime_file("", true),
+						},
+						telemetry = {
+							enable = false,
+						},
+						completion = {
+							callSnippet = "Replace",
+						},
+					},
+				},
+			}
+
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+			for lsp, settings in pairs(servers) do
+				lspconfig[lsp].setup({
+					on_attach = on_attach,
+					capabilities = capabilities,
+					settings = settings,
+				})
+			end
+
+			-- set diagnostic style and icon
+			local x = vim.diagnostic.severity
+			vim.diagnostic.config({
+				virtual_text = { prefix = "" },
+				signs = { text = { [x.ERROR] = "✘", [x.WARN] = "▲", [x.INFO] = "⚑", [x.HINT] = "" } },
+				underline = true,
+			})
+		end,
+	},
+
+	-- complete
+	{
+		"hrsh7th/nvim-cmp",
+		event = { "InsertEnter", "CmdlineEnter" },
+		dependencies = {
+			"onsails/lspkind.nvim",
+
+			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
+			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
+			"hrsh7th/cmp-path", -- { name = 'path' }
+			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
+
+			-- for luasnip
+			{
+				"L3MON4D3/LuaSnip",
+				build = "make install_jsregexp",
+				dependencies = { "rafamadriz/friendly-snippets" },
+				config = function()
+					require("luasnip.loaders.from_vscode").lazy_load()
+				end,
+			},
+			"saadparwaiz1/cmp_luasnip",
+		},
+
+		config = require("plugin-nvim-cmp"),
+	},
+
+	-- rust
+	{
+		"mrcjkb/rustaceanvim",
+		version = "^5", -- Recommended
+		ft = { "rust" },
 	},
 
 	-- diagnostic
