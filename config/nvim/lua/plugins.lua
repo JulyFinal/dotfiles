@@ -43,9 +43,9 @@ local plugins = {
 						" ╚═╝  ╚═══╝ ╚══════╝ ╚═════╝    ╚═══╝   ╚═╝ ╚═╝     ╚═╝",
 					},
 					shortcut = {
-						{ icon = "󰊳  ", desc = "Update", group = "@property", action = "Lazy update", key = "u" },
+						{ icon = "󰏕  ", desc = "Update", icon_hl = "@property", action = "Lazy update", key = "u" },
 						{
-							icon = "  ",
+							icon = "  ",
 							icon_hl = "@variable",
 							desc = "Files",
 							group = "Label",
@@ -53,19 +53,19 @@ local plugins = {
 							key = "f",
 						},
 						{
-							icon = "  ",
+							icon = "  ",
 							desc = "New File",
 							action = "DashboardNewFile",
 							key = "n",
 						},
 						{
-							icon = "  ",
+							icon = "  ",
 							desc = "Old Files",
 							action = "Telescope oldfiles",
 							key = "o",
 						},
 						{
-							icon = "  ",
+							icon = "󰮗  ",
 							desc = "Live Grep",
 							action = "Telescope live_grep",
 							key = "g",
