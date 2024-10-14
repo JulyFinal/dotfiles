@@ -29,7 +29,8 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon  # install nix
 nix-env -iA nixpkgs.blesh
 
 # tools
-nix-env -iA nixpkgs.bat nixpkgs.bottom nixpkgs.tealdeer zoxide direnv 
+nix-env -iA nixpkgs.bat nixpkgs.bottom nixpkgs.tealdeer nixpkgs.zoxide nixpkgs.direnv 
+nix-env -iA nixpkgs.lua-language-server
 
 # rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # install rustup
@@ -44,8 +45,14 @@ cargo install harper-ls --locked # English grammar checker
 
 nix-env -iA nixpkgs.deno
 
+uv tool install ruff
+uv tool install basedpyright
+
 # install paru
 git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si
 
 # WPS
 # paru -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
+
+git config user.email "julyfinal@outlook.com"
+git config user.name "final"
