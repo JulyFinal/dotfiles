@@ -12,7 +12,6 @@ return function()
 
 	local mapping = {
 		["<C-g>"] = cmp.mapping.complete(),
-		["<C-e>"] = cmp.mapping.abort(),
 		-- ["<Tab>"] = cmp.mapping.select_next_item(),
 		["<Tab>"] = cmp.mapping(function(fallback)
 			if cmp.visible() then

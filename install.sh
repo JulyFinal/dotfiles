@@ -18,7 +18,7 @@ cd dotfiles && sh symlink-dotfiles.sh
 ## install base pkg
 sudo pacman -S --needed base-devel
 sudo pacman -S fd ripgrep fzf fd sd openssl
-sudo pacman -S xsel 
+sudo pacman -S xsel
 sudo pacman -S zip unzip zlib xz
 sudo pacman -S neovim lazygit proxychains-ng
 
@@ -29,8 +29,10 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon  # install nix
 nix-env -iA nixpkgs.blesh
 
 # tools
-nix-env -iA nixpkgs.bat nixpkgs.bottom nixpkgs.tealdeer nixpkgs.zoxide nixpkgs.direnv 
-nix-env -iA nixpkgs.lua-language-server
+nix-env -iA nixpkgs.bat nixpkgs.bottom nixpkgs.tealdeer nixpkgs.zoxide nixpkgs.direnv
+
+## lsp
+nix-env -iA nixpkgs.lua-language-server nixpkgs.stylua nixpkgs.shfmt nixpkgs.taplo nixpkgs.alejandra nixpkgs.deno
 
 # rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # install rustup
@@ -43,8 +45,6 @@ cargo install --git https://github.com/astral-sh/uv uv # or use brew: brew insta
 cargo install --git https://github.com/estin/simple-completion-language-server.git # for helix
 cargo install harper-ls --locked # English grammar checker
 
-nix-env -iA nixpkgs.deno
-
 uv tool install ruff
 uv tool install basedpyright
 
@@ -54,5 +54,6 @@ git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si
 # WPS
 # paru -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
 
+# git
 git config user.email "julyfinal@outlook.com"
 git config user.name "final"
