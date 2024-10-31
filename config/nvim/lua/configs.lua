@@ -62,16 +62,16 @@ vim.opt.smartindent = true
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 -- vim.opt.title = true
---
+
 -- -- fold
--- vim.opt.foldmethod = "indent"
--- vim.opt.foldcolumn = "0"
--- vim.opt.foldlevel = 99
+vim.opt.foldmethod = "indent"
+vim.opt.foldcolumn = "0"
+vim.opt.foldlevel = 99
 --
 -- -- disable nvim intro
 -- vim.opt.shortmess:append("sI")
---
--- vim.opt.termguicolors = true
+
+vim.opt.termguicolors = true
 --
 -- -- go to previous/next line with h,l,left arrow and right arrow
 -- -- when cursor reaches end/beginning of line
