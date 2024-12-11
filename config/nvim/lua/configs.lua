@@ -111,3 +111,16 @@ vim.opt.splitright = true
 -- vim.opt.pumheight = 10
 -- -- 永远显示 tabline
 -- vim.opt.showtabline = 1
+
+vim.diagnostic.config({
+	virtual_text = { prefix = "" },
+	signs = {
+		text = {
+			[vim.diagnostic.severity.ERROR] = "✘",
+			[vim.diagnostic.severity.WARN] = "▲",
+			[vim.diagnostic.severity.INFO] = "⚑",
+			[vim.diagnostic.severity.HINT] = "",
+		},
+	},
+	underline = true,
+})

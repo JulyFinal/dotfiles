@@ -125,20 +125,6 @@ local plugins = {
 		},
 	},
 
-	--- 自动括号
-	{
-		"windwp/nvim-autopairs",
-		event = "InsertEnter",
-		dependencies = { "hrsh7th/nvim-cmp" },
-		config = function()
-			require("nvim-autopairs").setup({})
-			-- If you want to automatically add `(` after selecting a function or method
-			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-			local cmp = require("cmp")
-			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-		end,
-	},
-
 	{
 		"kylechui/nvim-surround",
 		event = "BufEnter",
@@ -151,10 +137,8 @@ local plugins = {
 		"nvim-treesitter/nvim-treesitter",
 		config = function()
 			for _, config in pairs(require("nvim-treesitter.parsers").get_parser_configs()) do
-				config.install_info.url = config.install_info.url:gsub(
-					"https://github.com/",
-					"https://mirror.ghproxy.com/https://github.com/"
-				)
+				config.install_info.url =
+					config.install_info.url:gsub("https://github.com/", "https://ghproxy.net/https://github.com/")
 			end
 			require("nvim-treesitter.configs").setup({
 				ensure_installed = { "lua", "python", "toml", "bash", "markdown", "json" },
@@ -183,7 +167,6 @@ local plugins = {
 			"MunifTanjim/nui.nvim",
 		},
 		keys = {
-			-- { "<leader>e", ":Neotree float reveal<CR>", desc = "NeoTree [E]xplore" },
 			{ "\\", ":Neotree float reveal<CR>", desc = "NeoTree reveal", silent = true },
 		},
 		config = function()
@@ -351,22 +334,11 @@ local plugins = {
 			{ "<leader>a", ":lua vim.lsp.buf.code_action()<CR>", mode = { "n" } },
 		},
 		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
+			"saghen/blink.cmp",
 			"nvim-telescope/telescope.nvim",
 		},
-		config = function()
-			local lspconfig = require("lspconfig")
-
-			local on_attach = function(client, bufnr)
-				-- Enable completion triggered by <c-x><c-o>
-				vim.api.nvim_set_option_value("omnifunc", "v:lua.vim.lsp.omnifunc", { buf = bufnr })
-				if client.name == "ruff_lsp" then
-					-- Disable hover in favor of Pyright
-					client.server_capabilities.hoverProvider = false
-				end
-			end
-
-			local servers = {
+		opts = {
+			servers = {
 				["ruff"] = {},
 				["basedpyright"] = {
 					basedpyright = {
@@ -393,69 +365,101 @@ local plugins = {
 						},
 					},
 				},
-			}
+			},
+		},
+		config = function(_, opts)
+			local lspconfig = require("lspconfig")
 
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			-- local on_attach = function(client, bufnr)
+			-- 	-- Enable completion triggered by <c-x><c-o>
+			-- 	vim.api.nvim_set_option_value("omnifunc", "v:lua.vim.lsp.omnifunc", { buf = bufnr })
+			-- 	if client.name == "ruff_lsp" then
+			-- 		-- Disable hover in favor of Pyright
+			-- 		client.server_capabilities.hoverProvider = false
+			-- 	end
+			-- end
+			--
+			-- local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			--
+			-- for lsp, settings in pairs(servers) do
+			-- 	lspconfig[lsp].setup({
+			-- 		on_attach = on_attach,
+			-- 		capabilities = capabilities,
+			-- 		settings = settings,
+			-- 	})
+			-- end
 
-			for lsp, settings in pairs(servers) do
-				lspconfig[lsp].setup({
-					on_attach = on_attach,
-					capabilities = capabilities,
-					settings = settings,
-				})
+			for server, config in pairs(opts.servers) do
+				-- passing config.capabilities to blink.cmp merges with the capabilities in your
+				-- `opts[server].capabilities, if you've defined it
+				config.capabilities = require("blink.cmp").get_lsp_capabilities(config.capabilities)
+				lspconfig[server].setup(config)
 			end
-
-			-- set diagnostic style and icon
-			local x = vim.diagnostic.severity
-			vim.diagnostic.config({
-				virtual_text = { prefix = "" },
-				signs = { text = { [x.ERROR] = "✘", [x.WARN] = "▲", [x.INFO] = "⚑", [x.HINT] = "" } },
-				underline = true,
-			})
 		end,
 	},
 
 	-- complete
 	{
-		"hrsh7th/nvim-cmp",
-		event = { "InsertEnter", "CmdlineEnter" },
-		dependencies = {
-			"onsails/lspkind.nvim",
+		"saghen/blink.cmp",
+		lazy = false,
+		dependencies = { "rafamadriz/friendly-snippets", "mikavilpas/blink-ripgrep.nvim" },
+		version = "v0.*",
 
-			"hrsh7th/cmp-nvim-lsp", -- { name = nvim_lsp }
-			"hrsh7th/cmp-buffer", -- { name = 'buffer' }
-			"hrsh7th/cmp-path", -- { name = 'path' }
-			"hrsh7th/cmp-cmdline", -- { name = 'cmdline' }
+		---@module 'blink.cmp'
+		---@type blink.cmp.Config
+		opts = {
+			keymap = { preset = "default" },
 
-			-- for luasnip
-			{
-				"L3MON4D3/LuaSnip",
-				build = "make install_jsregexp",
-				dependencies = { "rafamadriz/friendly-snippets" },
-				config = function()
-					require("luasnip.loaders.from_vscode").lazy_load()
-				end,
+			appearance = {
+				use_nvim_cmp_as_default = true,
+				nerd_font_variant = "mono",
 			},
-			"saadparwaiz1/cmp_luasnip",
-		},
 
-		config = require("plugin-nvim-cmp"),
+			sources = {
+				default = { "lsp", "path", "snippets", "buffer" },
+			},
+
+			-- experimental auto-brackets support
+			completion = {
+				enabled_providers = { "lsp", "path", "snippets", "buffer", "lazydev", "ripgrep" },
+				accept = { auto_brackets = { enabled = true } },
+			},
+
+			providers = {
+				-- dont show LuaLS require statements when lazydev has items
+				lsp = { fallback_for = { "lazydev" } },
+				lazydev = { name = "LazyDev", module = "lazydev.integrations.blink" },
+				ripgrep = {
+					module = "blink-ripgrep",
+					name = "Ripgrep",
+					-- the options below are optional, some default values are shown
+					---@module "blink-ripgrep"
+					---@type blink-ripgrep.Options
+					opts = {
+						prefix_min_len = 3,
+						context_size = 5,
+						max_filesize = "1M",
+					},
+				},
+			},
+			-- experimental signature help support
+			-- signature = { enabled = true }
+		},
+		-- allows extending the providers array elsewhere in your config
+		-- without having to redefine it
+		opts_extend = { "sources.default" },
 	},
 
 	-- LSP Plugins
 	{
-		-- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-		-- used for completion, annotations and signatures of Neovim apis
 		"folke/lazydev.nvim",
 		ft = "lua",
 		opts = {
 			library = {
-				-- Load luvit types when the `vim.uv` word is found
-				{ path = "luvit-meta/library", words = { "vim%.uv" } },
+				{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
 			},
 		},
 	},
-	{ "Bilal2453/luvit-meta", lazy = true },
 
 	-- rust
 	{
@@ -487,10 +491,11 @@ local opts = {
 		log = { "-10" }, -- show the last 10 commits
 		timeout = 120, -- kill processes that take more than 2 minutes
 		-- url_format = "https://github.com/%s.git",
-		url_format = "git@github.com:%s",
+		-- url_format = "git@github.com:%s",
 		-- url_format = "https://hub.fastgit.xyz/%s",
 		-- url_format = "https://mirror.ghproxy.com/https://github.com/%s",
 		-- url_format = "https://github.moeyy.xyz/https://github.com/%s",
+		url_format = "https://ghproxy.net/https://github.com/%s",
 	},
 }
 
