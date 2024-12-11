@@ -654,7 +654,7 @@ local plugins = {
 			},
 
 			sources = {
-				default = { "lsp", "path", "snippets", "buffer" },
+				default = { "lsp", "path", "snippets", "buffer", "lazydev", "ripgrep" },
 			},
 
 			-- experimental auto-brackets support
