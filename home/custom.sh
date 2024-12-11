@@ -28,8 +28,8 @@ alias vi="nvim"
 alias at="tmux a -t 0"
 
 # PROXY
-alias setproxy="export ALL_PROXY=socks5://finalserver:12334; echo 'SET PROXY SUCCESS!!!'"
-alias setproxylocal="export ALL_PROXY=socks5://127.0.0.1:12334; echo 'SET PROXY SUCCESS!!!'"
+alias setproxy="export ALL_PROXY=socks5://finalserver:10808; echo 'SET PROXY SUCCESS!!!'"
+alias setproxylocal="export ALL_PROXY=socks5://localhost:10808; echo 'SET PROXY SUCCESS!!!'"
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 
 ## python
