@@ -626,6 +626,7 @@ local plugins = {
 				["<C-q>"] = { "show", "show_documentation", "hide_documentation" },
 				["<C-e>"] = { "hide", "fallback" },
 
+				-- ["<Tab>"] = { "snippet_forward", "fallback" },
 				["<Tab>"] = {
 					function(cmp)
 						if cmp.snippet_active() then
@@ -646,6 +647,8 @@ local plugins = {
 
 				["<C-b>"] = { "scroll_documentation_up", "fallback" },
 				["<C-f>"] = { "scroll_documentation_down", "fallback" },
+
+				["<CR>"] = { "accept", "fallback" },
 			},
 
 			appearance = {
