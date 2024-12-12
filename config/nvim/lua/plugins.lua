@@ -154,7 +154,7 @@ local plugins = {
 					config.install_info.url:gsub("https://github.com/", "https://ghproxy.net/https://github.com/")
 			end
 			require("nvim-treesitter.configs").setup({
-				ensure_installed = { "lua", "python", "toml", "bash", "markdown", "json" },
+				ensure_installed = { "lua", "python", "toml", "bash", "json" },
 				sync_install = true,
 				auto_install = true,
 				ignore_install = {},
