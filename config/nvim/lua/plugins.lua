@@ -686,8 +686,15 @@ local plugins = {
 					},
 				},
 			},
+			documentation = {
+				-- Controls whether the documentation window will automatically show when selecting a completion item
+				auto_show = true,
+				ghost_text = {
+					enabled = true,
+				},
+			},
 			-- experimental signature help support
-			-- signature = { enabled = true }
+			signature = { enabled = true },
 		},
 		-- allows extending the providers array elsewhere in your config
 		-- without having to redefine it
