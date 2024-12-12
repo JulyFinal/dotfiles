@@ -410,7 +410,7 @@ local plugins = {
 	{
 		"saghen/blink.cmp",
 		lazy = false,
-		dependencies = { "rafamadriz/friendly-snippets", "mikavilpas/blink-ripgrep.nvim" },
+		dependencies = { "folke/lazydev.nvim", "rafamadriz/friendly-snippets", "mikavilpas/blink-ripgrep.nvim" },
 		version = "v0.*",
 
 		---@module 'blink.cmp'
@@ -455,7 +455,6 @@ local plugins = {
 				default = { "lsp", "path", "snippets", "buffer", "lazydev", "ripgrep" },
 			},
 
-			-- experimental auto-brackets support
 			completion = {
 				enabled_providers = { "lsp", "path", "snippets", "buffer", "lazydev", "ripgrep" },
 				accept = { auto_brackets = { enabled = true } },
@@ -465,13 +464,11 @@ local plugins = {
 			},
 
 			providers = {
-				-- dont show LuaLS require statements when lazydev has items
 				lsp = { fallback_for = { "lazydev" } },
 				lazydev = { name = "LazyDev", module = "lazydev.integrations.blink" },
 				ripgrep = {
 					module = "blink-ripgrep",
 					name = "Ripgrep",
-					-- the options below are optional, some default values are shown
 					---@module "blink-ripgrep"
 					---@type blink-ripgrep.Options
 					opts = {
@@ -482,17 +479,13 @@ local plugins = {
 				},
 			},
 			documentation = {
-				-- Controls whether the documentation window will automatically show when selecting a completion item
 				auto_show = true,
 				ghost_text = {
 					enabled = true,
 				},
 			},
-			-- experimental signature help support
 			signature = { enabled = true },
 		},
-		-- allows extending the providers array elsewhere in your config
-		-- without having to redefine it
 		opts_extend = { "sources.default" },
 	},
 
@@ -518,7 +511,6 @@ local opts = {
 	spec = plugins,
 	defaults = { lazy = true },
 	install = { colorscheme = { "tokyonight" } },
-	-- checker = { enabled = true },
 	change_detection = {
 		notify = false,
 	},
