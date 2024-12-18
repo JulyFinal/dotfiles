@@ -54,3 +54,6 @@ map("i", "<C-b>", "<ESC>ha", opt)
 -- buffers
 map("n", "gn", ":bn<CR>", opt)
 map("n", "gnn", ":bp<CR>", opt)
+
+-- lsp
+map("n", "<leader>p", ":LspStart", opt)
