@@ -342,6 +342,8 @@ local plugins = {
 		"neovim/nvim-lspconfig",
 		event = "BufEnter",
 		keys = {
+			{ "<leader>p", ":LspStart<cr>", mode = { "n" } },
+
 			{ "gr", ":Telescope lsp_references<cr>", mode = { "n" } },
 			{ "gd", ":Telescope lsp_definitions<cr>", mode = { "n" } },
 			{ "gm", ":Telescope lsp_implementations<cr>", mode = { "n" } },
