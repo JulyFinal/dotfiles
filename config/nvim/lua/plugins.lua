@@ -148,25 +148,27 @@ local plugins = {
 
 	{
 		"nvim-treesitter/nvim-treesitter",
-		config = function()
+		event = "BufReadPre",
+		opts = {
+			ensure_installed = { "lua", "python", "toml", "bash", "json" },
+			sync_install = true,
+			auto_install = true,
+			ignore_install = {},
+			highlight = {
+				enable = true,
+				disable = {},
+				additional_vim_regex_highlighting = false,
+			},
+			indent = {
+				enable = true,
+			},
+		},
+		config = function(_, opts)
 			for _, config in pairs(require("nvim-treesitter.parsers").get_parser_configs()) do
 				config.install_info.url =
 					config.install_info.url:gsub("https://github.com/", "https://ghproxy.net/https://github.com/")
 			end
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = { "lua", "python", "toml", "bash", "json" },
-				sync_install = true,
-				auto_install = true,
-				ignore_install = {},
-				highlight = {
-					enable = true,
-					disable = {},
-					additional_vim_regex_highlighting = false,
-				},
-				indent = {
-					enable = true,
-				},
-			})
+			require("nvim-treesitter.configs").setup(opts)
 		end,
 	},
 
@@ -448,45 +450,52 @@ local plugins = {
 				["<CR>"] = { "accept", "fallback" },
 			},
 
+			---@module 'blink.cmp.config.appearance'
+			---@type blink.cmp.Config
 			appearance = {
 				use_nvim_cmp_as_default = true,
 				nerd_font_variant = "mono",
 			},
 
+			---@module 'blink.cmp.config.completion'
+			---@type blink.cmp.Config
+			completion = {
+				menu = {
+					border = "rounded",
+				},
+				documentation = {
+					auto_show = true,
+					ghost_text = {
+						enabled = true,
+					},
+					window = { border = "rounded" },
+				},
+				ghost_text = { enabled = true },
+			},
+
+			---@module 'blink.cmp.config.sources'
+			---@type blink.cmp.Config
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer", "lazydev", "ripgrep" },
-			},
-
-			completion = {
-				enabled_providers = { "lsp", "path", "snippets", "buffer", "lazydev", "ripgrep" },
-				accept = { auto_brackets = { enabled = true } },
-				trigger = {
-					show_in_snippet = false,
-				},
-			},
-
-			providers = {
-				lsp = { fallback_for = { "lazydev" } },
-				lazydev = { name = "LazyDev", module = "lazydev.integrations.blink" },
-				ripgrep = {
-					module = "blink-ripgrep",
-					name = "Ripgrep",
-					---@module "blink-ripgrep"
-					---@type blink-ripgrep.Options
-					opts = {
-						prefix_min_len = 3,
-						context_size = 5,
-						max_filesize = "1M",
+				providers = {
+					lsp = { fallback_for = { "lazydev" } },
+					lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", fallbacks = { "lsp" } },
+					ripgrep = {
+						name = "Ripgrep",
+						module = "blink-ripgrep",
+						opts = {
+							prefix_min_len = 3,
+							context_size = 5,
+							max_filesize = "1M",
+							additional_rg_options = {},
+						},
 					},
 				},
 			},
-			documentation = {
-				auto_show = true,
-				ghost_text = {
-					enabled = true,
-				},
-			},
-			signature = { enabled = true },
+
+			---@module 'blink.cmp.config.signature'
+			---@type blink.cmp.Config
+			signature = { enabled = true, window = { border = "rounded" } },
 		},
 		opts_extend = { "sources.default" },
 	},
