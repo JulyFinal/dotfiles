@@ -28,6 +28,11 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon  # install nix
 # bash ble
 nix-env -iA nixpkgs.blesh
 
+# zsh_autosuggest
+# zsh-syntax-highlighting
+# fast-syntax-highlighting
+# zsh-completions
+
 # tools
 nix-env -iA nixpkgs.bat nixpkgs.bottom nixpkgs.tealdeer nixpkgs.zoxide nixpkgs.direnv
 
