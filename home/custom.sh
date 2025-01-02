@@ -4,7 +4,7 @@ if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
 
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /home/final/dotfiles/zsh_plugins/zsh-autosuggestions.zsh
 source /home/final/dotfiles/zsh_plugins/catppuccin_mocha-zsh-syntax-highlighting.zsh
 
 # eval
