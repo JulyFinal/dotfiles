@@ -4,24 +4,12 @@ if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
 # eval
-if [ -n "$BASH_VERSION" ]; then
-  eval "$(uv generate-shell-completion bash)"
-  eval "$(starship init bash)"
-  eval "$(zoxide init bash)"
-  eval "$(direnv hook bash)"
-  # ble config
-  [[ $- == *i* ]] && source "$(blesh-share)"/ble.sh --noattach
-elif [ -n "$ZSH_VERSION" ]; then
-  autoload compinit
-  compinit
-
-  eval "$(uv generate-shell-completion zsh)"
-  eval "$(starship init zsh)"
-  eval "$(zoxide init zsh)"
-  eval "$(direnv hook zsh)"
-else
-  echo "must be zsh or bash"
-fi
+  # autoload compinit
+  # compinit
+eval "$(uv generate-shell-completion zsh)"
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+eval "$(direnv hook zsh)"
 
 # custom alias
 alias vi="nvim"
@@ -48,7 +36,6 @@ alias w="watch -n"
 alias tf="tail -f"
 alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
 alias uvt="uv tool"
-alias rebash="source ~/.profile"
 alias rezsh="source ~/.zshrc"
 
 # >>> git command >>>
@@ -78,9 +65,3 @@ fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
-
-if [ -n "$BASH_VERSION" ]; then
-  [[ ! ${BLE_VERSION-} ]] || ble-attach
-fi
