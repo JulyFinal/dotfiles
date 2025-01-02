@@ -3,9 +3,11 @@ if [ -d "$HOME/.local/bin" ]; then PATH="$HOME/.local/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
+
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
 # eval
-  # autoload compinit
-  # compinit
 eval "$(uv generate-shell-completion zsh)"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"

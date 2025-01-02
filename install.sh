@@ -25,9 +25,10 @@ sudo pacman -S neovim lazygit proxychains-ng
 
 sh <(curl -L https://nixos.org/nix/install) --no-daemon  # install nix
 
+
+nix-env -iA nixpkgs.zsh-completions
 # zsh_autosuggest
 # zsh-syntax-highlighting
-# fast-syntax-highlighting
 # zsh-completions
 
 # tools
