@@ -24,7 +24,7 @@ if [ -f "$HOME/.zshrc" ]; then
   rm -rf "$HOME/.zshrc"
 fi
 
-link "$dotfiles/home/custom.sh" "$HOME/.zshrc"
+link "$dotfiles/home/zshrc" "$HOME/.zshrc"
 
 link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
 
