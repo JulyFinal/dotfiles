@@ -24,10 +24,10 @@ if [ -f "$HOME/.zshrc" ]; then
   rm -rf "$HOME/.zshrc"
 fi
 
-link "$dotfiles/home/zshrc" "$HOME/.zshrc"
-link "$dotfiles/zsh" "$HOME/.zsh"
 
-link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
+for name in `ls home`; do
+    link "$dotfiles/home/$name" "$HOME/.$name"
+done
 
 for name in `ls config`; do
     link "$dotfiles/config/$name" "$config/$name"
