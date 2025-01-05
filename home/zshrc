@@ -13,7 +13,7 @@ if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
 
-source $HOME/.zsh/zsh-autosuggestions.zsh
+source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # eval

@@ -6,10 +6,6 @@
   path = home/zsh/zsh-autosuggestions
   url = https://github.moeyy.xyz/https://github.com/zsh-users/zsh-autosuggestions.git
 
-[submodule "zsh/fast-syntax-highlighting"]
-  path = home/zsh/fast-syntax-highlighting
-  url = https://github.moeyy.xyz/https://github.com/zdharma-continuum/fast-syntax-highlighting.git
-
-[submodule "zsh/zsh-completions"]
-  path = home/zsh/zsh-completions
-  url = https://github.moeyy.xyz/https://github.com/zsh-users/zsh-completions.git
+[submodule "zsh/zsh-syntax-hightlighting"]
+  path = home/zsh/zsh-syntax-hightlighting
+  url = https://github.moeyy.xyz/https://github.com/zsh-users/zsh-syntax-hightlighting.git
