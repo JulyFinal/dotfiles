@@ -25,6 +25,7 @@ if [ -f "$HOME/.zshrc" ]; then
 fi
 
 link "$dotfiles/home/zshrc" "$HOME/.zshrc"
+link "$dotfiles/zsh" "$HOME/.zsh"
 
 link "$dotfiles/home/tmux.conf" "$HOME/.tmux.conf"
 

@@ -30,6 +30,10 @@ nix-env -iA nixpkgs.zsh-completions
 # zsh_autosuggest
 # zsh-syntax-highlighting
 # zsh-completions
+## 自动补全
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/plugins/zsh-autosuggestions
+# 语法高亮
+git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.zsh/plugins/zsh-syntax-highlighting
 
 # tools
 nix-env -iA nixpkgs.bat nixpkgs.bottom nixpkgs.tealdeer nixpkgs.zoxide nixpkgs.direnv
