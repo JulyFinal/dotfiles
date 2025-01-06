@@ -1,6 +1,3 @@
-autoload -Uz compinit
-compinit
-
 # 启用路径展开功能
 setopt AUTO_CD
 setopt AUTO_PUSHD
