@@ -47,6 +47,7 @@ alias du="du -sh"
 alias w="watch -n"
 alias tf="tail -f"
 alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
+alias uvr="uv run"
 alias uvt="uv tool"
 alias rezsh="source ~/.zshrc"
 
