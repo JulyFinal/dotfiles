@@ -14,7 +14,7 @@ if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
 
 source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # eval
 eval "$(uv generate-shell-completion zsh)"
