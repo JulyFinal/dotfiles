@@ -465,9 +465,6 @@ local plugins = {
 				},
 				documentation = {
 					auto_show = true,
-					ghost_text = {
-						enabled = true,
-					},
 					window = { border = "rounded" },
 				},
 				ghost_text = { enabled = true },
@@ -478,8 +475,8 @@ local plugins = {
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer", "lazydev", "ripgrep" },
 				providers = {
-					lsp = { fallback_for = { "lazydev" } },
-					lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", fallbacks = { "lsp" } },
+					lsp = { fallbacks = { "lazydev" } },
+					lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", score_offset = 100 },
 					ripgrep = {
 						name = "Ripgrep",
 						module = "blink-ripgrep",
