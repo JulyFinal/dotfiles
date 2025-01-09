@@ -28,6 +28,10 @@ sudo pacman -S neovim lazygit proxychains-ng
 
 sh <(curl -L https://nixos.org/nix/install) --no-daemon  # install nix
 
+# nix-channel --add https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
+# nix-channel --update
+
+
 # rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # install rustup
 # sudo pacman -S rustup
