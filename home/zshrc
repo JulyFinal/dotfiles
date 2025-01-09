@@ -8,6 +8,9 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
 
+autoload -U compinit; compinit
+source <(fzf --zsh)
+
 # custom alias
 alias vi="nvim"
 alias at="tmux a -t 0"
