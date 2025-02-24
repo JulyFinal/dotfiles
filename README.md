@@ -24,6 +24,12 @@ cd dotfiles && ./symlink-dotfiles.sh
 
 `fd ripgrep fzf sd openssl xsel zip unzip zlib xz neovim lazygit bat bottom tealdeer zoxide direnv atuin`
 
+## zsh
+
+```bash
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+```
+
 
 ## nix
 

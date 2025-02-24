@@ -3,6 +3,9 @@ if [ -d "$HOME/.local/bin" ]; then PATH="$HOME/.local/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
+# zsh plugins
+if [ -d "$HOME/.zsh/zsh-autosuggestions" ]; then source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh; fi
+
 # eval
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
