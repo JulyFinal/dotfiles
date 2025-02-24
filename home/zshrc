@@ -7,6 +7,7 @@ if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
+eval "$(atuin init zsh)"
 
 autoload -U compinit; compinit
 source <(fzf --zsh)

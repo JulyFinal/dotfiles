@@ -22,7 +22,7 @@ cd dotfiles && ./symlink-dotfiles.sh
 ## install base pkg
 `# sudo pacman -S --needed base-devel # for pacman`
 
-`fd ripgrep fzf sd openssl xsel zip unzip zlib xz neovim lazygit bat bottom tealdeer zoxide direnv`
+`fd ripgrep fzf sd openssl xsel zip unzip zlib xz neovim lazygit bat bottom tealdeer zoxide direnv atuin`
 
 
 ## nix

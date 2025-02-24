@@ -16,7 +16,7 @@ vim.opt.breakindent = true
 -- Save undo history
 vim.opt.undofile = true
 
-vim.opt.clipboard = "unnamedplus"
+-- vim.opt.clipboard = "unnamedplus"
 
 -- Numbers
 vim.opt.number = true
