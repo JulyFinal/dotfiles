@@ -11,16 +11,16 @@ cd dotfiles && ./symlink-dotfiles.sh
 
 ## fonts
 ```
-# mkdir -p ~/.local/share/fonts
-# wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.1/FiraMono.zip
-# unzip FiraMono.zip -d FiraMono
-# mv FiraMono ~/.local/share/fonts
-# fc-cache -fv
+mkdir -p ~/.local/share/fonts
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.1/FiraMono.zip
+unzip FiraMono.zip -d FiraMono
+mv FiraMono ~/.local/share/fonts
+fc-cache -fv
 ```
 
 
 ## install base pkg
-`# sudo pacman -S --needed base-devel # for pacman`
+`sudo pacman -S --needed base-devel # for pacman`
 
 `fd ripgrep fzf sd openssl xsel zip unzip zlib xz neovim lazygit bat bottom tealdeer zoxide direnv atuin`
 
@@ -33,10 +33,12 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosugges
 
 ## nix
 
-`sh <(curl -L https://nixos.org/nix/install) --no-daemon`  # install nix
+```
+sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
-`# nix-channel --add https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixpkgs-unstable nixpkgs`
-`# nix-channel --update`
+nix-channel --add https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
+nix-channel --update
+```
 
 
 ## rust
