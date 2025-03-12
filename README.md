@@ -22,7 +22,7 @@ fc-cache -fv
 ## install base pkg
 `sudo pacman -S --needed base-devel # for pacman`
 
-`fd ripgrep fzf sd openssl xsel zip unzip zlib xz neovim lazygit bat bottom tealdeer zoxide direnv atuin`
+`fd ripgrep fzf sd openssl xsel zip unzip zlib xz neovim lazygit starship bat bottom tealdeer zoxide direnv atuin`
 
 ## zsh
 
