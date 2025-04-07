@@ -1,4 +1,4 @@
-if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then . $HOME/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then . $HOME/.nix-profile/etc/profile.d/nix.sh; fi
 if [ -d "$HOME/.local/bin" ]; then PATH="$HOME/.local/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
@@ -30,17 +30,11 @@ alias pp="export PYTHONPATH=$(pwd)"
 alias pipcn='uv pip install -i https://pypi.tuna.tsinghua.edu.cn/simple'
 
 # linux command
-alias ls="ls --color=auto"
+alias ls="ls -h --color=auto"
 alias ll="ls -lh --color=auto"
-alias la="ls -alh --color=auto"
-alias h5="head -n 5"
-alias h10="head -n 10"
+alias lla="ls -alh --color=auto"
 alias du="du -sh"
-alias w="watch -n"
-alias tf="tail -f"
 alias disksize="lsblk --json | jq -c '.blockdevices[] | [.name,.size]'"
-alias uvr="uv run"
-alias uvt="uv tool"
 alias rezsh="source ~/.zshrc"
 
 # >>> git command >>>
@@ -66,10 +60,5 @@ if command -v fzf >/dev/null 2>&1; then
 
 fi
 
-if command -v bat >/dev/null 2>&1; then
-  alias cat='bat -pp --theme="Nord"'
-  alias tailf='f() { tail -f "$1" | bat --paging=never -l log; unset -f f; }; f'
-fi
-
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
