@@ -1,3 +1,5 @@
+LANGUAGE=en
+
 if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then . $HOME/.nix-profile/etc/profile.d/nix.sh; fi
 if [ -d "$HOME/.local/bin" ]; then PATH="$HOME/.local/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
@@ -23,6 +25,7 @@ alias at="tmux a -t 0"
 alias setproxy="export ALL_PROXY=socks5://finalserver:10808; echo 'SET PROXY SUCCESS!!!'"
 alias setproxylocal="export ALL_PROXY=socks5://localhost:10808; echo 'SET PROXY SUCCESS!!!'"
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
+alias pc="proxychains -q"
 
 ## python
 alias av="source .venv/bin/activate"

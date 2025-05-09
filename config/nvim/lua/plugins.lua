@@ -116,7 +116,6 @@ local plugins = {
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "BufEnter",
-		tag = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		keys = {
 			{ "<leader>F", "<cmd>Telescope<cr>", desc = "find_files" },
@@ -438,7 +437,6 @@ local plugins = {
 			"folke/lazydev.nvim",
 			"rafamadriz/friendly-snippets",
 			"mikavilpas/blink-ripgrep.nvim",
-			"olimorris/codecompanion.nvim",
 		},
 		version = "v0.*",
 
@@ -497,7 +495,7 @@ local plugins = {
 			---@module 'blink.cmp.config.sources'
 			---@type blink.cmp.Config
 			sources = {
-				default = { "codecompanion", "lazydev", "ripgrep", "lsp", "path", "snippets", "buffer" },
+				default = { "lazydev", "ripgrep", "lsp", "path", "snippets", "buffer" },
 				providers = {
 					lsp = { fallbacks = { "lazydev" } },
 					lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", score_offset = 100 },
@@ -519,39 +517,6 @@ local plugins = {
 			signature = { enabled = true, window = { border = "rounded" } },
 		},
 		opts_extend = { "sources.default" },
-	},
-
-	{
-		"olimorris/codecompanion.nvim",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"nvim-treesitter/nvim-treesitter",
-		},
-		config = function()
-			require("codecompanion").setup({
-				adapters = {
-					openai = function()
-						return require("codecompanion.adapters").extend("openai_compatible", {
-							schema = {
-								model = { default = "Qwen/Qwen2.5-Coder-7B-Instruct" },
-							},
-							env = {
-								url = "https://api.siliconflow.cn",
-								api_key = "",
-							},
-						})
-					end,
-				},
-				strategies = {
-					chat = {
-						adapter = "openai",
-					},
-					inline = {
-						adapter = "openai",
-					},
-				},
-			})
-		end,
 	},
 
 	-- rust
