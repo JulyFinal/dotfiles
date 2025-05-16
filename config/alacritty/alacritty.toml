@@ -1,0 +1,62 @@
+[general]
+live_config_reload = true
+import = ["~/.config/alacritty/theme/catppuccin-mocha.toml"]
+
+[window]
+opacity = 0.85
+# 边缘空白
+[window.padding]
+x = 18
+y = 16
+
+# 窗口大小
+[window.dimensions]
+columns = 120
+lines = 60
+
+[env]
+TERM = "xterm-256color"
+
+[scrolling]
+# 历史保留行数
+history = 2000
+
+# 每次滚动行数
+multiplier = 20
+
+[font]
+size = 10
+# 字体
+[font.normal]
+family = "Maple Mono NF CN"
+style = "Regular"
+
+[font.bold]
+family = "Maple Mono NF CN"
+style = "Bold"
+
+[font.italic]
+family = "Maple Mono NF CN"
+style = "Italic"
+
+[font.bold_italic]
+family = "Maple Mono NF CN"
+style = "Bold Italic"
+
+[keyboard]
+bindings = [
+  { key = "C", mods = "Command", action = "Copy" },
+  { key = "V", mods = "Command", action = "Paste" },
+  { key = "N", mods = "Command", action = "SpawnNewInstance" },
+  { key = "W", mods = "Command", action = "Quit" },
+]
+
+[cursor]
+style = "Beam"
+unfocused_hollow = true
+
+[debug]
+render_timer = false
+persistent_logging = false
+log_level = "Off"
+print_events = false
