@@ -1,4 +1,5 @@
 -- mapleader
+--
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -111,9 +112,11 @@ vim.opt.splitright = true
 -- vim.opt.pumheight = 10
 -- -- 永远显示 tabline
 -- vim.opt.showtabline = 1
+--
+vim.o.winborder = "rounded"
 
 vim.diagnostic.config({
-	virtual_text = { prefix = "" },
+	virtual_text = { prefix = "", virtual_text = true, current_line = true },
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = "✘",
