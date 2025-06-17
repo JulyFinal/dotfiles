@@ -26,6 +26,7 @@ alias setproxy="export ALL_PROXY=socks5://finalserver:10808; echo 'SET PROXY SUC
 alias setproxylocal="export ALL_PROXY=socks5://localhost:10808; echo 'SET PROXY SUCCESS!!!'"
 alias unsetproxy="unset ALL_PROXY; echo 'UNSET PROXY SUCCESS!!!'"
 alias pc="proxychains -q"
+alias gg='google-chrome-stable --proxy-server="socks5://127.0.0.1:10808"'
 
 ## python
 alias av="source .venv/bin/activate"
