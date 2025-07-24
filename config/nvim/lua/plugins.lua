@@ -146,6 +146,7 @@ local plugins = {
 
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = 'master',
     event = "BufReadPre",
     opts = {
       ensure_installed = { "lua", "python", "toml", "bash", "json" },
@@ -162,10 +163,9 @@ local plugins = {
       },
     },
     config = function(_, opts)
-      for _, config in pairs(require("nvim-treesitter.parsers").get_parser_configs()) do
-        config.install_info.url =
-            config.install_info.url:gsub("https://github.com/", "https://ghproxy.net/https://github.com/")
-      end
+      -- for _, config in pairs(require("nvim-treesitter.parsers").get_parser_configs()) do
+      --   config.install_info.url = config.install_info.url:gsub("https://github.com/", "https://ghproxy.net/https://github.com/")
+      -- end
       require("nvim-treesitter.configs").setup(opts)
     end,
   },
