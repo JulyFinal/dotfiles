@@ -19,7 +19,7 @@ source <(fzf --zsh)
 
 # custom alias
 alias vi="nvim"
-alias at="tmux a -t 0"
+alias tt="tmux a -t 0"
 
 # PROXY
 alias setproxy="export ALL_PROXY=socks5://finalserver:10808; echo 'SET PROXY SUCCESS!!!'"
@@ -66,3 +66,6 @@ fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+
+
