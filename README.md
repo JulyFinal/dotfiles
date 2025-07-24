@@ -9,17 +9,9 @@ git clone https://github.com/JulyFinal/dotfiles.git
 cd dotfiles && ./symlink-dotfiles.sh
 ```
 
-## fonts
-```
-mkdir -p ~/.local/share/fonts
-wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.1/FiraMono.zip
-unzip FiraMono.zip -d FiraMono
-mv FiraMono ~/.local/share/fonts
-fc-cache -fv
-```
-
 
 ## install base pkg
+
 `sudo pacman -S --needed base-devel # for pacman`
 
 `fd ripgrep fzf sd openssl xsel zip unzip zlib xz neovim lazygit starship bat bottom tealdeer zoxide direnv atuin`
@@ -71,3 +63,62 @@ cargo install --git https://github.com/estin/simple-completion-language-server.g
 git config user.email "julyfinal@outlook.com"
 git config user.name "final"
 ```
+
+
+## WIP hyprland
+
+`hyprland waybar kitty`
+
+
+pavucontrol -> pulsemixer
+
+nm-connection-editor -> nmcli nmtui
+
+wofi
+
+swaync
+
+automount udisk
+
+`pacman -S udiskie`
+
+https://wiki.archlinuxcn.org/wiki/Hyprland
+
+https://blog.manjusaka.de/p/0-0-0-52/#%E5%AE%89%E8%A3%85snapper
+
+
+
+## VPN
+
+`networkmanager-openvpn`
+
+`nmcli connection import type openvpn file xxx.ovpn`
+
+
+## PROXY
+
+sudo pacman -S v2raya xray
+
+sudo systemctl enable --now v2raya  # 启动并配置开机自启
+
+sudo vim /etc/default/v2raya
+
+V2RAYA_V2RAY_BIN=/usr/bin/xray
+
+V2RAYA_V2RAY_ASSETSDIR=/usr/share/xray
+
+sudo systemctl restart v2raya
+
+
+/etc/systemd/system/v2raya.service.d
+
+[Service]
+Environment="V2RAYA_V2RAY_BIN=/usr/bin/xray"
+Environment="V2RAYA_V2RAY_ASSETSDIR=/usr/share/xray"
+
+sudo systemctl daemon-reload && sudo systemctl restart v2raya
+
+
+
+sudo pacman -S fcitx5-im fcitx5-chinese-addons fcitx5-anthy fcitx5-pinyin-moegirl fcitx5-material-color fcitx5-pinyin-zhwiki
+
