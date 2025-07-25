@@ -1,65 +1,142 @@
 {
-    "layer": "top",
-    "position": "top",
-    "height": 40,
-    "spacing": 4,
-    "modules-left": ["hyprland/workspaces", "hyprland/mode"],
-    "modules-center": ["hyprland/window"],
-    "modules-right": ["tray", "pulseaudio", "network", "cpu", "memory", "clock"],
-    "hyprland/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "on-click": "activate"
+  "gtk-layer-shell": true,
+  "layer": "top",
+  "modules-left": [
+    "custom/launcher",
+    "cpu",
+    "temperature",
+    "memory"
+  ],
+  "modules-center": [
+    "hyprland/workspaces"
+  ],
+  "modules-right": [
+    "backlight",
+    "pulseaudio",
+    "network",
+    "battery",
+    "clock",
+    "custom/power"
+  ],
+  "height": 22,
+  "custom/launcher": {
+    "format": " ",
+    "tooltip": false
+  },
+  "cpu": {
+    "interval": 5,
+    "format": " {usage}%",
+    "max-length": 10
+  },
+  "temperature": {
+    "interval": 5,
+    "tooltip": false,
+    "format": " {temperatureC}°C",
+    "max-length": 10,
+    "thermal-zone": 1,
+    "input-filename": "temp1_input",
+    "hwon-path": "sys/devices/platform/coretemp.0/hwon/hwon5/temp1_input"
+  },
+  "memory": {
+    "interval": 10,
+    "format": " {}%",
+    "max-length": 10
+  },
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "1": "",
+      "2": "",
+      "3": "",
+      "4": "",
+      "5": "",
+      "6": "",
+      "7": "",
+      "8": "",
+      "9": "",
+      "10": "",
+      "default": ""
     },
-    "tray": {
-        "spacing": 10
+    "on-click": "activate"
+  },
+  "backlight": {
+    "tooltip": false,
+    "format": "{icon} {percent}%",
+    "interval": 2,
+    "on-scroll-up": "light -A 5%",
+    "on-scroll-down": "light -U 5%",
+    "align": 0,
+    "rotate": 0,
+    "format-icons": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "on-click": "",
+    "smooth-scrolling-threshold": 1
+  },
+  "pulseaudio": {
+    "tooltip": false,
+    "scroll-step": 5,
+    "format": "{icon} {volume}%",
+    "format-muter": " 婢 muted",
+    "format-icons": {
+      "default": [
+        "",
+        "奔",
+        "墳"
+      ]
     },
-    "pulseaudio": {
-        "format": "{volume}% {icon}",
-        "format-muted": " Muted",
-        "on-click": "pavucontrol",
-        "format-icons": {
-            "default": ["", ""]
-        }
-    },
-    "network": {
-        "format-wifi": "({signalStrength}%) ",
-        "format-ethernet": "{ifname}: {ipaddr}/{cidr} ",
-        "format-disconnected": "Disconnected ⚠",
-        "tooltip-format": "{ifname} via {gwaddr} ",
-        "on-click": "kitty --hold nmtui"
-    },
-    "cpu": {
-        "format": "{usage}% ",
-        "tooltip": true,
-        "on-click": "kitty --hold btm"
-    },
-    "memory": {
-        "format": "{}% ",
-        "on-click": "kitty --hold btm"
-    },
-    "clock": {
-        "format": "{:%Y-%m-%d %H:%M:%S}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-    },
-    "custom/notification": {
-      "tooltip": false,
-      "format": "{count} {icon}",
-      "format-icons": {
-        "notification": "<span foreground='red'><sup></sup></span>",
-        "none": "",
-        "dnd-notification": "<span foreground='red'><sup></sup></span>",
-        "dnd-none": "",
-        "inhibited-notification": "<span foreground='red'><sup></sup></span>",
-        "inhibited-none": "",
-        "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-        "dnd-inhibited-none": ""
-      },
-      "return-type": "json",
-      "exec-if": "which swaync-client",
-      "exec": "swaync-client -swb",
-      "on-click": "swaync-client -t -sw",
-      "on-click-right": "swaync-client -d -sw",
-      "escape": true
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+  },
+  "network": {
+    "tooltip": false,
+    "format-wifi": "{icon} {essid}",
+    "format-alt": "{icon}",
+    "format-alt-click": "click-right",
+    "format-disconnected": "{icon} offline",
+    "margin-top": 9,
+    "margin-bottom": 9,
+    "margin-right": 9,
+    "margin-left": 9,
+    "format-icons": {
+      "wifi": [
+        ""
+      ],
+      "ethernet": [
+        ""
+      ],
+      "disconnected": [
+        "睊"
+      ]
     }
+  },
+  "battery": {
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 20
+    },
+    "format": "{icon} {capacity}%",
+    "format-charging": " {capacity}%",
+    "format-plugged": " {capacity}%",
+    "format-alt": "{time} {icon}",
+    "format-icons": [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "clock": {
+    "format": "{: %H:%M }",
+    "format-alt": "{: %a, %d %b}"
+  },
+  "custom/power": {
+    "tooltip": false,
+    "font": "Awesome",
+    "format": ""
+  }
 }
