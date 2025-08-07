@@ -122,3 +122,14 @@ sudo systemctl daemon-reload && sudo systemctl restart v2raya
 
 sudo pacman -S fcitx5-im fcitx5-chinese-addons fcitx5-anthy fcitx5-pinyin-moegirl fcitx5-material-color fcitx5-pinyin-zhwiki
 
+
+
+## WXWORK Only Wine
+
+`sudo pacman -S wine wine-mono`
+
+`wine ~/Downloads/WeCom_*.exe`
+
+`wine regedit wine-breeze-dark.reg`
+
+wine-breeze-dark.reg from `https://gist.github.com/Zeinok/ceaf6ff204792dde0ae31e0199d89398`
