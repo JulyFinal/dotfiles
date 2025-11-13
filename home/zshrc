@@ -15,5 +15,41 @@ eval "$(atuin init zsh)"
 autoload -U compinit; compinit
 source <(fzf --zsh)
 
+# PROXY
+alias proxy="
+    export http_proxy=http://127.0.0.1:10808;
+    export https_proxy=http://127.0.0.1:10808;
+    export all_proxy=http://127.0.0.1:10808;
+    export no_proxy=localhost,127.0.0.1,::1;
+    export HTTP_PROXY=http://127.0.0.1:10808;
+    export HTTPS_PROXY=http://127.0.0.1:10808;
+    export ALL_PROXY=http://127.0.0.1:10808;
+    export NO_PROXY=localhost,127.0.0.1,::1;
+    echo '🔗 代理已启用: 127.0.0.1:10808';"
+
+# 取消代理
+alias unproxy="
+    unset http_proxy;
+    unset https_proxy;
+    unset all_proxy;
+    unset no_proxy;
+    unset HTTP_PROXY;
+    unset HTTPS_PROXY;
+    unset ALL_PROXY;
+    unset NO_PROXY;
+    echo '🔓 代理已禁用';"
+
+# 代理状态检测
+alias checkproxy='
+    if [ -n "$http_proxy" ]; then
+        echo "🔗 代理已启用:";
+        echo "  HTTP: $http_proxy";
+        echo "  HTTPS: $https_proxy";
+        echo "  ALL: $all_proxy";
+        echo "  NO_PROXY: $no_proxy";
+    else
+        echo "🔓 代理未启用";
+    fi'
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
