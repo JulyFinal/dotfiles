@@ -3,17 +3,18 @@ if [ -d "$HOME/.local/bin" ]; then PATH="$HOME/.local/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then PATH="$HOME/.cargo/bin:$PATH"; fi
 if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
 
-# zsh plugins
-if [ -d "$HOME/.zsh/zsh-autosuggestions" ]; then source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh; fi
-
 # eval
+eval "$(atuin init zsh)"
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
-eval "$(atuin init zsh)"
+
+# zsh plugins
+if [ -d "$HOME/.zsh/zsh-autosuggestions" ]; then source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh; fi
 
 autoload -U compinit; compinit
 source <(fzf --zsh)
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
