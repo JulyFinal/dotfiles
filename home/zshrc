@@ -15,6 +15,17 @@ if [ -d "$HOME/.zsh/zsh-autosuggestions" ]; then source ~/.zsh/zsh-autosuggestio
 autoload -U compinit; compinit
 source <(fzf --zsh)
 
+alias nix-update="nix-channel --update && nix-env -u '*'"
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+
+# opencode
+export PATH=/home/final/.opencode/bin:$PATH
+
+# go
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
 

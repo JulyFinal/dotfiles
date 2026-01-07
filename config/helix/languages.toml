@@ -11,21 +11,6 @@ feature_unicode_input = false        # enable "unicode input"
 feature_paths = true                 # enable path completion
 feature_citations = false            # enable citation completion (only on `citation` feature enabled)
 
-[language-server.basedpyright]
-command = "basedpyright-langserver"
-args = ["--stdio"]
-
-[language-server.basedpyright.config]
-python.analysis.venvPath = "."
-python.analysis.venv = ".venv"
-basedpyright.analysis.autoSearchPaths = true
-# basedpyright.analysis.diagnosticMode = "workspace"
-basedpyright.analysis.useLibraryCodeForType = true
-# basedpyright.analysis.logLevel = "Error"
-basedpyright.analysis.typeCheckingMode = "basic"
-basedpyright.analysis.autoImoprtCompletion = true
-
-
 [language-server.ty]
 command = "ty"
 args = ["server"]
@@ -43,8 +28,6 @@ shebangs = ["python"]
 roots = [
   "pyproject.toml",
   "setup.py",
-  "poetry.lock",
-  "pyrightconfig.json",
   "requirements.txt",
   ".venv/",
   "ty.toml",

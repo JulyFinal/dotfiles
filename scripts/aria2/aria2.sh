@@ -18,8 +18,9 @@ touch ~/.aria2/{aria2.log,aria2.session,cookies.txt,dht.dat}
 
 aria2c \
   --dir="${HOME}/download" \
-  --file-allocation=none \
-  -c \
+  --file-allocation=falloc \
+  --continue \
+  --check-integrity=true \
   --max-concurrent-downloads=26 \
   --split=128 \
   --min-split-size=1M \
