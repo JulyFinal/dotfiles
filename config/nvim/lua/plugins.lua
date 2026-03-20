@@ -115,7 +115,6 @@ local plugins = {
   -- telescope
   {
     "nvim-telescope/telescope.nvim",
-    event = "BufEnter",
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
       { "<leader>F",  "<cmd>Telescope<cr>",                                     desc = "find_files" },
@@ -138,7 +137,7 @@ local plugins = {
 
   {
     "kylechui/nvim-surround",
-    event = "BufEnter",
+    event = "BufReadPost",
     config = function()
       require("nvim-surround").setup()
     end,
@@ -150,7 +149,7 @@ local plugins = {
     event = "BufReadPre",
     opts = {
       ensure_installed = { "lua", "python", "toml", "bash", "json" },
-      sync_install = true,
+      sync_install = false,
       auto_install = true,
       ignore_install = {},
       highlight = {
@@ -250,7 +249,7 @@ local plugins = {
   -- comment
   {
     "numToStr/Comment.nvim",
-    event = "BufEnter",
+    event = "BufReadPost",
     config = function()
       require("Comment").setup()
     end,
@@ -259,7 +258,7 @@ local plugins = {
   {
     "akinsho/bufferline.nvim",
     version = "*",
-    event = "BufEnter",
+    lazy = false,
     config = function()
       require("bufferline").setup()
     end,
@@ -327,7 +326,7 @@ local plugins = {
   -- lualine
   {
     "nvim-lualine/lualine.nvim",
-    event = "BufEnter",
+    lazy = false,
     config = function()
       require("lualine").setup({
         options = {
@@ -358,7 +357,7 @@ local plugins = {
       "rafamadriz/friendly-snippets",
       "mikavilpas/blink-ripgrep.nvim",
     },
-    version = "*",
+    version = "1.*",
 
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
@@ -391,8 +390,7 @@ local plugins = {
       ---@module 'blink.cmp.config.sources'
       ---@type blink.cmp.Config
       sources = {
-        default = { "lazydev", "lsp", "path", "snippets", "buffer", "cmdline", "ripgrep" },
-        lsp = { fallbacks = {} },
+        default = { "lazydev", "lsp", "path", "snippets", "buffer", "ripgrep" },
         providers = {
           lazydev = {
             name = "LazyDev",
@@ -440,12 +438,6 @@ local plugins = {
           cmd = { "ty", "server" },
           filetypes = { "python" },
           root_markers = { "ty.toml", "pyproject.toml" },
-        },
-
-        basedpyright = {
-          cmd = { "basedpyright-langserver", "--stdio" },
-          filetypes = { "python" },
-          root_markers = { "pyproject.toml" },
         },
 
         lua_ls = {
