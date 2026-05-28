@@ -1,0 +1,4 @@
+git 设置 nvim 为默认编辑器	git config --global core.editor "nvim"
+git 保存凭证	git config --global credential.helper store
+git pull 默认 rebase	git config --global pull.rebase true
+git rebase 自动 stash	git config --global rebase.autoStash true

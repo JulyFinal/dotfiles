@@ -140,3 +140,52 @@ wine-breeze-dark.reg from `https://gist.github.com/Zeinok/ceaf6ff204792dde0ae31e
 ## log
 
 https://github.com/pamburus/hl 高性能日志阅读工具
+
+
+## cmd-widget — 轻量命令速查工具
+
+按 `Ctrl-G` 弹出 fzf 搜索常用命令，选中后直接插入当前 shell 输入框（不自动执行）。
+
+### 为什么用 TSV
+
+早期版本用 Markdown + rg 解析，但 ` :: ` 分隔符在某些命令中可能冲突，且 fzf 按字段拆分后列表只显示描述，命令不可见。改用 TSV（TAB 分隔）后：
+
+- 列表同时显示描述和命令，一目了然
+- TAB 是天然分隔符，不会和命令内容冲突
+- 不需要 rg，awk 即可解析，依赖更轻
+
+### 安装
+
+在 `~/.zshrc` 中添加：
+
+```bash
+source ~/dotfiles/scripts/cmd-widget.zsh
+```
+
+默认快捷键 `Ctrl-G`。如需修改，编辑 `cmd-widget.zsh` 末尾的 `bindkey`。
+
+### 新增命令
+
+在 `scripts/commands/` 下新建或编辑 `.tsv` 文件，每行格式：
+
+```
+描述<TAB>命令
+```
+
+- `#` 开头的行为注释，空行被忽略
+- 无 TAB 的行被跳过
+
+示例 `scripts/commands/git.tsv`：
+
+```
+git 设置 nvim 为默认编辑器	git config --global core.editor "nvim"
+git 保存凭证	git config --global credential.helper store
+git pull 默认 rebase	git config --global pull.rebase true
+git rebase 自动 stash	git config --global rebase.autoStash true
+```
+
+### 使用
+
+```
+Ctrl-G    → 弹出 fzf，搜索命令，选中后插入输入框
+```

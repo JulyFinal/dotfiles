@@ -16,6 +16,7 @@ autoload -U compinit; compinit
 source <(fzf --zsh)
 
 alias nix-update="nix-channel --update && nix-env -u '*'"
+source ~/dotfiles/scripts/cmd-widget.zsh
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -29,3 +30,4 @@ export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

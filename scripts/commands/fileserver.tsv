@@ -1,0 +1,3 @@
+caddy 当前目录文件服务器	caddy file-server --browse --listen :8000 --root ./
+rclone 当前目录 http 服务	rclone serve http . --addr :8000
+python 当前目录 http 服务	uvx python -m http.server 8000
