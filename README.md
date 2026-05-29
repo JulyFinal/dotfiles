@@ -146,13 +146,24 @@ https://github.com/pamburus/hl 高性能日志阅读工具
 
 按 `Ctrl-G` 弹出 fzf 搜索常用命令，选中后直接插入当前 shell 输入框（不自动执行）。
 
-### 为什么用 TSV
+### 为什么用 YAML
 
-早期版本用 Markdown + rg 解析，但 ` :: ` 分隔符在某些命令中可能冲突，且 fzf 按字段拆分后列表只显示描述，命令不可见。改用 TSV（TAB 分隔）后：
+早期版本用 Markdown + rg，后来改用 TSV。但 TSV 对人工维护不友好，TAB 不可见、多行命令不好写。YAML 解决了这些问题：
 
-- 列表同时显示描述和命令，一目了然
-- TAB 是天然分隔符，不会和命令内容冲突
-- 不需要 rg，awk 即可解析，依赖更轻
+- 结构清晰，`name` / `cmd` / `tags` 一目了然
+- 原生支持多行命令（`|` 块标量）
+- 无需手动区分分隔符和命令内容
+- IDE 和编辑器默认支持 YAML 语法高亮
+
+### 依赖
+
+- `fzf` — 模糊搜索
+- `yq` — YAML 解析（推荐 mikefarah/yq Go 版，也兼容 kislyuk/yq Python 版）
+- `base64` — 编解码多行命令
+
+```bash
+sudo pacman -S fzf yq
+```
 
 ### 安装
 
@@ -162,30 +173,50 @@ https://github.com/pamburus/hl 高性能日志阅读工具
 source ~/dotfiles/scripts/cmd-widget.zsh
 ```
 
+然后 `source ~/.zshrc` 或开新终端。
+
 默认快捷键 `Ctrl-G`。如需修改，编辑 `cmd-widget.zsh` 末尾的 `bindkey`。
+
+如果 `Ctrl-G` 没反应，检查终端是否占用了该键：`stty -a | grep quit`。在 `~/.zshrc` 末尾加 `stty quit undef 2>/dev/null` 释放。
+
+### 命令文件格式
+
+放在 `scripts/commands/*.yaml`，每个文件是一个命令列表。
+
+**单行命令：**
+
+```yaml
+- name: python 当前目录 http 服务
+  cmd: uvx python -m http.server 8000
+  tags: [fileserver, python]
+```
+
+**多行命令：**
+
+```yaml
+- name: git 全局配置
+  cmd: |
+    git config --global core.editor "nvim"
+    git config --global credential.helper store
+    git config --global pull.rebase true
+    git config --global rebase.autoStash true
+  tags: [git, init]
+```
+
+字段说明：
+
+- `name` — 必填，命令说明，用于 fzf 搜索
+- `cmd` — 必填，命令内容。多行用 `|`
+- `tags` — 可选，分类标签，fzf 中显示为 `[tag1,tag2]`
 
 ### 新增命令
 
-在 `scripts/commands/` 下新建或编辑 `.tsv` 文件，每行格式：
-
-```
-描述<TAB>命令
-```
-
-- `#` 开头的行为注释，空行被忽略
-- 无 TAB 的行被跳过
-
-示例 `scripts/commands/git.tsv`：
-
-```
-git 设置 nvim 为默认编辑器	git config --global core.editor "nvim"
-git 保存凭证	git config --global credential.helper store
-git pull 默认 rebase	git config --global pull.rebase true
-git rebase 自动 stash	git config --global rebase.autoStash true
-```
+在 `scripts/commands/` 下新建或编辑 `.yaml` 文件，按上述格式写入即可。无需重启 shell，下次 `Ctrl-G` 自动生效。
 
 ### 使用
 
 ```
-Ctrl-G    → 弹出 fzf，搜索命令，选中后插入输入框
+Ctrl-G    → 弹出 fzf，搜索命令，选中后插入输入框（不自动执行）
 ```
+
+fzf 列表显示格式：`[tags] name :: cmd摘要`（多行命令摘要中用 `;` 连接）

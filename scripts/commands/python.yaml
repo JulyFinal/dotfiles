@@ -1,0 +1,3 @@
+- name: python 当前最新包的情况
+  cmd: uv pip list --outdated
+  tags: [python, package]

@@ -1,0 +1,11 @@
+- name: caddy 当前目录文件服务器
+  cmd: caddy file-server --browse --listen :8000 --root ./
+  tags: [fileserver, http]
+
+- name: rclone 当前目录 http 服务
+  cmd: rclone serve http . --addr :8000
+  tags: [fileserver, http]
+
+- name: python 当前目录 http 服务
+  cmd: uvx python -m http.server 8000
+  tags: [fileserver, python]
