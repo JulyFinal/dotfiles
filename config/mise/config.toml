@@ -1,0 +1,18 @@
+[tools]
+go = "latest"
+node = "24"
+npm = "12"
+"npm:@anthropic-ai/claude-code" = "latest"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:@google/gemini-cli" = "latest"
+"npm:@openai/codex" = "latest"
+"npm:corepack" = "latest"
+"npm:vercel" = "latest"
+rust = "stable"
+uv = "latest"
+
+[settings]
+minimum_release_age = "0"
+
+[settings.npm]
+package_manager = "npm"
