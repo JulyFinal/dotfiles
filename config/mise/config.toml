@@ -1,4 +1,5 @@
 [tools]
+atuin = "latest"
 go = "latest"
 node = "24"
 npm = "12"
@@ -10,6 +11,13 @@ npm = "12"
 "npm:vercel" = "latest"
 rust = "stable"
 uv = "latest"
+bat = "latest"
+deno = "latest"
+fzf = "latest"
+rclone = "latest"
+starship = "latest"
+yazi = "latest"
+zoxide = "latest"
 
 [settings]
 minimum_release_age = "0"
