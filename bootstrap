@@ -109,7 +109,15 @@ done < "$repo_dir/services/user-common.txt"
 mise install
 
 if $with_deepin; then
-    distrobox assemble create --file "$repo_dir/distrobox/deepin.ini"
+    if distrobox list --no-color 2>/dev/null | awk -F '|' '
+        { name=$2; gsub(/^[[:space:]]+|[[:space:]]+$/, "", name) }
+        name == "deepin" { found=1 }
+        END { exit !found }
+    '; then
+        printf '%s\n' 'Distrobox deepin already exists; leaving it unchanged.'
+    else
+        distrobox assemble create --file "$repo_dir/distrobox/deepin.ini"
+    fi
 fi
 
 "$repo_dir/doctor"

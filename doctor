@@ -17,13 +17,20 @@ for command_name in niri waybar kitty fcitx5 hyprlock vicinae mise chezmoi; do
     fi
 done
 
-mcp_npx="$HOME/.local/share/mise/shims/npx"
+mcp_filesystem="$HOME/.local/share/mise/shims/mcp-server-filesystem"
 codex_config="$HOME/.codex/config.toml"
-if [[ -x "$mcp_npx" ]] && [[ -f "$codex_config" ]] && \
-   grep -Fq "command = \"$mcp_npx\"" "$codex_config"; then
-    ok 'Codex MCP uses the stable mise npx shim'
+if [[ -x "$mcp_filesystem" ]] && [[ -f "$codex_config" ]] && \
+   grep -Fq "command = \"$mcp_filesystem\"" "$codex_config"; then
+    mcp_response=$(printf '%s\n' \
+        '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"dotfiles-doctor","version":"1"}}}' \
+        | timeout 10s "$mcp_filesystem" "$HOME" 2>/dev/null || true)
+    if grep -Fq '"protocolVersion":"2025-11-25"' <<<"$mcp_response"; then
+        ok 'Codex filesystem MCP handshake'
+    else
+        fail 'Codex filesystem MCP handshake failed'
+    fi
 else
-    fail 'Codex MCP npx path is not stable'
+    fail 'Codex filesystem MCP is not installed through Mise'
 fi
 
 if niri validate >/dev/null 2>&1; then
@@ -40,6 +47,25 @@ while IFS= read -r unit; do
         fail "system service disabled: $unit"
     fi
 done < "$repo_dir/services/system-common.txt"
+
+profile=$(sed -nE 's/^[[:space:]]*profile[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' \
+    "${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi/chezmoi.toml" 2>/dev/null | head -n1)
+if [[ "$profile" == laptop ]]; then
+    while IFS= read -r unit; do
+        [[ -z "$unit" ]] && continue
+        if systemctl is-enabled "$unit" >/dev/null 2>&1; then
+            ok "laptop system service: $unit"
+        else
+            fail "laptop system service disabled: $unit"
+        fi
+    done < "$repo_dir/services/system-laptop.txt"
+fi
+
+if cmp -s "$repo_dir/rootfs/etc/greetd/config.toml" /etc/greetd/config.toml; then
+    ok 'system greetd configuration'
+else
+    fail 'system greetd configuration differs from the repository'
+fi
 
 while IFS= read -r unit; do
     [[ -z "$unit" ]] && continue

@@ -11,20 +11,20 @@ trust_level = "trusted"
 [mcp_servers]
 
 [mcp_servers.filesystem]
-command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
-args = ["-y", "@modelcontextprotocol/server-filesystem", "{{ .chezmoi.homeDir }}"]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/mcp-server-filesystem"
+args = ["{{ .chezmoi.homeDir }}"]
 
 [mcp_servers.memory]
-command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
-args = ["-y", "@modelcontextprotocol/server-memory"]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/mcp-server-memory"
+args = []
 
 [mcp_servers.context7]
-command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
-args = ["-y", "@upstash/context7-mcp"]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/context7-mcp"
+args = []
 
 [mcp_servers.sequential_thinking]
-command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
-args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/mcp-server-sequential-thinking"
+args = []
 
 [tui]
 status_line = ["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]
