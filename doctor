@@ -5,17 +5,33 @@ repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 failures=0
 warnings=0
 
+# A long-lived shell may predate newly installed mise tools. Shims keep the
+# diagnostic accurate without requiring the user to restart their terminal.
+if [[ -d "$HOME/.local/share/mise/shims" ]]; then
+    export PATH="$HOME/.local/share/mise/shims:$PATH"
+fi
+
 ok() { printf 'OK    %s\n' "$*"; }
 warn() { printf 'WARN  %s\n' "$*"; warnings=$((warnings + 1)); }
 fail() { printf 'FAIL  %s\n' "$*"; failures=$((failures + 1)); }
 
-for command_name in niri waybar kitty fcitx5 hyprlock vicinae mise chezmoi; do
+for command_name in \
+    niri waybar kitty fcitx5 hyprlock vicinae mise chezmoi \
+    yq stylua ruff ty lua-language-server shfmt taplo deno rustfmt; do
     if command -v "$command_name" >/dev/null 2>&1; then
         ok "command: $command_name"
     else
         fail "missing command: $command_name"
     fi
 done
+
+if command_palette_name=$(yq -r '.[0].name' \
+    "$repo_dir/dot_config/zsh/commands/git.yaml" 2>/dev/null) && \
+   [[ -n "$command_palette_name" && "$command_palette_name" != null ]]; then
+    ok 'command palette YAML parser'
+else
+    fail 'command palette YAML parser failed'
+fi
 
 mcp_filesystem="$HOME/.local/share/mise/shims/mcp-server-filesystem"
 codex_config="$HOME/.codex/config.toml"
@@ -37,6 +53,19 @@ if niri validate >/dev/null 2>&1; then
     ok 'niri configuration'
 else
     fail 'niri configuration is invalid'
+fi
+
+nvim_output=''
+if nvim_output=$(timeout 30s nvim --headless '+qa' 2>&1) && [[ -z "$nvim_output" ]]; then
+    ok 'neovim clean startup'
+else
+    fail 'neovim startup emitted errors'
+fi
+
+if chezmoi --source "$repo_dir" --destination "$HOME" verify >/dev/null 2>&1; then
+    ok 'chezmoi destination matches source state'
+else
+    fail 'chezmoi destination differs from source state'
 fi
 
 while IFS= read -r unit; do

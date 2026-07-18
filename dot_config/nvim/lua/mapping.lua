@@ -1,8 +1,5 @@
 -- n, v, i, t = mode names
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
 local map = vim.api.nvim_set_keymap -- 复用 opt 参数
 local opt = { noremap = true, silent = true }
 
@@ -20,7 +17,7 @@ map("n", "<leader>x", ":bdelete!<CR>", opt)
 -- Save file
 map("n", "<C-s>", "<cmd> w <CR>", opt)
 map("n", "<leader>w", "<cmd> w <CR>", opt)
--- update packer
+-- plugin manager
 map("n", "<leader>uu", "<cmd> Lazy <CR>", opt)
 
 -- 比例控制

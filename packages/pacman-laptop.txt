@@ -1,5 +1,3 @@
 brightnessctl
-intel-ucode
 power-profiles-daemon
 sof-firmware
-vulkan-intel

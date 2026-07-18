@@ -238,15 +238,14 @@ local plugins = {
         formatters_by_ft = {
           lua = { "stylua" },
           python = { "ruff_format" },
-          javascript = { "deno" },
+          javascript = { "deno_fmt" },
           rust = { "rustfmt" },
           bash = { "shfmt" },
-          markdown = { "deno" },
+          markdown = { "deno_fmt" },
           toml = { "taplo" },
-          json = { "deno" },
-          jsonc = { "deno" },
-          nix = { "alejandra" },
-          html = { "deno" },
+          json = { "deno_fmt" },
+          jsonc = { "deno_fmt" },
+          html = { "deno_fmt" },
 
           ["_"] = { "trim_whitespace" },
         },
@@ -497,9 +496,9 @@ local plugins = {
 }
 
 local opts = {
-  spec = plugins,
   defaults = { lazy = true },
   install = { colorscheme = { "tokyonight" } },
+  rocks = { enabled = false },
   change_detection = {
     notify = false,
   },

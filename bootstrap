@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-profile=laptop
+profile=laptop-intel
 dry_run=false
 with_deepin=true
 
 usage() {
-    printf '%s\n' 'Usage: ./bootstrap [--profile laptop|desktop] [--dry-run] [--skip-deepin]'
+    printf '%s\n' 'Usage: ./bootstrap [--profile laptop-intel|laptop-amd|desktop] [--dry-run] [--skip-deepin]'
 }
 
 while (($#)); do
@@ -36,7 +36,7 @@ while (($#)); do
 done
 
 case "$profile" in
-    laptop|desktop) ;;
+    laptop|laptop-intel|laptop-amd|desktop) ;;
     *) printf 'Unsupported profile: %s\n' "$profile" >&2; exit 2 ;;
 esac
 
@@ -47,26 +47,36 @@ fi
 
 repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 
+case "$profile" in
+    laptop|laptop-intel) display_profile=laptop; hardware_profile=intel ;;
+    laptop-amd) display_profile=laptop; hardware_profile=amd ;;
+    desktop) display_profile=desktop; hardware_profile=none ;;
+esac
+
 read_list() {
     sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$1"
 }
 
 mapfile -t pacman_packages < <(
     read_list "$repo_dir/packages/pacman-common.txt"
-    if [[ "$profile" == laptop ]]; then
+    if [[ "$display_profile" == laptop ]]; then
         read_list "$repo_dir/packages/pacman-laptop.txt"
+    fi
+    if [[ "$hardware_profile" != none ]]; then
+        read_list "$repo_dir/packages/pacman-$hardware_profile.txt"
     fi
 )
 mapfile -t aur_packages < <(read_list "$repo_dir/packages/aur.txt")
 
 if $dry_run; then
-    printf 'Profile: %s\n\nPacman packages:\n' "$profile"
+    printf 'Profile: %s (display=%s, hardware=%s)\n\nPacman packages:\n' \
+        "$profile" "$display_profile" "$hardware_profile"
     printf '  %s\n' "${pacman_packages[@]}"
     printf '\nAUR packages:\n'
     printf '  %s\n' "${aur_packages[@]}"
     if command -v chezmoi >/dev/null 2>&1; then
         chezmoi --source "$repo_dir" --destination "$HOME" \
-            --override-data "{\"profile\":\"$profile\"}" diff || true
+            --override-data "{\"profile\":\"$display_profile\"}" diff || true
     fi
     if $with_deepin && command -v distrobox >/dev/null 2>&1; then
         distrobox assemble create --dry-run --file "$repo_dir/distrobox/deepin.ini"
@@ -87,7 +97,7 @@ paru -S --needed --noconfirm "${aur_packages[@]}"
 
 config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi
 mkdir -p "$config_dir"
-DOTFILES_PROFILE="$profile" DOTFILES_SOURCE_DIR="$repo_dir" \
+DOTFILES_PROFILE="$display_profile" DOTFILES_SOURCE_DIR="$repo_dir" \
     chezmoi --source "$repo_dir" execute-template < "$repo_dir/.chezmoi.toml.tmpl" \
     > "$config_dir/chezmoi.toml"
 chezmoi --source "$repo_dir" --destination "$HOME" apply --force
@@ -97,7 +107,7 @@ sudo install -Dm0644 "$repo_dir/rootfs/etc/greetd/config.toml" /etc/greetd/confi
 while IFS= read -r unit; do
     [[ -n "$unit" ]] && sudo systemctl enable "$unit"
 done < "$repo_dir/services/system-common.txt"
-if [[ "$profile" == laptop ]]; then
+if [[ "$display_profile" == laptop ]]; then
     while IFS= read -r unit; do
         [[ -n "$unit" ]] && sudo systemctl enable "$unit"
     done < "$repo_dir/services/system-laptop.txt"
@@ -107,6 +117,14 @@ while IFS= read -r unit; do
 done < "$repo_dir/services/user-common.txt"
 
 mise install
+
+# Make the first interactive Neovim launch deterministic. Restore the locked
+# plugin revisions and pre-install the parsers declared by the configuration.
+mise exec -- nvim --headless \
+    '+Lazy! restore' \
+    '+Lazy load nvim-treesitter' \
+    '+TSUpdateSync lua python toml bash json' \
+    '+qa'
 
 if $with_deepin; then
     if distrobox list --no-color 2>/dev/null | awk -F '|' '

@@ -1,7 +1,7 @@
 daemonize
 show-failed-attempts
 indicator-caps-lock
-font=JetBrainsMono Nerd Font
+font=Maple Mono NF CN
 font-size=22
 color=1e2021
 inside-color=2e3440cc

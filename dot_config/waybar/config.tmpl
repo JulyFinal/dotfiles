@@ -24,8 +24,10 @@
     "tray",
     "network",
     "pulseaudio",
+{{ if eq .profile "laptop" -}}
     "backlight",
     "battery",
+{{ end -}}
     "custom/power"
   ],
 
@@ -108,6 +110,7 @@
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
   },
 
+{{ if eq .profile "laptop" -}}
   "backlight": {
     "format": "{icon}  {percent}%",
     "format-icons": ["󰃞", "󰃟", "󰃠"],
@@ -128,6 +131,7 @@
     "format-icons": ["󰁺", "󰁻", "󰁽", "󰁿", "󰂁", "󰁹"],
     "tooltip-format": "电量：{capacity}%\n功耗：{power} W\n剩余：{time}"
   },
+{{ end -}}
 
   "custom/power": {
     "format": "",

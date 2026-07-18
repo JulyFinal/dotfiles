@@ -4,56 +4,147 @@ This repository is the reproducible source of truth for the current Arch Linux
 desktop. Chezmoi manages user files, Pacman and Paru install system packages,
 Mise installs development tools, and the bootstrap enables required services.
 
-## Fresh installation
+## Install
 
 ```bash
 sudo pacman -S --needed git base-devel
 git clone https://github.com/JulyFinal/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./bootstrap --profile laptop
+./bootstrap --profile laptop-intel
 ```
 
-For a desktop without laptop-specific power, backlight and Intel graphics
-packages:
+Available profiles:
+
+- `laptop-intel`: laptop UI, power services, Intel microcode and graphics.
+- `laptop-amd`: laptop UI, power services, AMD microcode and graphics.
+- `desktop`: no battery, backlight, laptop power or GPU-vendor packages.
+- `laptop`: legacy alias for `laptop-intel`.
+
+Preview without changing the machine:
 
 ```bash
-./bootstrap --profile desktop
+./bootstrap --profile laptop-intel --dry-run
 ```
 
-Preview all declared work without changing the machine:
+Pass `--skip-deepin` to omit the Deepin/WeCom container.
+
+## Daily workflow
 
 ```bash
-./bootstrap --profile laptop --dry-run
-```
-
-Use `--skip-deepin` to omit the Deepin/WeCom container.
-
-## Daily use
-
-```bash
+cd ~/dotfiles
+git pull --ff-only
 chezmoi diff
+chezmoi apply
+chezmoi verify
+./doctor
+```
+
+- `chezmoi diff` previews destination changes.
+- `chezmoi apply` deploys the repository state.
+- `chezmoi verify` exits non-zero when a managed file has drifted.
+- `./doctor` verifies the desktop, editor, services, MCP and proxy runtime.
+- `./tests/smoke.sh` validates both display profiles without sudo.
+
+## Add and edit files
+
+Edit a managed file through Chezmoi:
+
+```bash
+chezmoi edit ~/.config/kitty/kitty.conf
+chezmoi diff
+chezmoi apply
+```
+
+Import a file that was edited in place:
+
+```bash
+chezmoi add ~/.config/kitty/kitty.conf
+```
+
+Add a new application configuration or home file:
+
+```bash
+chezmoi add ~/.config/example/config.toml
+chezmoi add ~/.gitconfig
+chezmoi add ~/.local/bin/my-script
+```
+
+Use a template when a file contains a home path, username or profile-specific
+section:
+
+```bash
+chezmoi add --template ~/.config/example/config.toml
+```
+
+Useful template values:
+
+```text
+{{ .chezmoi.homeDir }}
+{{ .chezmoi.username }}
+{{ .profile }}
+```
+
+Chezmoi source naming maps to destination behavior:
+
+| Source name | Destination behavior |
+| --- | --- |
+| `dot_config/foo` | `~/.config/foo` |
+| `dot_zshrc` | `~/.zshrc` |
+| `private_foo` | private permissions |
+| `executable_foo` | executable permissions |
+| `foo.tmpl` | rendered as a template |
+
+Run `git status` and inspect the diff before committing an imported file.
+
+## Remove, repair and roll back
+
+Stop managing a file while leaving the destination in place:
+
+```bash
+chezmoi forget ~/.config/example/config.toml
+```
+
+Discard a destination-only edit and restore the repository version:
+
+```bash
+chezmoi apply ~/.config/kitty/kitty.conf
+```
+
+Restore a historical source file, then deploy it:
+
+```bash
+git restore --source=<commit> -- dot_config/kitty/kitty.conf
+chezmoi apply ~/.config/kitty/kitty.conf
+```
+
+Roll back a whole commit without rewriting history:
+
+```bash
+git revert <commit>
 chezmoi apply
 ./doctor
 ```
 
-Edit deployed files normally, then import the changes with `chezmoi add` or use
-`chezmoi edit`. The repository source directory is `~/dotfiles`.
+General repair sequence:
 
-## Managed state
+```bash
+chezmoi doctor
+chezmoi diff
+chezmoi apply --force
+chezmoi verify
+./doctor
+```
 
-- Niri, Waybar, Kitty, Mako, Hyprlock, Fcitx5, GTK and Vicinae configuration.
-- Shell, editors, Mise tools and personal command palette.
-- Arch official and AUR package manifests.
-- greetd and enabled system/user services.
-- Deepin Distrobox definition and the WeCom launcher workaround.
-- v2rayN XDG autostart with start-hidden and close-to-tray behavior.
+`--force` overwrites destination conflicts, so always inspect `chezmoi diff`
+first. The tag `pre-chezmoi-20260718` is reference material for the legacy
+layout; do not run its old destructive symlink script.
 
-Browser profiles, proxy subscriptions, device pairing keys, histories and
-container filesystems are deliberately excluded. Restore subscription secrets
-manually after bootstrap.
+## Managed and excluded state
 
-## Rollback
+Managed state includes Niri, Waybar, Kitty, Mako, Hyprlock, Fcitx5, GTK,
+Vicinae, Neovim, shell tools, package manifests, services, Distrobox/WeCom and
+v2rayN autostart.
 
-The tag `pre-chezmoi-20260718` contains the last symlink-managed layout. The
-legacy files are also preserved under `archive/pre-chezmoi` for reference but
-are ignored by Chezmoi.
+Do not add browser profiles, proxy subscriptions, `gh/hosts.yml`, KDE Connect
+pairing keys, histories, tokens, passwords, private keys, caches or container
+filesystems. Restore secrets and device pairing manually after bootstrap.

@@ -6,4 +6,4 @@ rootfs/**
 distrobox/**
 bootstrap
 doctor
-.gitmodules
+tests/**

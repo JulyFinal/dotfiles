@@ -5,6 +5,13 @@ vim.g.maplocalleader = " "
 
 vim.g.have_nerd_font = true
 
+-- This configuration uses native Lua plugins only. Disable unused remote
+-- providers so :checkhealth reports actionable issues instead of optional SDKs.
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- mouse mode
 vim.opt.mouse = "a"
 
@@ -38,10 +45,6 @@ vim.opt.updatetime = 200
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
 vim.opt.timeoutlen = 300
-
--- Configure how new splits should be opened
-vim.opt.splitright = true
-vim.opt.splitbelow = true
 
 -- Sets how neovim will display certain whitespace characters in the editor.
 vim.opt.list = true
@@ -79,7 +82,6 @@ vim.opt.termguicolors = true
 -- vim.opt.whichwrap:append("<>[]hl")
 --
 -- utf8
-vim.g.encoding = "UTF-8"
 vim.opt.fileencoding = "utf-8"
 vim.opt.sidescrolloff = 10
 --
