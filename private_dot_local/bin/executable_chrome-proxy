@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+proxy_server=${CHROME_PROXY_SERVER:-http://127.0.0.1:10808}
+
+# Chrome reuses its existing browser process and silently ignores networking
+# flags from later launches. Refuse that misleading state instead of pretending
+# the new window is proxied. Closing Chrome preserves the normal user profile.
+if pgrep -u "$(id -u)" -x chrome >/dev/null 2>&1; then
+    printf '%s\n' 'Chrome is already running. Close every Chrome window, then run chrome-proxy again.' >&2
+    exit 1
+fi
+
+exec google-chrome-stable \
+    --proxy-server="$proxy_server" \
+    "$@"

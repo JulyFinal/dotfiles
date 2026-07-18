@@ -39,6 +39,15 @@ else
     fail 'yazi configuration schema is invalid'
 fi
 
+chrome_flags="$HOME/.config/chrome-flags.conf"
+if [[ -x "$HOME/.local/bin/chrome-proxy" ]] && \
+   [[ -f "$chrome_flags" ]] && \
+   ! grep -Eq '^[[:space:]]*--proxy-(server|pac-url)=' "$chrome_flags"; then
+    ok 'Chrome proxy is opt-in through chrome-proxy'
+else
+    fail 'Chrome still has a global proxy or chrome-proxy is missing'
+fi
+
 fcitx_theme_dir="$HOME/.local/share/fcitx5/themes/catppuccin-mocha-mauve"
 fcitx_classicui="$HOME/.config/fcitx5/conf/classicui.conf"
 if [[ -f "$fcitx_classicui" ]] && \
