@@ -1,17 +1,25 @@
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+local uv = vim.uv or vim.loop
+local lazy_module = lazypath .. "/lua/lazy/init.lua"
+
+if not uv.fs_stat(lazy_module) then
+  local partial = uv.fs_lstat(lazypath)
+  if partial then
+    if partial.type ~= "directory" then
+      error("Cannot install lazy.nvim: " .. lazypath .. " exists and is not a directory")
+    end
+    -- A cancelled clone can leave a .git-only directory behind. It is a
+    -- rebuildable dependency cache, so remove the incomplete checkout first.
+    vim.fn.delete(lazypath, "rf")
+  end
+
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
   -- local lazyrepo = "https://github.moeyy.xyz/https://github.com/folke/lazy.nvim.git"
   local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out,                            "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
+  if vim.v.shell_error ~= 0 or not uv.fs_stat(lazy_module) then
+    vim.fn.delete(lazypath, "rf")
+    error("Failed to clone lazy.nvim:\n" .. out)
   end
 end
 vim.opt.rtp:prepend(lazypath)
