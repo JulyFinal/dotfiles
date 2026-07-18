@@ -17,7 +17,7 @@ fail() { printf 'FAIL  %s\n' "$*"; failures=$((failures + 1)); }
 
 for command_name in \
     niri waybar kitty fcitx5 hyprlock vicinae mise chezmoi \
-    yq stylua ruff ty lua-language-server shfmt taplo deno rustfmt; do
+    yazi yq stylua ruff ty lua-language-server shfmt taplo deno rustfmt; do
     if command -v "$command_name" >/dev/null 2>&1; then
         ok "command: $command_name"
     else
@@ -31,6 +31,12 @@ if command_palette_name=$(yq -r '.[0].name' \
     ok 'command palette YAML parser'
 else
     fail 'command palette YAML parser failed'
+fi
+
+if timeout 10s yazi --debug >/dev/null 2>&1; then
+    ok 'yazi configuration schema'
+else
+    fail 'yazi configuration schema is invalid'
 fi
 
 fcitx_theme_dir="$HOME/.local/share/fcitx5/themes/catppuccin-mocha-mauve"
