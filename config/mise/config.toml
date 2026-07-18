@@ -18,6 +18,7 @@ rclone = "latest"
 starship = "latest"
 yazi = "latest"
 zoxide = "latest"
+agy = "latest"
 
 [settings]
 minimum_release_age = "0"

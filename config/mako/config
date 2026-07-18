@@ -1,26 +1,45 @@
 sort=-time
 layer=overlay
-background-color=#2e34407f
-width=420
-height=120
-border-size=3
-border-color=#99c0d0
-border-radius=12
-icons=0
-max-icon-size=64
-default-timeout=5000
+anchor=top-right
+
+font=Maple Mono NF CN 10
+format=<b>%s</b>\n%b
+markup=1
+text-alignment=left
+
+background-color=#181c27f5
+text-color=#e8eaf2ff
+width=340
+height=96
+outer-margin=10,10,0,0
+margin=6
+padding=10,12
+border-size=1
+border-color=#ffffff1f
+border-radius=18
+
+icons=1
+icon-location=left
+max-icon-size=42
+icon-border-radius=10
+icon-path=/usr/share/icons/breeze-dark:/usr/share/icons/breeze:/usr/share/icons/Adwaita:/usr/share/icons/AdwaitaLegacy:/usr/share/icons/hicolor
+
+max-visible=4
+group-by=app-name
+default-timeout=6000
 ignore-timeout=0
-font="Maple Mono NF CN" 14
-margin=12
-padding=12,20
+progress-color=over #89b4facc
 
 [urgency=low]
-border-color=#cccccc
+background-color=#181c27ed
+text-color=#bac2deff
+border-color=#ffffff1f
+default-timeout=3500
 
 [urgency=normal]
-border-color=#99c0d0
+border-color=#ffffff1f
 
 [urgency=critical]
-border-color=#bf616a
+background-color=#2b1922f2
+border-color=#f38ba880
 default-timeout=0
-

@@ -1,126 +1,137 @@
 {
-  "gtk-layer-shell": true,
   "layer": "top",
+  "position": "top",
+  "mode": "dock",
+  "exclusive": true,
+  "passthrough": false,
+  "gtk-layer-shell": true,
+  "reload_style_on_change": true,
+  "height": 28,
+  "spacing": 5,
+  "margin-top": 0,
+  "margin-left": 8,
+  "margin-right": 8,
+
   "modules-left": [
     "custom/launcher",
-    "cpu",
-    "temperature",
-    "memory"
+    "niri/workspaces",
+    "niri/window"
   ],
   "modules-center": [
-    "hyprland/workspaces"
+    "clock"
   ],
   "modules-right": [
-    "pulseaudio",
+    "tray",
     "network",
+    "pulseaudio",
+    "backlight",
     "battery",
-    "clock",
     "custom/power"
   ],
-  "height": 22,
+
   "custom/launcher": {
-    "format": " ",
-    "tooltip": false
+    "format": "",
+    "tooltip-format": "打开应用启动器",
+    "on-click": "vicinae toggle"
   },
-  "cpu": {
-    "interval": 5,
-    "format": " {usage}%",
-    "max-length": 10
-  },
-  "temperature": {
-    "interval": 5,
-    "tooltip": false,
-    "format": " {temperatureC}°C",
-    "max-length": 10,
-    "thermal-zone": 1,
-    "input-filename": "temp1_input",
-    "hwon-path": "sys/devices/platform/coretemp.0/hwon/hwon5/temp1_input"
-  },
-  "memory": {
-    "interval": 10,
-    "format": " {}%",
-    "max-length": 10
-  },
-  "hyprland/workspaces": {
+
+  "niri/workspaces": {
     "format": "{icon}",
     "format-icons": {
-      "1": "",
-      "2": "",
-      "3": "",
-      "4": "󰎄",
-      "5": "󰈮",
-      "6": "󰈬",
-      "7": "",
-      "8": "",
-      "9": "󰯁",
-      "10": "",
-      "default": ""
+      "active": "",
+      "default": "",
+      "urgent": ""
     },
-    "on-click": "activate"
+    "sort-by-number": true,
+    "on-click": "activate",
+    "on-scroll-up": "niri msg action focus-workspace-up",
+    "on-scroll-down": "niri msg action focus-workspace-down"
   },
-  "pulseaudio": {
-    "tooltip": false,
-    "scroll-step": 5,
-    "format": "{icon} {volume}%",
-    "format-muter": "  muted",
-    "format-icons": {
-      "default": [
-        "",
-        "",
-        ""
-      ]
-    },
-    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
-  },
-  "network": {
-    "tooltip": false,
-    "format-wifi": "{icon} {essid}",
-    "format-alt": "{icon}",
-    "format-alt-click": "click-right",
-    "format-disconnected": "{icon} offline",
-    "margin-top": 9,
-    "margin-bottom": 9,
-    "margin-right": 9,
-    "margin-left": 9,
-    "format-icons": {
-      "wifi": [
-        ""
-      ],
-      "ethernet": [
-        "󰴽"
-      ],
-      "disconnected": [
-        ""
-      ]
+
+  "niri/window": {
+    "format": "{title}",
+    "max-length": 34,
+    "separate-outputs": true,
+    "rewrite": {
+      "(.*) — Mozilla Firefox": "$1",
+      "(.*) - Google Chrome": "$1"
     }
   },
+
+  "clock": {
+    "interval": 1,
+    "format": "  {:%H:%M}",
+    "format-alt": "  {:%Y年%m月%d日  %A}",
+    "tooltip-format": "<big>{:%Y年 %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#f5e0dc'><b>{}</b></span>",
+        "days": "<span color='#cdd6f4'>{}</span>",
+        "weeks": "<span color='#89b4fa'>W{}</span>",
+        "weekdays": "<span color='#a6e3a1'><b>{}</b></span>",
+        "today": "<span color='#11111b' background='#cba6f7'><b>{}</b></span>"
+      }
+    }
+  },
+
+  "tray": {
+    "icon-size": 14,
+    "spacing": 6,
+    "show-passive-items": true
+  },
+
+  "network": {
+    "interval": 2,
+    "format-wifi": "  {signalStrength}%",
+    "format-ethernet": "󰈀",
+    "format-linked": "󰈀",
+    "format-disconnected": "󰖪",
+    "tooltip-format-wifi": "{essid}\n信号：{signalStrength}%\n地址：{ipaddr}\n下载：{bandwidthDownBytes}  上传：{bandwidthUpBytes}",
+    "tooltip-format-ethernet": "{ifname}\n地址：{ipaddr}",
+    "tooltip-format-disconnected": "网络已断开",
+    "on-click": "kitty --class nmtui -e nmtui"
+  },
+
+  "pulseaudio": {
+    "scroll-step": 5,
+    "format": "{icon}  {volume}%",
+    "format-muted": "",
+    "format-icons": {
+      "headphone": "",
+      "headset": "󰋎",
+      "default": ["", "", ""]
+    },
+    "tooltip-format": "音量：{volume}%",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "backlight": {
+    "format": "{icon}  {percent}%",
+    "format-icons": ["󰃞", "󰃟", "󰃠"],
+    "tooltip-format": "屏幕亮度：{percent}%",
+    "on-scroll-up": "brightnessctl set +5%",
+    "on-scroll-down": "brightnessctl set 5%-"
+  },
+
   "battery": {
     "states": {
-      "good": 95,
       "warning": 30,
-      "critical": 20
+      "critical": 15
     },
-    "format": "{icon} {capacity}%",
-    "format-charging": " {capacity}%",
-    "format-plugged": " {capacity}%",
-    "format-alt": "{time} {icon}",
-    "format-icons": [
-      "",
-      "",
-      "",
-      "",
-      ""
-    ]
+    "format": "{icon}  {capacity}%",
+    "format-charging": "󰂄  {capacity}%",
+    "format-plugged": "󰚥  {capacity}%",
+    "format-alt": "{icon}  {time}",
+    "format-icons": ["󰁺", "󰁻", "󰁽", "󰁿", "󰂁", "󰁹"],
+    "tooltip-format": "电量：{capacity}%\n功耗：{power} W\n剩余：{time}"
   },
-  "clock": {
-    "format": "{:%H:%M}",
-    "format-alt": "{:%a %d %b}",
-    "tooltip-format": "{:%Y-%m-%d %H:%M:%S}",
-    "interval": 1
-  },
+
   "custom/power": {
-    "tooltip": false,
-    "font": "Awesome",
-    "format": ""
+    "format": "",
+    "tooltip-format": "电源菜单",
+    "on-click": "/home/link/.local/bin/niri-power-menu"
   }
 }
