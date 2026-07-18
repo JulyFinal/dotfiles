@@ -48,6 +48,15 @@ else
     fail 'Chrome still has a global proxy or chrome-proxy is missing'
 fi
 
+gtk_font=$(gsettings get org.gnome.desktop.interface font-name 2>/dev/null || true)
+zh_sans=$(fc-match 'sans-serif:lang=zh-cn' 2>/dev/null || true)
+if [[ "$gtk_font" == "'Noto Sans CJK SC 10'" ]] && \
+   [[ "$zh_sans" == *'Noto Sans CJK SC'* ]]; then
+    ok 'proportional Simplified Chinese UI font'
+else
+    fail 'GTK or Simplified Chinese font fallback is incorrect'
+fi
+
 fcitx_theme_dir="$HOME/.local/share/fcitx5/themes/catppuccin-mocha-mauve"
 fcitx_classicui="$HOME/.config/fcitx5/conf/classicui.conf"
 if [[ -f "$fcitx_classicui" ]] && \

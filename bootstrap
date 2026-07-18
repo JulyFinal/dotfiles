@@ -102,6 +102,11 @@ DOTFILES_PROFILE="$display_profile" DOTFILES_SOURCE_DIR="$repo_dir" \
     > "$config_dir/chezmoi.toml"
 chezmoi --source "$repo_dir" --destination "$HOME" apply --force
 
+# GTK applications use a proportional UI font. Keep Maple Mono for terminals,
+# editors and status surfaces where fixed-width metrics are intentional.
+gsettings set org.gnome.desktop.interface font-name 'Noto Sans CJK SC 10'
+gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans CJK SC 10'
+
 sudo install -Dm0644 "$repo_dir/rootfs/etc/greetd/config.toml" /etc/greetd/config.toml
 
 while IFS= read -r unit; do
