@@ -2,26 +2,26 @@ sort=-time
 layer=overlay
 anchor=top-right
 
-font=Maple Mono NF CN 10
+font=Maple Mono NF CN 7
 format=<b>%s</b>\n%b
 markup=1
 text-alignment=left
 
 background-color=#181c27f5
 text-color=#e8eaf2ff
-width=340
-height=96
-outer-margin=10,10,0,0
-margin=6
-padding=10,12
+width=227
+height=64
+outer-margin=7,7,0,0
+margin=4
+padding=7,8
 border-size=1
 border-color=#ffffff1f
-border-radius=18
+border-radius=12
 
 icons=1
 icon-location=left
-max-icon-size=42
-icon-border-radius=10
+max-icon-size=28
+icon-border-radius=7
 icon-path=/usr/share/icons/breeze-dark:/usr/share/icons/breeze:/usr/share/icons/Adwaita:/usr/share/icons/AdwaitaLegacy:/usr/share/icons/hicolor
 
 max-visible=4
