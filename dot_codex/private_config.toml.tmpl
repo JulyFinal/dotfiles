@@ -26,6 +26,10 @@ args = []
 command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/mcp-server-sequential-thinking"
 args = []
 
+[mcp_servers.atuin]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/atuin"
+args = ["mcp"]
+
 [tui]
 status_line = ["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]
 status_line_use_colors = true

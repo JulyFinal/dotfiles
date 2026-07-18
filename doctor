@@ -49,6 +49,23 @@ else
     fail 'Codex filesystem MCP is not installed through Mise'
 fi
 
+mcp_atuin="$HOME/.local/share/mise/shims/atuin"
+if [[ -x "$mcp_atuin" ]] && [[ -f "$codex_config" ]] && \
+   grep -Fq "command = \"$mcp_atuin\"" "$codex_config"; then
+    mcp_response=$(printf '%s\n%s\n' \
+        '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"dotfiles-doctor","version":"1"}}}' \
+        '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
+        | timeout 10s "$mcp_atuin" mcp 2>/dev/null || true)
+    if grep -Fq '"name":"atuin_history"' <<<"$mcp_response" && \
+       grep -Fq '"readOnlyHint":true' <<<"$mcp_response"; then
+        ok 'Codex Atuin MCP handshake'
+    else
+        fail 'Codex Atuin MCP handshake failed'
+    fi
+else
+    fail 'Codex Atuin MCP is not configured'
+fi
+
 if niri validate >/dev/null 2>&1; then
     ok 'niri configuration'
 else
