@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -u
+
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+failures=0
+warnings=0
+
+ok() { printf 'OK    %s\n' "$*"; }
+warn() { printf 'WARN  %s\n' "$*"; warnings=$((warnings + 1)); }
+fail() { printf 'FAIL  %s\n' "$*"; failures=$((failures + 1)); }
+
+for command_name in niri waybar kitty fcitx5 hyprlock vicinae mise chezmoi; do
+    if command -v "$command_name" >/dev/null 2>&1; then
+        ok "command: $command_name"
+    else
+        fail "missing command: $command_name"
+    fi
+done
+
+mcp_npx="$HOME/.local/share/mise/shims/npx"
+codex_config="$HOME/.codex/config.toml"
+if [[ -x "$mcp_npx" ]] && [[ -f "$codex_config" ]] && \
+   grep -Fq "command = \"$mcp_npx\"" "$codex_config"; then
+    ok 'Codex MCP uses the stable mise npx shim'
+else
+    fail 'Codex MCP npx path is not stable'
+fi
+
+if niri validate >/dev/null 2>&1; then
+    ok 'niri configuration'
+else
+    fail 'niri configuration is invalid'
+fi
+
+while IFS= read -r unit; do
+    [[ -z "$unit" ]] && continue
+    if systemctl is-enabled "$unit" >/dev/null 2>&1; then
+        ok "system service: $unit"
+    else
+        fail "system service disabled: $unit"
+    fi
+done < "$repo_dir/services/system-common.txt"
+
+while IFS= read -r unit; do
+    [[ -z "$unit" ]] && continue
+    if systemctl --user is-enabled "$unit" >/dev/null 2>&1; then
+        ok "user service: $unit"
+    else
+        fail "user service disabled: $unit"
+    fi
+done < "$repo_dir/services/user-common.txt"
+
+v2rayn_config=${XDG_DATA_HOME:-$HOME/.local/share}/v2rayN/guiConfigs/guiNConfig.json
+if [[ -f "$v2rayn_config" ]] && \
+   grep -q '"AutoRun": true' "$v2rayn_config" && \
+   grep -q '"AutoHideStartup": true' "$v2rayn_config" && \
+   grep -q '"Hide2TrayWhenClose": true' "$v2rayn_config"; then
+    ok 'v2rayN background settings'
+else
+    warn 'v2rayN background settings take effect on the next autostart'
+fi
+
+if ss -ltn 2>/dev/null | grep -q ':10808 '; then
+    ok 'v2rayN port 10808 is listening'
+    if curl --silent --fail --max-time 12 --proxy socks5h://127.0.0.1:10808 \
+        https://www.google.com/generate_204 --output /dev/null; then
+        ok 'proxy HTTP check'
+    else
+        warn 'proxy port is open, but the external HTTP check failed'
+    fi
+else
+    warn 'v2rayN port 10808 is not listening'
+fi
+
+if git -C "$repo_dir" grep -IlE '(BEGIN [A-Z ]*PRIVATE KEY|Authorization: Bearer|api[_-]?key[=:]|password[=:])' \
+    -- ':!archive' ':!doctor' >/dev/null 2>&1; then
+    fail 'possible secret found in tracked source state'
+else
+    ok 'tracked secret scan'
+fi
+
+printf '\nResult: %d failure(s), %d warning(s)\n' "$failures" "$warnings"
+((failures == 0))

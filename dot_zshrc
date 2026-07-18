@@ -1,0 +1,23 @@
+if [ -d "$HOME/.local/bin" ]; then PATH="$HOME/.local/bin:$PATH"; fi
+if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
+
+# eval
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+
+# zsh plugins
+if [ -d "$HOME/.zsh/zsh-autosuggestions" ]; then source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh; fi
+
+autoload -U compinit; compinit
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
+
+if [ -r "$HOME/.config/zsh/cmd-widget.zsh" ]; then
+    source "$HOME/.config/zsh/cmd-widget.zsh"
+fi
+
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+export GO111MODULE=on
+export GOPROXY=https://goproxy.cn

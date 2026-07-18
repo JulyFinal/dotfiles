@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+
+app=/usr/lib/v2rayN/v2rayN
+config_dir="${XDG_DATA_HOME:-$HOME/.local/share}/v2rayN/guiConfigs"
+config="$config_dir/guiNConfig.json"
+
+patch_config() {
+    [ -f "$config" ] || return 0
+    sed -i \
+        -e 's/"AutoRun": false/"AutoRun": true/' \
+        -e 's/"AutoHideStartup": false/"AutoHideStartup": true/' \
+        -e 's/"Hide2TrayWhenClose": false/"Hide2TrayWhenClose": true/' \
+        "$config"
+}
+
+if [ ! -x "$app" ]; then
+    printf '%s\n' 'v2rayN is not installed at /usr/lib/v2rayN/v2rayN' >&2
+    exit 127
+fi
+
+patch_config
+exec "$app"

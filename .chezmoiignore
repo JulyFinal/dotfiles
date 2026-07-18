@@ -1,0 +1,9 @@
+README.md
+archive/**
+packages/**
+services/**
+rootfs/**
+distrobox/**
+bootstrap
+doctor
+.gitmodules

@@ -1,0 +1,60 @@
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+service_tier = "default"
+
+[projects."{{ .chezmoi.homeDir }}/dotfiles"]
+trust_level = "trusted"
+
+[projects."{{ .chezmoi.homeDir }}"]
+trust_level = "trusted"
+
+[mcp_servers]
+
+[mcp_servers.filesystem]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "{{ .chezmoi.homeDir }}"]
+
+[mcp_servers.memory]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
+args = ["-y", "@modelcontextprotocol/server-memory"]
+
+[mcp_servers.context7]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
+args = ["-y", "@upstash/context7-mcp"]
+
+[mcp_servers.sequential_thinking]
+command = "{{ .chezmoi.homeDir }}/.local/share/mise/shims/npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]
+status_line_use_colors = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+"gpt-5.6-sol" = 4
+
+[notice]
+hide_rate_limit_model_nudge = true
+
+[marketplaces.waza]
+last_updated = "2026-07-18T05:26:09Z"
+last_revision = "b70c0e7f784303aece08304ad13f5ded55650ab7"
+source_type = "git"
+source = "https://github.com/tw93/Waza.git"
+
+[marketplaces.kami]
+last_updated = "2026-07-18T05:26:03Z"
+last_revision = "f97bfc9ef83626edb863f6e42632067047a23601"
+source_type = "git"
+source = "https://github.com/tw93/kami.git"
+
+[plugins."waza@waza"]
+enabled = true
+
+[plugins."kami@kami"]
+enabled = true
+
+[features]
+memories = true
+network_proxy = true

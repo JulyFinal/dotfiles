@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Prefer the themed ext-session-lock client, but never leave the session
+# without a working locker while the package is being installed.
+if command -v hyprlock >/dev/null 2>&1; then
+    exec hyprlock
+fi
+
+exec swaylock -f

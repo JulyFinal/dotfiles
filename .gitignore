@@ -1,4 +1,5 @@
+.chezmoi.toml
 state.yml
-runtime
-config/helix/external-snippets
-
+runtime/
+*.swp
+*.tmp

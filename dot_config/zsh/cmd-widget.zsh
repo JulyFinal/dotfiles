@@ -1,6 +1,6 @@
 # cmd-widget.zsh — 轻量命令速查工具（zsh widget）
 
-_CMD_DIR="$HOME/dotfiles/scripts/commands"
+_CMD_DIR="$HOME/.config/zsh/commands"
 
 cmd-widget() {
     local line encoded cmd missing

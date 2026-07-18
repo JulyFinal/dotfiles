@@ -1,0 +1,23 @@
+daemonize
+show-failed-attempts
+indicator-caps-lock
+font=JetBrainsMono Nerd Font
+font-size=22
+color=1e2021
+inside-color=2e3440cc
+inside-clear-color=ebcb8bcc
+inside-ver-color=5e81accc
+inside-wrong-color=bf616acc
+ring-color=81a1c1ff
+ring-clear-color=ebcb8bff
+ring-ver-color=88c0d0ff
+ring-wrong-color=bf616aff
+key-hl-color=a3be8cff
+bs-hl-color=d08770ff
+text-color=eceff4ff
+text-clear-color=2e3440ff
+text-ver-color=eceff4ff
+text-wrong-color=eceff4ff
+separator-color=00000000
+indicator-radius=110
+indicator-thickness=8

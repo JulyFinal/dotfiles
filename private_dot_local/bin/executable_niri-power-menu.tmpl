@@ -1,0 +1,10 @@
+#!/bin/sh
+
+choice=$(printf '锁定\n注销\n重启\n关机\n' | vicinae dmenu --navigation-title='电源' --placeholder='选择操作…' --no-section --no-quick-look --no-metadata --no-footer --width=420 --height=300) || exit 0
+
+case "$choice" in
+    锁定) exec {{ .chezmoi.homeDir }}/.local/bin/niri-lock ;;
+    注销) exec niri msg action quit ;;
+    重启) exec systemctl reboot ;;
+    关机) exec systemctl poweroff ;;
+esac

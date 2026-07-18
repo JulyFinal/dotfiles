@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+profile=laptop
+dry_run=false
+with_deepin=true
+
+usage() {
+    printf '%s\n' 'Usage: ./bootstrap [--profile laptop|desktop] [--dry-run] [--skip-deepin]'
+}
+
+while (($#)); do
+    case "$1" in
+        --profile)
+            profile=${2:?missing profile}
+            shift 2
+            ;;
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        --skip-deepin)
+            with_deepin=false
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+case "$profile" in
+    laptop|desktop) ;;
+    *) printf 'Unsupported profile: %s\n' "$profile" >&2; exit 2 ;;
+esac
+
+if [[ ! -e /etc/arch-release ]]; then
+    printf '%s\n' 'This bootstrap supports Arch Linux only.' >&2
+    exit 1
+fi
+
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
+read_list() {
+    sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$1"
+}
+
+mapfile -t pacman_packages < <(
+    read_list "$repo_dir/packages/pacman-common.txt"
+    if [[ "$profile" == laptop ]]; then
+        read_list "$repo_dir/packages/pacman-laptop.txt"
+    fi
+)
+mapfile -t aur_packages < <(read_list "$repo_dir/packages/aur.txt")
+
+if $dry_run; then
+    printf 'Profile: %s\n\nPacman packages:\n' "$profile"
+    printf '  %s\n' "${pacman_packages[@]}"
+    printf '\nAUR packages:\n'
+    printf '  %s\n' "${aur_packages[@]}"
+    if command -v chezmoi >/dev/null 2>&1; then
+        chezmoi --source "$repo_dir" --destination "$HOME" \
+            --override-data "{\"profile\":\"$profile\"}" diff || true
+    fi
+    if $with_deepin && command -v distrobox >/dev/null 2>&1; then
+        distrobox assemble create --dry-run --file "$repo_dir/distrobox/deepin.ini"
+    fi
+    exit 0
+fi
+
+sudo pacman -Syu --needed --noconfirm "${pacman_packages[@]}"
+
+if ! command -v paru >/dev/null 2>&1; then
+    build_dir=$(mktemp -d /tmp/paru-bootstrap.XXXXXX)
+    trap 'rm -rf -- "$build_dir"' EXIT
+    git clone --depth 1 https://aur.archlinux.org/paru.git "$build_dir/paru"
+    (cd "$build_dir/paru" && makepkg -si --needed --noconfirm)
+fi
+
+paru -S --needed --noconfirm "${aur_packages[@]}"
+
+config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi
+mkdir -p "$config_dir"
+DOTFILES_PROFILE="$profile" DOTFILES_SOURCE_DIR="$repo_dir" \
+    chezmoi --source "$repo_dir" execute-template < "$repo_dir/.chezmoi.toml.tmpl" \
+    > "$config_dir/chezmoi.toml"
+chezmoi --source "$repo_dir" --destination "$HOME" apply --force
+
+sudo install -Dm0644 "$repo_dir/rootfs/etc/greetd/config.toml" /etc/greetd/config.toml
+
+while IFS= read -r unit; do
+    [[ -n "$unit" ]] && sudo systemctl enable "$unit"
+done < "$repo_dir/services/system-common.txt"
+if [[ "$profile" == laptop ]]; then
+    while IFS= read -r unit; do
+        [[ -n "$unit" ]] && sudo systemctl enable "$unit"
+    done < "$repo_dir/services/system-laptop.txt"
+fi
+while IFS= read -r unit; do
+    [[ -n "$unit" ]] && systemctl --user enable "$unit"
+done < "$repo_dir/services/user-common.txt"
+
+mise install
+
+if $with_deepin; then
+    distrobox assemble create --file "$repo_dir/distrobox/deepin.ini"
+fi
+
+"$repo_dir/doctor"

@@ -1,0 +1,4 @@
+sourceDir = {{ env "DOTFILES_SOURCE_DIR" | default (joinPath .chezmoi.homeDir "dotfiles") | quote }}
+
+[data]
+profile = {{ env "DOTFILES_PROFILE" | default "laptop" | quote }}
