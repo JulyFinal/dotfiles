@@ -1,3 +1,4 @@
 brightnessctl
 power-profiles-daemon
+python-gobject
 sof-firmware

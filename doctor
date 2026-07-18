@@ -33,6 +33,17 @@ else
     fail 'command palette YAML parser failed'
 fi
 
+fcitx_theme_dir="$HOME/.local/share/fcitx5/themes/catppuccin-mocha-mauve"
+fcitx_classicui="$HOME/.config/fcitx5/conf/classicui.conf"
+if [[ -f "$fcitx_classicui" ]] && \
+   grep -Fqx 'Theme=catppuccin-mocha-mauve' "$fcitx_classicui" && \
+   [[ -f "$fcitx_theme_dir/theme.conf" && -f "$fcitx_theme_dir/panel.svg" && \
+      -f "$fcitx_theme_dir/highlight.svg" ]]; then
+    ok 'fcitx5 Catppuccin theme'
+else
+    fail 'fcitx5 Catppuccin theme is incomplete'
+fi
+
 mcp_filesystem="$HOME/.local/share/mise/shims/mcp-server-filesystem"
 codex_config="$HOME/.codex/config.toml"
 if [[ -x "$mcp_filesystem" ]] && [[ -f "$codex_config" ]] && \

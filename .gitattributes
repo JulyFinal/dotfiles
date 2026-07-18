@@ -1,0 +1,3 @@
+# Fcitx serializes these runtime-owned files with one trailing blank line.
+dot_config/private_fcitx5/private_conf/*.conf whitespace=-blank-at-eof
+dot_config/private_fcitx5/private_profile whitespace=-blank-at-eof
