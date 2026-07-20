@@ -1,3 +1,4 @@
+fcitx5-theme-wechat
 google-chrome
 maplemono-nf-cn
 v2rayn

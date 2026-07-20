@@ -57,15 +57,19 @@ else
     fail 'GTK or Simplified Chinese font fallback is incorrect'
 fi
 
-fcitx_theme_dir="$HOME/.local/share/fcitx5/themes/catppuccin-mocha-mauve"
 fcitx_classicui="$HOME/.config/fcitx5/conf/classicui.conf"
+fcitx_theme_root=/usr/share/fcitx5/themes
 if [[ -f "$fcitx_classicui" ]] && \
-   grep -Fqx 'Theme=catppuccin-mocha-mauve' "$fcitx_classicui" && \
-   [[ -f "$fcitx_theme_dir/theme.conf" && -f "$fcitx_theme_dir/panel.svg" && \
-      -f "$fcitx_theme_dir/highlight.svg" ]]; then
-    ok 'fcitx5 Catppuccin theme'
+   grep -Fqx 'Font="Noto Sans CJK SC 9"' "$fcitx_classicui" && \
+   grep -Fqx 'Theme=wechat-light' "$fcitx_classicui" && \
+   grep -Fqx 'DarkTheme=wechat-dark' "$fcitx_classicui" && \
+   [[ -f "$fcitx_theme_root/wechat-light/theme.conf" && \
+      -f "$fcitx_theme_root/wechat-light/panel.svg" && \
+      -f "$fcitx_theme_root/wechat-dark/theme.conf" && \
+      -f "$fcitx_theme_root/wechat-dark/panel.svg" ]]; then
+    ok 'fcitx5 WeChat theme and proportional font'
 else
-    fail 'fcitx5 Catppuccin theme is incomplete'
+    fail 'fcitx5 WeChat theme or proportional font is incomplete'
 fi
 
 mcp_filesystem="$HOME/.local/share/mise/shims/mcp-server-filesystem"
