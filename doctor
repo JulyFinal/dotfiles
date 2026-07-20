@@ -58,18 +58,17 @@ else
 fi
 
 fcitx_classicui="$HOME/.config/fcitx5/conf/classicui.conf"
-fcitx_theme_root=/usr/share/fcitx5/themes
+fcitx_theme_dir="$HOME/.local/share/fcitx5/themes/wechat-dark-compact"
 if [[ -f "$fcitx_classicui" ]] && \
    grep -Fqx 'Font="Noto Sans CJK SC 9"' "$fcitx_classicui" && \
-   grep -Fqx 'Theme=wechat-light' "$fcitx_classicui" && \
-   grep -Fqx 'DarkTheme=wechat-dark' "$fcitx_classicui" && \
-   [[ -f "$fcitx_theme_root/wechat-light/theme.conf" && \
-      -f "$fcitx_theme_root/wechat-light/panel.svg" && \
-      -f "$fcitx_theme_root/wechat-dark/theme.conf" && \
-      -f "$fcitx_theme_root/wechat-dark/panel.svg" ]]; then
-    ok 'fcitx5 WeChat theme and proportional font'
+   grep -Fqx 'Theme=wechat-dark-compact' "$fcitx_classicui" && \
+   grep -Fqx 'DarkTheme=wechat-dark-compact' "$fcitx_classicui" && \
+   [[ -f "$fcitx_theme_dir/theme.conf" && \
+      -f "$fcitx_theme_dir/panel.svg" && \
+      -f "$fcitx_theme_dir/highlight.svg" ]]; then
+    ok 'fcitx5 compact dark WeChat theme and proportional font'
 else
-    fail 'fcitx5 WeChat theme or proportional font is incomplete'
+    fail 'fcitx5 compact dark WeChat theme or proportional font is incomplete'
 fi
 
 mcp_filesystem="$HOME/.local/share/mise/shims/mcp-server-filesystem"
@@ -160,6 +159,15 @@ while IFS= read -r unit; do
         fail "user service disabled: $unit"
     fi
 done < "$repo_dir/services/user-common.txt"
+
+vicinae_environment=$(systemctl --user show -p Environment --value vicinae.service 2>/dev/null || true)
+if [[ "$vicinae_environment" == *'XMODIFIERS=@im=fcitx'* ]] && \
+   [[ "$vicinae_environment" == *'GTK_IM_MODULE=fcitx'* ]] && \
+   [[ "$vicinae_environment" == *'QT_IM_MODULE=fcitx'* ]]; then
+    ok 'Vicinae application-launch IME environment'
+else
+    fail 'Vicinae application-launch IME environment is incomplete'
+fi
 
 v2rayn_config=${XDG_DATA_HOME:-$HOME/.local/share}/v2rayN/guiConfigs/guiNConfig.json
 if [[ -f "$v2rayn_config" ]] && \

@@ -3,4 +3,5 @@ google-chrome
 maplemono-nf-cn
 v2rayn
 vicinae-bin
+wechat
 xray
