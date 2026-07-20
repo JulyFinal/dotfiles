@@ -18,7 +18,8 @@
    "font": {
       "rendering": "native",
       "normal": {
-         "family": "Maple Mono NF CN"
+         "family": "Noto Sans CJK SC",
+         "size": 9
       }
    },
    "theme": {
@@ -44,8 +45,8 @@
          "enabled": true
       },
       "size": {
-         "width": 560,
-         "height": 350
+         "width": 920,
+         "height": 600
       },
       "layer_shell": {
          "enabled": true,
