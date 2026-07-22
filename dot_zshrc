@@ -13,9 +13,7 @@ if [ -d "$HOME/.zsh/zsh-autosuggestions" ]; then source ~/.zsh/zsh-autosuggestio
 autoload -U compinit; compinit
 command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
 
-if [ -r "$HOME/.config/zsh/cmd-widget.zsh" ]; then
-    source "$HOME/.config/zsh/cmd-widget.zsh"
-fi
+command -v navi >/dev/null 2>&1 && eval "$(navi widget zsh)"
 
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin

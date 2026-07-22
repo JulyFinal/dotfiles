@@ -1,0 +1,73 @@
+% fileserver, http
+
+# caddy 当前目录文件服务器
+caddy file-server --browse --listen :8000 --root ./
+
+# rclone 当前目录 http 服务 [legacy]
+rclone serve http . --addr :8000
+
+% fileserver, python
+
+# python 当前目录 http 服务
+uvx python -m http.server 8000
+
+% git, init
+
+# git 全局配置
+```sh
+git config --global core.editor "nvim"
+git config --global credential.helper store
+git config --global pull.rebase true
+git config --global rebase.autoStash true
+```
+
+% git
+
+# git 设置 nvim 为默认编辑器
+git config --global core.editor "nvim"
+
+# git 保存凭证
+git config --global credential.helper store
+
+# git pull 默认 rebase
+git config --global pull.rebase true
+
+# git rebase 自动 stash
+git config --global rebase.autoStash true
+
+% js, npm, package
+
+# npm 更新全局包
+npm outdated -g | tail -n +2 | awk '{print $1 "@" $4}' | xargs npm install -g
+
+% hf, model
+
+# hf model download
+HF_ENDPOINT=https://hf-mirror.com uvx hf download
+
+% proxy, network
+
+# proxy on
+```sh
+proxy_on(){ ip="${1:-127.0.0.1}"; port="${2:-10808}"; export http_proxy="http://$ip:$port" https_proxy="http://$ip:$port" all_proxy="http://$ip:$port" HTTP_PROXY="http://$ip:$port" HTTPS_PROXY="http://$ip:$port" ALL_PROXY="http://$ip:$port" no_proxy="localhost,127.0.0.1,$ip,::1" NO_PROXY="localhost,127.0.0.1,$ip,::1"; echo "🔗 代理已启用: $ip:$port"; }
+proxy_on
+```
+
+# proxy off
+```sh
+proxy_off(){ unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY no_proxy NO_PROXY; echo "🔌 代理已关闭"; }
+proxy_off
+```
+
+% python, package
+
+# python 当前最新包的情况
+uv pip list --outdated
+
+% ssh
+
+# ssh ed25519 key
+ssh-keygen -t ed25519 -C "julyfinal@outlook.com"
+
+# ssh rsa key
+ssh-keygen -t rsa -b 4096 -C "julyfinal@outlook.com"

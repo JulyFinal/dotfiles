@@ -61,6 +61,7 @@ retired_tools = {
 assert retired_tools.isdisjoint(pacman_packages)
 assert "xray" not in aur_packages
 assert "rclone" not in (root / "dot_config/mise/config.toml").read_text().splitlines()
+assert 'navi = "latest"' in (root / "dot_config/mise/config.toml").read_text().splitlines()
 assert "rclone-koofr.service" not in user_services
 assert not (root / "dot_config/autostart/v2rayN.desktop.tmpl").exists()
 assert not (root / "private_dot_local/bin/executable_v2rayn-background").exists()
@@ -87,6 +88,13 @@ desktop_paths = [
     "dot_config/swaylock", "dot_config/waybar",
 ]
 assert all(not (root / path).exists() for path in desktop_paths)
+assert not (root / "dot_config/zsh/cmd-widget.zsh").exists()
+assert not list((root / "dot_config/zsh/commands").glob("*.yaml"))
+zshrc = (root / "dot_zshrc").read_text()
+assert 'eval "$(navi widget zsh)"' in zshrc and "cmd-widget" not in zshrc
+navi_cheat = (root / "private_dot_local/private_share/navi/cheats/personal.cheat").read_text()
+assert sum(line.startswith("# ") for line in navi_cheat.splitlines()) == 15
+assert "rclone 当前目录 http 服务 [legacy]" in navi_cheat
 assert not (root / "dot_config/systemd/user/rclone-koofr.service").exists()
 assert not (root / "private_dot_local/bin/executable_rdp-copy-image").exists()
 gitignore = (root / ".gitignore").read_text()
@@ -115,6 +123,13 @@ fi
 destination="$test_root/home"
 mkdir -p "$destination"
 chezmoi --source "$repo_dir" --destination "$destination" apply --force
+
+navi_path="$repo_dir/private_dot_local/private_share/navi/cheats"
+navi_bin=$(mise which navi)
+test "$("$navi_bin" --path "$navi_path" --print --query 'git 设置 nvim 为默认编辑器' --best-match)" = \
+    'git config --global core.editor "nvim"'
+test "$("$navi_bin" --path "$navi_path" --print --query 'rclone 当前目录 http 服务' --best-match)" = \
+    'rclone serve http . --addr :8000'
 
 for lua_file in "$repo_dir"/dot_config/nvim/init.lua "$repo_dir"/dot_config/nvim/lua/*.lua; do
     nvim --headless -u NONE "+lua assert(loadfile('$lua_file'))" '+qa'
