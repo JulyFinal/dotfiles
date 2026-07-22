@@ -16,7 +16,7 @@ warn() { printf 'WARN  %s\n' "$*"; warnings=$((warnings + 1)); }
 fail() { printf 'FAIL  %s\n' "$*"; failures=$((failures + 1)); }
 
 for command_name in \
-    niri waybar kitty fcitx5 hyprlock vicinae mise chezmoi \
+    kitty vicinae mise chezmoi \
     yazi yq stylua ruff ty lua-language-server shfmt taplo deno rustfmt; do
     if command -v "$command_name" >/dev/null 2>&1; then
         ok "command: $command_name"
@@ -48,28 +48,6 @@ else
     fail 'Chrome still has a global proxy or chrome-proxy is missing'
 fi
 
-gtk_font=$(gsettings get org.gnome.desktop.interface font-name 2>/dev/null || true)
-zh_sans=$(fc-match 'sans-serif:lang=zh-cn' 2>/dev/null || true)
-if [[ "$gtk_font" == "'Noto Sans CJK SC 10'" ]] && \
-   [[ "$zh_sans" == *'Noto Sans CJK SC'* ]]; then
-    ok 'proportional Simplified Chinese UI font'
-else
-    fail 'GTK or Simplified Chinese font fallback is incorrect'
-fi
-
-fcitx_classicui="$HOME/.config/fcitx5/conf/classicui.conf"
-fcitx_theme_dir="$HOME/.local/share/fcitx5/themes/wechat-dark-compact"
-if [[ -f "$fcitx_classicui" ]] && \
-   grep -Fqx 'Font="Noto Sans CJK SC 9"' "$fcitx_classicui" && \
-   grep -Fqx 'Theme=wechat-dark-compact' "$fcitx_classicui" && \
-   grep -Fqx 'DarkTheme=wechat-dark-compact' "$fcitx_classicui" && \
-   [[ -f "$fcitx_theme_dir/theme.conf" && \
-      -f "$fcitx_theme_dir/panel.svg" && \
-      -f "$fcitx_theme_dir/highlight.svg" ]]; then
-    ok 'fcitx5 compact dark WeChat theme and proportional font'
-else
-    fail 'fcitx5 compact dark WeChat theme or proportional font is incomplete'
-fi
 
 mcp_filesystem="$HOME/.local/share/mise/shims/mcp-server-filesystem"
 codex_config="$HOME/.codex/config.toml"
@@ -104,12 +82,6 @@ else
     fail 'Codex Atuin MCP is not configured'
 fi
 
-if niri validate >/dev/null 2>&1; then
-    ok 'niri configuration'
-else
-    fail 'niri configuration is invalid'
-fi
-
 nvim_output=''
 if nvim_output=$(timeout 30s nvim --headless '+qa' 2>&1) && [[ -z "$nvim_output" ]]; then
     ok 'neovim clean startup'
@@ -120,7 +92,19 @@ fi
 if chezmoi --source "$repo_dir" --destination "$HOME" verify >/dev/null 2>&1; then
     ok 'chezmoi destination matches source state'
 else
-    fail 'chezmoi destination differs from source state'
+    chezmoi_diff=$(chezmoi --source "$repo_dir" --destination "$HOME" diff --no-pager 2>/dev/null || true)
+    meaningful_diff=$(awk '
+        /^(---|\+\+\+)/ { next }
+        /^[+-]/ {
+            line = substr($0, 2)
+            if (line !~ /^[[:space:]]*last_(updated|revision)[[:space:]]*=/) print
+        }
+    ' <<<"$chezmoi_diff")
+    if [[ -z "$meaningful_diff" ]] && [[ "$chezmoi_diff" == *'.codex/config.toml'* ]]; then
+        ok 'chezmoi destination matches source state (Codex marketplace metadata ignored)'
+    else
+        fail 'chezmoi destination differs from source state'
+    fi
 fi
 
 while IFS= read -r unit; do
@@ -145,12 +129,6 @@ if [[ "$profile" == laptop ]]; then
     done < "$repo_dir/services/system-laptop.txt"
 fi
 
-if cmp -s "$repo_dir/rootfs/etc/greetd/config.toml" /etc/greetd/config.toml; then
-    ok 'system greetd configuration'
-else
-    fail 'system greetd configuration differs from the repository'
-fi
-
 while IFS= read -r unit; do
     [[ -z "$unit" ]] && continue
     if systemctl --user is-enabled "$unit" >/dev/null 2>&1; then
@@ -160,27 +138,14 @@ while IFS= read -r unit; do
     fi
 done < "$repo_dir/services/user-common.txt"
 
-vicinae_environment=$(systemctl --user show -p Environment --value vicinae.service 2>/dev/null || true)
-if [[ "$vicinae_environment" == *'XMODIFIERS=@im=fcitx'* ]] && \
-   [[ "$vicinae_environment" == *'GTK_IM_MODULE=fcitx'* ]] && \
-   [[ "$vicinae_environment" == *'QT_IM_MODULE=fcitx'* ]]; then
-    ok 'Vicinae application-launch IME environment'
+if systemctl --user is-active mihomo.service >/dev/null 2>&1; then
+    ok 'Mihomo proxy service'
 else
-    fail 'Vicinae application-launch IME environment is incomplete'
+    warn 'Mihomo proxy service is not active'
 fi
 
-v2rayn_config=${XDG_DATA_HOME:-$HOME/.local/share}/v2rayN/guiConfigs/guiNConfig.json
-if [[ -f "$v2rayn_config" ]] && \
-   grep -q '"AutoRun": true' "$v2rayn_config" && \
-   grep -q '"AutoHideStartup": true' "$v2rayn_config" && \
-   grep -q '"Hide2TrayWhenClose": true' "$v2rayn_config"; then
-    ok 'v2rayN background settings'
-else
-    warn 'v2rayN background settings take effect on the next autostart'
-fi
-
-if ss -ltn 2>/dev/null | grep -q ':10808 '; then
-    ok 'v2rayN port 10808 is listening'
+if ss -ltn 2>/dev/null | grep -q '127\.0\.0\.1:10808'; then
+    ok 'local proxy port 10808 is listening'
     if curl --silent --fail --max-time 12 --proxy socks5h://127.0.0.1:10808 \
         https://www.google.com/generate_204 --output /dev/null; then
         ok 'proxy HTTP check'
@@ -188,14 +153,16 @@ if ss -ltn 2>/dev/null | grep -q ':10808 '; then
         warn 'proxy port is open, but the external HTTP check failed'
     fi
 else
-    warn 'v2rayN port 10808 is not listening'
+    warn 'local proxy port 10808 is not listening'
 fi
 
-if git -C "$repo_dir" grep -IlE '(BEGIN [A-Z ]*PRIVATE KEY|Authorization: Bearer|api[_-]?key[=:]|password[=:])' \
-    -- ':!archive' ':!doctor' >/dev/null 2>&1; then
-    fail 'possible secret found in tracked source state'
+if "$repo_dir/tests/pre-commit" worktree >/dev/null && \
+   "$repo_dir/tests/pre-commit" staged >/dev/null; then
+    ok 'worktree and staged secret scan'
 else
-    ok 'tracked secret scan'
+    "$repo_dir/tests/pre-commit" worktree >&2 || true
+    "$repo_dir/tests/pre-commit" staged >&2 || true
+    fail 'possible secret found in worktree or staged state'
 fi
 
 printf '\nResult: %d failure(s), %d warning(s)\n' "$failures" "$warnings"

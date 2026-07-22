@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/mihomo
+data_dir=${XDG_DATA_HOME:-$HOME/.local/share}/mihomo
+example=$config_dir/config.yaml.example
+config=$config_dir/config.yaml
+action=${1:-configure}
+
+configure() {
+    local url=${2:-}
+    if [[ -z $url ]]; then
+        read -r -p '订阅地址: ' url
+    fi
+    if [[ $url != http://* && $url != https://* ]]; then
+        printf '%s\n' '订阅地址必须以 http:// 或 https:// 开头' >&2
+        exit 2
+    fi
+    mkdir -p "$config_dir" "$data_dir"
+    python3 - "$example" "$config" "$url" <<'PY'
+import json
+import os
+import pathlib
+import sys
+
+source = pathlib.Path(sys.argv[1])
+destination = pathlib.Path(sys.argv[2])
+url = sys.argv[3]
+text = source.read_text()
+if "__SUBSCRIPTION_URL__" not in text:
+    raise SystemExit("subscription placeholder is missing")
+destination.write_text(text.replace("__SUBSCRIPTION_URL__", json.dumps(url)))
+os.chmod(destination, 0o600)
+PY
+    printf '已写入私有配置：%s\n' "$config"
+}
+
+test_subscription() {
+    [[ -x /usr/bin/mihomo ]] || { printf '%s\n' '请先安装 mihomo-bin' >&2; exit 1; }
+    [[ -s $config ]] || { printf '%s\n' '请先运行 mihomo-subscription configure' >&2; exit 1; }
+
+    local listening=false
+    test_pid=
+    test_dir=$(mktemp -d /tmp/mihomo-subscription.XXXXXX)
+    cleanup() {
+        [[ -z ${test_pid:-} ]] || kill "$test_pid" 2>/dev/null || true
+        rm -rf -- "$test_dir"
+    }
+    trap cleanup EXIT HUP INT TERM
+
+    sed \
+        -e 's/^mixed-port: 10808$/mixed-port: 10809/' \
+        -e 's/^external-controller: 127\.0\.0\.1:9090$/external-controller: 127.0.0.1:19090/' \
+        "$config" > "$test_dir/config.yaml"
+    /usr/bin/mihomo -t -d "$test_dir" -f "$test_dir/config.yaml"
+    /usr/bin/mihomo -d "$test_dir" -f "$test_dir/config.yaml" > "$test_dir/mihomo.log" 2>&1 &
+    test_pid=$!
+
+    for _ in {1..150}; do
+        if ss -ltn | grep -q '127\.0\.0\.1:10809'; then
+            listening=true
+            break
+        fi
+        kill -0 "$test_pid" 2>/dev/null || break
+        sleep 0.1
+    done
+    if ! $listening; then
+        tail -n 40 "$test_dir/mihomo.log" >&2
+        exit 1
+    fi
+
+    if ! python3 - <<'PY'
+import json
+import time
+import urllib.request
+
+url = "http://127.0.0.1:19090/providers/proxies/subscription"
+for attempt in range(300):
+    try:
+        with urllib.request.urlopen(url, timeout=0.5) as response:
+            count = len(json.load(response).get("proxies") or [])
+        if count:
+            print(f"订阅已加载 {count} 个节点，等待 {attempt / 10:.1f} 秒")
+            raise SystemExit(0)
+    except (OSError, ValueError):
+        pass
+    time.sleep(0.1)
+raise SystemExit("等待订阅 provider 超时")
+PY
+    then
+        tail -n 40 "$test_dir/mihomo.log" >&2
+        exit 1
+    fi
+
+    if ! python3 - <<'PY'
+import json
+import time
+import urllib.request
+
+url = "http://127.0.0.1:19090/proxies/PROXY"
+for attempt in range(600):
+    try:
+        with urllib.request.urlopen(url, timeout=0.5) as response:
+            group = json.load(response)
+        if group.get("now") and group["now"] != "COMPATIBLE":
+            print(f"策略组已完成首次选路，等待 {attempt / 10:.1f} 秒")
+            raise SystemExit(0)
+    except (OSError, ValueError):
+        pass
+    time.sleep(0.1)
+raise SystemExit("等待 PROXY 策略组完成首次选路超时")
+PY
+    then
+        tail -n 40 "$test_dir/mihomo.log" >&2
+        exit 1
+    fi
+
+    if ! curl --silent --show-error --fail --max-time 20 \
+        --proxy socks5h://127.0.0.1:10809 \
+        https://www.google.com/generate_204 --output /dev/null; then
+        tail -n 40 "$test_dir/mihomo.log" >&2
+        exit 1
+    fi
+    printf '%s\n' 'OK: Mihomo 已加载订阅并通过 10809 代理访问外网'
+}
+
+case "$action" in
+    configure|set)
+        configure "$@"
+        ;;
+    test)
+        test_subscription
+        ;;
+    show-path)
+        printf '%s\n' "$config"
+        ;;
+    *)
+        printf 'Usage: mihomo-subscription {configure [URL]|test|show-path}\n' >&2
+        exit 2
+        ;;
+esac

@@ -1,0 +1,60 @@
+mixed-port: 10808
+allow-lan: false
+bind-address: 127.0.0.1
+mode: rule
+log-level: info
+ipv6: true
+external-controller: 127.0.0.1:9090
+
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  proxy-server-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+proxy-providers:
+  subscription:
+    type: http
+    url: __SUBSCRIPTION_URL__
+    path: ./providers/subscription.yaml
+    interval: 3600
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 300
+      timeout: 5000
+      lazy: false
+  work-openvpn:
+    type: file
+    path: ./providers/work-openvpn.yaml
+
+proxy-groups:
+  - name: PROXY
+    type: url-test
+    use:
+      - subscription
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    timeout: 5000
+    lazy: false
+  - name: WORK
+    type: select
+    use:
+      - work-openvpn
+
+rules:
+  - IP-CIDR,192.168.168.0/24,WORK,no-resolve
+  - MATCH,PROXY

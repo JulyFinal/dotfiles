@@ -3,10 +3,9 @@ set -euo pipefail
 
 profile=laptop-intel
 dry_run=false
-with_deepin=true
 
 usage() {
-    printf '%s\n' 'Usage: ./bootstrap [--profile laptop-intel|laptop-amd|desktop] [--dry-run] [--skip-deepin]'
+    printf '%s\n' 'Usage: ./bootstrap [--profile laptop-intel|laptop-amd|desktop] [--dry-run]'
 }
 
 while (($#)); do
@@ -17,10 +16,6 @@ while (($#)); do
             ;;
         --dry-run)
             dry_run=true
-            shift
-            ;;
-        --skip-deepin)
-            with_deepin=false
             shift
             ;;
         -h|--help)
@@ -76,13 +71,13 @@ if $dry_run; then
     printf '  %s\n' "${aur_packages[@]}"
     if command -v chezmoi >/dev/null 2>&1; then
         chezmoi --source "$repo_dir" --destination "$HOME" \
-            --override-data "{\"profile\":\"$display_profile\"}" diff || true
-    fi
-    if $with_deepin && command -v distrobox >/dev/null 2>&1; then
-        distrobox assemble create --dry-run --file "$repo_dir/distrobox/deepin.ini"
+            diff || true
     fi
     exit 0
 fi
+
+# Keep the repository's secret gate active on every restored machine.
+git -C "$repo_dir" config core.hooksPath tests
 
 sudo pacman -Syu --needed --noconfirm "${pacman_packages[@]}"
 
@@ -97,17 +92,13 @@ paru -S --needed --noconfirm "${aur_packages[@]}"
 
 config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi
 mkdir -p "$config_dir"
-DOTFILES_PROFILE="$display_profile" DOTFILES_SOURCE_DIR="$repo_dir" \
+DOTFILES_SOURCE_DIR="$repo_dir" \
     chezmoi --source "$repo_dir" execute-template < "$repo_dir/.chezmoi.toml.tmpl" \
     > "$config_dir/chezmoi.toml"
 chezmoi --source "$repo_dir" --destination "$HOME" apply --force
-
-# GTK applications use a proportional UI font. Keep Maple Mono for terminals,
-# editors and status surfaces where fixed-width metrics are intentional.
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans CJK SC 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans CJK SC 10'
-
-sudo install -Dm0644 "$repo_dir/rootfs/etc/greetd/config.toml" /etc/greetd/config.toml
+sudo install -Dm0644 \
+    "$repo_dir/rootfs/etc/xdg/reflector/reflector.conf" \
+    /etc/xdg/reflector/reflector.conf
 
 while IFS= read -r unit; do
     [[ -n "$unit" ]] && sudo systemctl enable "$unit"
@@ -130,17 +121,5 @@ mise exec -- nvim --headless \
     '+Lazy load nvim-treesitter' \
     '+TSUpdateSync lua python toml bash json' \
     '+qa'
-
-if $with_deepin; then
-    if distrobox list --no-color 2>/dev/null | awk -F '|' '
-        { name=$2; gsub(/^[[:space:]]+|[[:space:]]+$/, "", name) }
-        name == "deepin" { found=1 }
-        END { exit !found }
-    '; then
-        printf '%s\n' 'Distrobox deepin already exists; leaving it unchanged.'
-    else
-        distrobox assemble create --file "$repo_dir/distrobox/deepin.ini"
-    fi
-fi
 
 "$repo_dir/doctor"

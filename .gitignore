@@ -3,3 +3,18 @@ state.yml
 runtime/
 *.swp
 *.tmp
+
+# Private machine state: keep examples, never the generated/live credentials.
+dot_config/mihomo/config.yaml
+dot_config/mihomo/private_config.yaml
+dot_config/rclone/rclone.conf
+dot_config/rclone/private_rclone.conf
+private_dot_local/private_share/mihomo/providers/
+private_dot_local/share/mihomo/providers/
+private_dot_local/private_share/remmina/
+private_dot_local/share/remmina/
+dot_config/gh/hosts.yml
+dot_config/private_gh/private_hosts.yml
+*.ovpn
+*.p12
+*.pfx

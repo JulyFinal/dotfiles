@@ -14,6 +14,7 @@
       "system_info": false
    },
    "consider_preedit": true,
+   "close_on_focus_loss": true,
    "pop_to_root_on_close": true,
    "font": {
       "rendering": "native",
@@ -50,7 +51,7 @@
       },
       "layer_shell": {
          "enabled": true,
-         "keyboard_interactivity": "exclusive",
+         "keyboard_interactivity": "on_demand",
          "layer": "top"
       }
    }

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+unit=mihomo.service
+action=${1:-status}
+
+case "$action" in
+    start|stop|restart)
+        systemctl --user "$action" "$unit"
+        ;;
+    status)
+        systemctl --user status "$unit" --no-pager
+        ;;
+    log|logs)
+        journalctl --user -u "$unit" -n 100 --no-pager
+        ;;
+    test)
+        listening=false
+        for _ in {1..30}; do
+            if ss -ltn | grep -q '127\.0\.0\.1:10808'; then
+                listening=true
+                break
+            fi
+            sleep 0.1
+        done
+        if ! $listening; then
+            printf '%s\n' 'FAIL: 127.0.0.1:10808 is not listening' >&2
+            exit 1
+        fi
+        curl --silent --show-error --fail --max-time 12 \
+            --proxy socks5h://127.0.0.1:10808 \
+            https://www.google.com/generate_204 --output /dev/null
+        printf '%s\n' 'OK: local proxy and external HTTP check passed'
+        ;;
+    *)
+        printf 'Usage: proxyctl {status|start|stop|restart|logs|test}\n' >&2
+        exit 2
+        ;;
+esac

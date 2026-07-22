@@ -1,7 +1,5 @@
-fcitx5-theme-wechat
 google-chrome
 maplemono-nf-cn
-v2rayn
+mihomo-bin
 vicinae-bin
-wechat
-xray
+wechat-bin

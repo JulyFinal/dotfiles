@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config=${XDG_CONFIG_HOME:-$HOME/.config}/mihomo/config.yaml
+data_dir=${XDG_DATA_HOME:-$HOME/.local/share}/mihomo
+provider=$data_dir/providers/work-openvpn.yaml
+action=${1:-status}
+connection=${2:-work}
+
+configure() {
+    command -v nmcli >/dev/null || { printf '%s\n' '缺少 nmcli' >&2; exit 1; }
+    command -v openssl >/dev/null || { printf '%s\n' '缺少 openssl' >&2; exit 1; }
+    mkdir -p "$(dirname -- "$provider")"
+
+    MIHOMO_OVPN_CONNECTION=$connection MIHOMO_OVPN_PROVIDER=$provider python3 - <<'PY'
+import json
+import os
+import pathlib
+import re
+import subprocess
+import tempfile
+
+connection = os.environ["MIHOMO_OVPN_CONNECTION"]
+destination = pathlib.Path(os.environ["MIHOMO_OVPN_PROVIDER"])
+
+def run(*args):
+    return subprocess.run(args, check=True, text=True, capture_output=True).stdout.strip()
+
+def parse_nm_map(text):
+    result = {}
+    pattern = r"(?:^|,)\s*([A-Za-z0-9_-]+)\s*=\s*(.*?)(?=,\s*[A-Za-z0-9_-]+\s*=|$)"
+    for match in re.finditer(pattern, text):
+        result[match.group(1)] = match.group(2).strip()
+    return result
+
+data = parse_nm_map(run("nmcli", "-g", "vpn.data", "connection", "show", connection))
+secrets = parse_nm_map(run("nmcli", "--show-secrets", "-g", "vpn.secrets", "connection", "show", connection))
+
+required = ("ca", "cert", "key", "ta", "remote")
+missing = [name for name in required if not data.get(name)]
+if missing:
+    raise SystemExit(f"NetworkManager 配置缺少字段: {', '.join(missing)}")
+
+remote = data["remote"].replace(r"\:", ":")
+remote_parts = remote.rsplit(":", 2)
+if len(remote_parts) != 3:
+    raise SystemExit(f"无法解析 remote: {remote}")
+server, port_text, proto_text = remote_parts
+proto = "tcp" if proto_text.lower().startswith("tcp") else "udp"
+
+key_result = subprocess.run(
+    ["openssl", "pkey", "-in", data["key"], "-passin", "stdin"],
+    input=secrets.get("cert-pass", "") + "\n",
+    check=True,
+    text=True,
+    capture_output=True,
+)
+
+def read(name):
+    return pathlib.Path(data[name]).expanduser().read_text()
+
+proxy = {
+    "name": "WORK-OVPN",
+    "type": "openvpn",
+    "server": server,
+    "port": int(port_text),
+    "proto": proto,
+    "dev": "tun",
+    "cipher": "AES-256-GCM",
+    "auth": "SHA1",
+    # This server pushes `comp-lzo no`, which OpenVPN treats as uncompressed
+    # stub framing. Mihomo 1.19.29 drops the frame entirely for `no`; `yes`
+    # makes it emit the required 0xFA uncompressed frame and interoperates.
+    "comp-lzo": "yes",
+    "udp": True,
+    "handshake-timeout": 15,
+    "ping": 10,
+    "ping-restart": 60,
+    "ca": read("ca"),
+    "cert": read("cert"),
+    "key": key_result.stdout,
+    "tls-auth": read("ta"),
+    "key-direction": str(data.get("ta-dir", "1")),
+}
+payload = json.dumps({"proxies": [proxy]}, ensure_ascii=False, indent=2) + "\n"
+
+destination.parent.mkdir(parents=True, exist_ok=True)
+fd, temporary = tempfile.mkstemp(prefix=".work-openvpn.", dir=destination.parent)
+try:
+    os.fchmod(fd, 0o600)
+    with os.fdopen(fd, "w") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, destination)
+finally:
+    if os.path.exists(temporary):
+        os.unlink(temporary)
+PY
+
+    chmod 600 "$provider"
+    if [[ -s $config ]]; then
+        /usr/bin/mihomo -t -d "$data_dir" -f "$config"
+        if systemctl --user is-active mihomo.service >/dev/null 2>&1; then
+            systemctl --user restart mihomo.service
+        fi
+    fi
+    printf '已生成 Mihomo 原生 OpenVPN provider：%s\n' "$provider"
+    printf '%s\n' '未启动 NetworkManager VPN。'
+}
+
+test_work() {
+    [[ -s $provider ]] || { printf '%s\n' '请先运行 mihomo-openvpn configure work' >&2; exit 1; }
+    python3 - <<'PY'
+import socket
+import struct
+
+proxy = ("127.0.0.1", 10808)
+target = bytes((192, 168, 168, 241))
+port = 3389
+
+def receive_exact(sock, size):
+    data = b""
+    while len(data) < size:
+        block = sock.recv(size - len(data))
+        if not block:
+            raise SystemExit("连接在收到完整响应前关闭")
+        data += block
+    return data
+
+with socket.create_connection(proxy, timeout=20) as sock:
+    sock.settimeout(20)
+    sock.sendall(b"\x05\x01\x00")
+    if receive_exact(sock, 2) != b"\x05\x00":
+        raise SystemExit("SOCKS5 握手失败")
+    sock.sendall(b"\x05\x01\x00\x01" + target + struct.pack("!H", port))
+    reply = receive_exact(sock, 4)
+    if reply[1] != 0:
+        raise SystemExit(f"SOCKS5 连接失败，状态码 {reply[1]}")
+    address_type = reply[3]
+    if address_type == 1:
+        receive_exact(sock, 4)
+    elif address_type == 3:
+        receive_exact(sock, receive_exact(sock, 1)[0])
+    elif address_type == 4:
+        receive_exact(sock, 16)
+    receive_exact(sock, 2)
+
+    # Minimal TPKT/X.224 RDP negotiation request. A TPKT reply proves that
+    # traffic crossed the OpenVPN data channel, not merely the SOCKS listener.
+    sock.sendall(bytes.fromhex("030000130ee000000000000100080003000000"))
+    header = receive_exact(sock, 4)
+    if header[0] != 3:
+        raise SystemExit(f"目标返回了非 RDP 响应: {header.hex()}")
+    length = struct.unpack("!H", header[2:])[0]
+    if length < 4:
+        raise SystemExit("RDP 响应长度无效")
+    receive_exact(sock, length - 4)
+
+print("OK: 10808 -> Mihomo OpenVPN -> 192.168.168.241:3389 数据通道正常")
+PY
+}
+
+case "$action" in
+    configure|import)
+        configure
+        ;;
+    test)
+        test_work
+        ;;
+    status)
+        if [[ -s $provider ]]; then
+            stat -c 'provider: %n (%a, %s bytes)' "$provider"
+        else
+            printf '%s\n' 'provider: 未配置'
+        fi
+        nmcli -t -f NAME,TYPE connection show --active | grep -E "^${connection}:" >/dev/null \
+            && printf 'NetworkManager %s: active\n' "$connection" \
+            || printf 'NetworkManager %s: inactive\n' "$connection"
+        ;;
+    show-path)
+        printf '%s\n' "$provider"
+        ;;
+    *)
+        printf 'Usage: mihomo-openvpn {configure [CONNECTION]|test|status|show-path}\n' >&2
+        exit 2
+        ;;
+esac

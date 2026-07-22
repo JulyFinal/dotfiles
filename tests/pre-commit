@@ -1,0 +1,206 @@
+#!/usr/bin/env python3
+"""Reject credential-shaped content before it enters dotfiles history."""
+
+from __future__ import annotations
+
+import configparser
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+
+MODE = sys.argv[1] if len(sys.argv) > 1 else "staged"
+if MODE not in {"staged", "worktree"}:
+    raise SystemExit("usage: tests/pre-commit [staged|worktree]")
+
+REPO = Path(
+    subprocess.check_output(
+        ["git", "rev-parse", "--show-toplevel"], text=True
+    ).strip()
+)
+
+# These files necessarily contain the scanner's own signatures.
+SIGNATURE_SOURCES = {"doctor", "tests/pre-commit"}
+
+FORBIDDEN_PATHS = (
+    re.compile(r"(^|/)\.env($|\.)", re.IGNORECASE),
+    re.compile(r"(^|/)id_(rsa|ecdsa|ed25519)(\.|$)", re.IGNORECASE),
+    re.compile(r"(^|/)(rclone\.conf|work-openvpn\.ya?ml)$", re.IGNORECASE),
+    re.compile(r"(^|/).*\.remmina$", re.IGNORECASE),
+    re.compile(r"(^|/).*\.(ovpn|p12|pfx)$", re.IGNORECASE),
+    re.compile(
+        r"^dot_config/(private_)?mihomo/(private_)?config\.ya?ml$",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"^dot_config/(private_)?gh/(private_)?hosts\.ya?ml$",
+        re.IGNORECASE,
+    ),
+)
+
+PRIVATE_KEY = re.compile(
+    rb"-----BEGIN (?:(?:RSA|EC|DSA|OPENSSH) )?PRIVATE KEY-----"
+)
+OPENVPN_STATIC_KEY = re.compile(rb"-----BEGIN OpenVPN Static key V1-----")
+BEARER = re.compile(rb"Authorization\s*:\s*Bearer\s+[A-Za-z0-9._~+/=-]{12,}", re.I)
+AWS_KEY = re.compile(rb"\bAKIA[0-9A-Z]{16}\b")
+GITHUB_TOKEN = re.compile(
+    rb"\b(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9_]{20,})\b"
+)
+URI_CREDENTIAL = re.compile(rb"[a-z][a-z0-9+.-]*://[^\s/:]+:[^\s/@]+@", re.I)
+ASSIGNMENT = re.compile(
+    rb"(?:^|[^A-Za-z0-9_])"
+    rb"(password|passwd|passphrase|private[_-]?key|api[_-]?key|"
+    rb"client[_-]?secret|access[_-]?token|refresh[_-]?token|rpc[_-]?secret)"
+    rb"\s*[:=]\s*[\"']?([^\s\"'#;,]{4,})",
+    re.I,
+)
+URL_SECRET = re.compile(
+    rb"https?://[^\s\"']*(?:token|key|secret|auth)=[^\s\"'&]{4,}", re.I
+)
+
+PLACEHOLDERS = (
+    b"${",
+    b"$",
+    b"__",
+    b"{{",
+    b"<",
+    b"example",
+    b"placeholder",
+    b"changeme",
+    b"redacted",
+)
+
+
+def git_bytes(*args: str) -> bytes:
+    return subprocess.check_output(["git", *args], cwd=REPO)
+
+
+def staged_files() -> list[tuple[str, bytes]]:
+    names = git_bytes(
+        "diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z"
+    ).split(b"\0")
+    result: list[tuple[str, bytes]] = []
+    for raw_name in names:
+        if not raw_name:
+            continue
+        name = raw_name.decode("utf-8", "surrogateescape")
+        content = subprocess.run(
+            ["git", "show", f":{name}"], cwd=REPO, capture_output=True, check=True
+        ).stdout
+        result.append((name, content))
+    return result
+
+
+def worktree_files() -> list[tuple[str, bytes]]:
+    names = git_bytes("ls-files", "-co", "--exclude-standard", "-z").split(b"\0")
+    result: list[tuple[str, bytes]] = []
+    for raw_name in names:
+        if not raw_name:
+            continue
+        name = raw_name.decode("utf-8", "surrogateescape")
+        path = REPO / name
+        if path.is_file():
+            result.append((name, path.read_bytes()))
+    return result
+
+
+def local_secret_fingerprints() -> list[tuple[str, bytes]]:
+    fingerprints: list[tuple[str, bytes]] = []
+
+    mihomo = Path.home() / ".config/mihomo/config.yaml"
+    if mihomo.is_file():
+        for match in re.finditer(rb"^\s*url:\s*(.+?)\s*$", mihomo.read_bytes(), re.M):
+            value = match.group(1).strip().strip(b"\"'")
+            if len(value) >= 12 and b"SUBSCRIPTION" not in value:
+                fingerprints.append(("live Mihomo URL", value))
+                break
+
+    rclone = Path.home() / ".config/rclone/rclone.conf"
+    if rclone.is_file():
+        parser = configparser.ConfigParser()
+        try:
+            parser.read(rclone)
+            for section in parser.sections():
+                value = parser.get(section, "password", fallback="").encode()
+                if len(value) >= 8:
+                    fingerprints.append(("live rclone password", value))
+        except configparser.Error:
+            pass
+
+    provider = Path.home() / ".local/share/mihomo/providers/work-openvpn.yaml"
+    if provider.is_file():
+        lines = provider.read_bytes().splitlines()
+        for index, line in enumerate(lines[:-1]):
+            if b"BEGIN PRIVATE KEY" in line or b"BEGIN OpenVPN Static key" in line:
+                value = lines[index + 1].strip()
+                if len(value) >= 16:
+                    fingerprints.append(("live OpenVPN key fingerprint", value))
+
+    remmina_dir = Path.home() / ".local/share/remmina"
+    for profile in remmina_dir.glob("*.remmina") if remmina_dir.is_dir() else ():
+        for line in profile.read_bytes().splitlines():
+            if line.startswith(b"password="):
+                value = line.partition(b"=")[2].strip()
+                if len(value) >= 8:
+                    fingerprints.append(("live Remmina password", value))
+                break
+
+    return fingerprints
+
+
+def assignment_is_placeholder(match: re.Match[bytes]) -> bool:
+    value = match.group(2).lower()
+    return value in {b"true", b"false", b"null", b"none"} or any(
+        marker in value for marker in PLACEHOLDERS
+    )
+
+
+files = staged_files() if MODE == "staged" else worktree_files()
+fingerprints = local_secret_fingerprints()
+findings: set[tuple[str, int, str]] = set()
+
+for name, content in files:
+    normalized_name = name.replace(os.sep, "/")
+    for pattern in FORBIDDEN_PATHS:
+        if pattern.search(normalized_name):
+            findings.add((name, 0, "private filename"))
+
+    if b"\0" in content:
+        continue
+
+    for label, value in fingerprints:
+        if value in content:
+            findings.add((name, 0, label))
+
+    if normalized_name in SIGNATURE_SOURCES:
+        continue
+
+    for line_number, line in enumerate(content.splitlines(), 1):
+        checks = (
+            (PRIVATE_KEY, "private key"),
+            (OPENVPN_STATIC_KEY, "OpenVPN static key"),
+            (BEARER, "bearer token"),
+            (AWS_KEY, "AWS access key"),
+            (GITHUB_TOKEN, "GitHub token"),
+            (URI_CREDENTIAL, "URI credentials"),
+            (URL_SECRET, "secret-bearing URL"),
+        )
+        for pattern, label in checks:
+            if pattern.search(line):
+                findings.add((name, line_number, label))
+        for match in ASSIGNMENT.finditer(line):
+            if not assignment_is_placeholder(match):
+                findings.add((name, line_number, "credential assignment"))
+
+if findings:
+    print(f"secret scan failed ({MODE}); values are redacted:", file=sys.stderr)
+    for name, line, label in sorted(findings):
+        location = f"{name}:{line}" if line else name
+        print(f"  {location}: {label}", file=sys.stderr)
+    raise SystemExit(1)
+
+print(f"secret scan passed ({MODE}, {len(files)} files)")

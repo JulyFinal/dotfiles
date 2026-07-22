@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ ! -r /etc/os-release ]]; then
+    printf '%s\n' '无法识别当前 Linux 发行版。' >&2
+    exit 1
+fi
+
+# shellcheck disable=SC1091
+source /etc/os-release
+case ${ID:-} in
+    ubuntu|debian) ;;
+    *)
+        printf '此安装器仅支持 Ubuntu/Debian，当前系统为 %s。\n' "${ID:-unknown}" >&2
+        exit 1
+        ;;
+esac
+
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl python3
+
+work_dir=$(mktemp -d /tmp/mihomo-ubuntu.XXXXXX)
+trap 'rm -rf -- "$work_dir"' EXIT
+
+release_json=$work_dir/release.json
+curl -fsSL --retry 3 \
+    https://api.github.com/repos/MetaCubeX/mihomo/releases/latest \
+    -o "$release_json"
+
+version=$(python3 - "$release_json" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as source:
+    print(json.load(source)["tag_name"])
+PY
+)
+
+arch=$(dpkg --print-architecture)
+case $arch in
+    amd64) package="mihomo-linux-amd64-v1-${version}.deb" ;;
+    arm64) package="mihomo-linux-arm64-${version}.deb" ;;
+    *)
+        printf 'Mihomo 官方 DEB 暂未覆盖此架构: %s\n' "$arch" >&2
+        exit 1
+        ;;
+esac
+
+download_url=$(python3 - "$release_json" "$package" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as source:
+    release = json.load(source)
+for asset in release["assets"]:
+    if asset["name"] == sys.argv[2]:
+        print(asset["browser_download_url"])
+        break
+else:
+    raise SystemExit(f"Release 中未找到 {sys.argv[2]}")
+PY
+)
+
+expected_sha256=$(python3 - "$release_json" "$package" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as source:
+    release = json.load(source)
+for asset in release["assets"]:
+    if asset["name"] == sys.argv[2]:
+        digest = asset.get("digest") or ""
+        if not digest.startswith("sha256:"):
+            raise SystemExit(f"Release 未提供 {sys.argv[2]} 的 SHA-256")
+        print(digest.removeprefix("sha256:"))
+        break
+else:
+    raise SystemExit(f"Release 中未找到 {sys.argv[2]}")
+PY
+)
+
+deb_file=$work_dir/$package
+curl -fL --retry 3 "$download_url" -o "$deb_file"
+printf '%s  %s\n' "$expected_sha256" "$deb_file" | sha256sum --check --status
+sudo apt-get install -y "$deb_file"
+
+config=/etc/mihomo/config.yaml
+sudo test -f "$config" || sudo install -m 0600 /dev/null "$config"
+if ! sudo grep -Eq '^[[:space:]]*external-controller:' "$config"; then
+    printf '\nexternal-controller: 127.0.0.1:9090\n' | sudo tee -a "$config" >/dev/null
+fi
+sudo mihomo -t -d /etc/mihomo
+sudo systemctl enable --now mihomo.service
+
+printf '\nMihomo %s 已安装。\n' "$version"
+printf '%s\n' '配置文件: /etc/mihomo/config.yaml'
+printf '%s\n' '日志命令: journalctl -u mihomo -f'
