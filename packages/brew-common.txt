@@ -1,0 +1,11 @@
+chezmoi
+cmake
+curl
+git
+gh
+mise
+neovim
+ninja
+tmux
+zsh
+bottom

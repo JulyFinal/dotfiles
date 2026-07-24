@@ -1,0 +1,2 @@
+kitty
+font-maple-mono-nf-cn
