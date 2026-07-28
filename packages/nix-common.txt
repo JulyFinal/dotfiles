@@ -1,13 +1,13 @@
+bottom
 chezmoi
 cmake
-coreutils
 curl
 git
 gh
-mise
+kitty
 mihomo
+mise
 neovim
 ninja
 tmux
 zsh
-bottom

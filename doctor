@@ -5,19 +5,44 @@ repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 failures=0
 warnings=0
 
-# A long-lived shell may predate newly installed mise tools. Shims keep the
-# diagnostic accurate without requiring the user to restart their terminal.
-if [[ -d "$HOME/.local/share/mise/shims" ]]; then
-    export PATH="$HOME/.local/share/mise/shims:$PATH"
-fi
+case "$(uname -s)" in
+    Darwin) os=macos ;;
+    Linux)
+        if [[ -e /etc/arch-release ]]; then os=arch; else os=linux; fi
+        ;;
+    *) os=unsupported ;;
+esac
+
+export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$HOME/.local/share/mise/shims:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
 ok() { printf 'OK    %s\n' "$*"; }
 warn() { printf 'WARN  %s\n' "$*"; warnings=$((warnings + 1)); }
 fail() { printf 'FAIL  %s\n' "$*"; failures=$((failures + 1)); }
 
-for command_name in \
-    kitty vicinae mise chezmoi \
-    yazi yq stylua ruff ty lua-language-server shfmt taplo deno rustfmt; do
+if command -v timeout >/dev/null 2>&1; then
+    timeout_bin=timeout
+elif command -v gtimeout >/dev/null 2>&1; then
+    timeout_bin=gtimeout
+else
+    timeout_bin=
+fi
+
+run_with_timeout() {
+    local duration=$1
+    shift
+    if [[ -n "$timeout_bin" ]]; then
+        "$timeout_bin" "$duration" "$@"
+    else
+        "$@"
+    fi
+}
+
+commands='mise chezmoi nvim yazi yq stylua ruff ty lua-language-server shfmt taplo deno rustfmt'
+case "$os" in
+    arch) commands="kitty vicinae $commands" ;;
+    linux|macos) commands="kitty $commands" ;;
+esac
+for command_name in $commands; do
     if command -v "$command_name" >/dev/null 2>&1; then
         ok "command: $command_name"
     else
@@ -25,29 +50,24 @@ for command_name in \
     fi
 done
 
-if command_palette_name=$(yq -r '.[0].name' \
-    "$repo_dir/dot_config/zsh/commands/git.yaml" 2>/dev/null) && \
-   [[ -n "$command_palette_name" && "$command_palette_name" != null ]]; then
-    ok 'command palette YAML parser'
-else
-    fail 'command palette YAML parser failed'
-fi
-
-if timeout 10s yazi --debug >/dev/null 2>&1; then
+if run_with_timeout 10s yazi --debug >/dev/null 2>&1; then
     ok 'yazi configuration schema'
 else
     fail 'yazi configuration schema is invalid'
 fi
 
-chrome_flags="$HOME/.config/chrome-flags.conf"
-if [[ -x "$HOME/.local/bin/chrome-proxy" ]] && \
-   [[ -f "$chrome_flags" ]] && \
-   ! grep -Eq '^[[:space:]]*--proxy-(server|pac-url)=' "$chrome_flags"; then
-    ok 'Chrome proxy is opt-in through chrome-proxy'
+if [[ "$os" == macos ]]; then
+    ok 'Chrome Linux flags not applicable on macOS'
 else
-    fail 'Chrome still has a global proxy or chrome-proxy is missing'
+    chrome_flags="$HOME/.config/chrome-flags.conf"
+    if [[ -x "$HOME/.local/bin/chrome-proxy" ]] && \
+       [[ -f "$chrome_flags" ]] && \
+       ! grep -Eq '^[[:space:]]*--proxy-(server|pac-url)=' "$chrome_flags"; then
+        ok 'Chrome proxy is opt-in through chrome-proxy'
+    else
+        fail 'Chrome still has a global proxy or chrome-proxy is missing'
+    fi
 fi
-
 
 mcp_filesystem="$HOME/.local/share/mise/shims/mcp-server-filesystem"
 codex_config="$HOME/.codex/config.toml"
@@ -55,7 +75,7 @@ if [[ -x "$mcp_filesystem" ]] && [[ -f "$codex_config" ]] && \
    grep -Fq "command = \"$mcp_filesystem\"" "$codex_config"; then
     mcp_response=$(printf '%s\n' \
         '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"dotfiles-doctor","version":"1"}}}' \
-        | timeout 10s "$mcp_filesystem" "$HOME" 2>/dev/null || true)
+        | run_with_timeout 10s "$mcp_filesystem" "$HOME" 2>/dev/null || true)
     if grep -Fq '"protocolVersion":"2025-11-25"' <<<"$mcp_response"; then
         ok 'Codex filesystem MCP handshake'
     else
@@ -71,7 +91,7 @@ if [[ -x "$mcp_atuin" ]] && [[ -f "$codex_config" ]] && \
     mcp_response=$(printf '%s\n%s\n' \
         '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"dotfiles-doctor","version":"1"}}}' \
         '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
-        | timeout 10s "$mcp_atuin" mcp 2>/dev/null || true)
+        | run_with_timeout 10s "$mcp_atuin" mcp 2>/dev/null || true)
     if grep -Fq '"name":"atuin_history"' <<<"$mcp_response" && \
        grep -Fq '"readOnlyHint":true' <<<"$mcp_response"; then
         ok 'Codex Atuin MCP handshake'
@@ -83,7 +103,7 @@ else
 fi
 
 nvim_output=''
-if nvim_output=$(timeout 30s nvim --headless '+qa' 2>&1) && [[ -z "$nvim_output" ]]; then
+if nvim_output=$(run_with_timeout 30s nvim --headless '+qa' 2>&1) && [[ -z "$nvim_output" ]]; then
     ok 'neovim clean startup'
 else
     fail 'neovim startup emitted errors'
@@ -107,44 +127,62 @@ else
     fi
 fi
 
-while IFS= read -r unit; do
-    [[ -z "$unit" ]] && continue
-    if systemctl is-enabled "$unit" >/dev/null 2>&1; then
-        ok "system service: $unit"
-    else
-        fail "system service disabled: $unit"
-    fi
-done < "$repo_dir/services/system-common.txt"
-
-profile=$(sed -nE 's/^[[:space:]]*profile[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' \
-    "${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi/chezmoi.toml" 2>/dev/null | head -n1)
-if [[ "$profile" == laptop ]]; then
+if [[ "$os" == arch ]]; then
     while IFS= read -r unit; do
         [[ -z "$unit" ]] && continue
         if systemctl is-enabled "$unit" >/dev/null 2>&1; then
-            ok "laptop system service: $unit"
+            ok "system service: $unit"
         else
-            fail "laptop system service disabled: $unit"
+            fail "system service disabled: $unit"
         fi
-    done < "$repo_dir/services/system-laptop.txt"
-fi
+    done < "$repo_dir/services/system-common.txt"
 
-while IFS= read -r unit; do
-    [[ -z "$unit" ]] && continue
-    if systemctl --user is-enabled "$unit" >/dev/null 2>&1; then
-        ok "user service: $unit"
-    else
-        fail "user service disabled: $unit"
+    profile=$(sed -nE 's/^[[:space:]]*profile[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' \
+        "${XDG_CONFIG_HOME:-$HOME/.config}/chezmoi/chezmoi.toml" 2>/dev/null | head -n1)
+    if [[ "$profile" == laptop || "$profile" == laptop-intel || "$profile" == laptop-amd ]]; then
+        while IFS= read -r unit; do
+            [[ -z "$unit" ]] && continue
+            if systemctl is-enabled "$unit" >/dev/null 2>&1; then
+                ok "laptop system service: $unit"
+            else
+                fail "laptop system service disabled: $unit"
+            fi
+        done < "$repo_dir/services/system-laptop.txt"
     fi
-done < "$repo_dir/services/user-common.txt"
-
-if systemctl --user is-active mihomo.service >/dev/null 2>&1; then
-    ok 'Mihomo proxy service'
-else
-    warn 'Mihomo proxy service is not active'
 fi
 
-if ss -ltn 2>/dev/null | grep -q '127\.0\.0\.1:10808'; then
+if [[ "$os" == arch || "$os" == linux ]]; then
+    if [[ "$os" == arch ]]; then
+        user_service_file=$repo_dir/services/user-common.txt
+    else
+        user_service_file=$repo_dir/services/user-portable.txt
+    fi
+    while IFS= read -r unit; do
+        [[ -z "$unit" ]] && continue
+        if systemctl --user is-enabled "$unit" >/dev/null 2>&1; then
+            ok "user service: $unit"
+        else
+            fail "user service disabled: $unit"
+        fi
+    done < "$user_service_file"
+    if systemctl --user is-active mihomo.service >/dev/null 2>&1; then
+        ok 'Mihomo proxy service'
+    else
+        warn 'Mihomo proxy service is not active'
+    fi
+elif [[ "$os" == macos ]]; then
+    if launchctl print "gui/$UID/io.github.metacubex.mihomo" >/dev/null 2>&1; then
+        ok 'Mihomo launch agent'
+    else
+        warn 'Mihomo launch agent is not loaded'
+    fi
+fi
+
+if (
+    exec 3<>/dev/tcp/127.0.0.1/10808
+    exec 3>&-
+    exec 3<&-
+) 2>/dev/null; then
     ok 'local proxy port 10808 is listening'
     if curl --silent --fail --max-time 12 --proxy socks5h://127.0.0.1:10808 \
         https://www.google.com/generate_204 --output /dev/null; then

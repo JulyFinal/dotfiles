@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "directTools": true
+  },
+  "mcpServers": {
+{{ if lookPath "docker" }}
+    "lightpanda": {
+      "command": "docker",
+      "args": ["exec", "-i", "lightpanda", "lightpanda", "mcp", "--log-level", "info"],
+      "lifecycle": "lazy"
+    },
+{{ end }}
+    "filesystem": {
+      "command": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/mcp-server-filesystem",
+      "args": ["{{ .chezmoi.homeDir }}"],
+      "lifecycle": "lazy"
+    },
+    "memory": {
+      "command": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/mcp-server-memory",
+      "args": [],
+      "lifecycle": "lazy"
+    },
+    "context7": {
+      "command": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/context7-mcp",
+      "args": [],
+      "lifecycle": "lazy"
+    },
+    "sequential_thinking": {
+      "command": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/mcp-server-sequential-thinking",
+      "args": [],
+      "lifecycle": "lazy"
+    },
+    "atuin": {
+      "command": "{{ .chezmoi.homeDir }}/.local/share/mise/shims/atuin",
+      "args": ["mcp"],
+      "lifecycle": "lazy"
+    }
+  }
+}

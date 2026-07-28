@@ -5,7 +5,7 @@ palette = "catppuccin_mocha"
 [character]
 success_symbol = "[❯](maroon)"
 error_symbol = "[❯](red)"
-vicmd_symbol = "[❮](green)"
+vimcmd_symbol = "[❮](green)"
 
 [git_branch]
 style = "bold mauve"

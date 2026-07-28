@@ -4,7 +4,7 @@ go = "latest"
 node = "24"
 npm = "12"
 "npm:@anthropic-ai/claude-code" = "latest"
-"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:@earendil-works/pi-coding-agent" = { version = "latest", npm_args = "--ignore-scripts=true" }
 "npm:@google/gemini-cli" = "latest"
 "npm:@openai/codex" = "latest"
 "npm:@modelcontextprotocol/server-filesystem" = "2026.7.10"

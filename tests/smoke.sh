@@ -11,16 +11,16 @@ PYTHONPYCACHEPREFIX="$test_root/pycache" python3 -m py_compile "$repo_dir/tests/
 for script in "$repo_dir"/private_dot_local/bin/executable_*; do
     sh -n "$script"
 done
+while IFS= read -r -d '' toml_file; do
+    taplo check "$toml_file"
+done < <(find "$repo_dir" -type f -name '*.toml' -print0)
 
 python3 - "$repo_dir" <<'PY'
 import json
 import sys
-import tomllib
 from pathlib import Path
 
 root = Path(sys.argv[1])
-for path in root.rglob("*.toml"):
-    tomllib.loads(path.read_text())
 json.loads((root / "dot_config/nvim/lazy-lock.json").read_text())
 vicinae = (root / "dot_config/vicinae/settings.json").read_text()
 vicinae_config = json.loads(
@@ -40,6 +40,9 @@ assert codex_env["ALL_PROXY"] == codex_env["all_proxy"] == zed_config["proxy"]
 assert codex_env["NO_PROXY"] == codex_env["no_proxy"] == "localhost,127.0.0.1,::1"
 aur_packages = (root / "packages/aur.txt").read_text().splitlines()
 user_services = (root / "services/user-common.txt").read_text().splitlines()
+portable_user_services = (
+    root / "services/user-portable.txt"
+).read_text().splitlines()
 assert "xembed-sni-proxy-standalone-git" not in aur_packages
 assert "xembed-sni-proxy.service" not in user_services
 pacman_packages = (root / "packages/pacman-common.txt").read_text().splitlines()
@@ -53,6 +56,8 @@ desktop_packages = {
 assert desktop_packages.isdisjoint(pacman_packages)
 assert "fcitx5-theme-wechat" not in aur_packages
 assert "mihomo.service" in user_services
+assert portable_user_services == ["mihomo.service"]
+assert "vicinae.service" not in portable_user_services
 assert "proxy-core.service" not in user_services and "v2rayn" not in aur_packages
 retired_tools = {
     "firefox", "freerdp", "gtk-vnc", "helix", "imagemagick",
@@ -67,13 +72,20 @@ assert not (root / "dot_config/autostart/v2rayN.desktop.tmpl").exists()
 assert not (root / "private_dot_local/bin/executable_v2rayn-background").exists()
 mihomo_example = (root / "dot_config/mihomo/config.yaml.example").read_text()
 mihomo_service = (root / "dot_config/systemd/user/mihomo.service").read_text()
+mihomo_wrapper = (root / "private_dot_local/bin/executable_mihomo-managed").read_text()
+mihomo_launchd = (
+    root / "Library/LaunchAgents/private_io.github.metacubex.mihomo.plist.tmpl"
+).read_text()
 mihomo_subscription = (root / "private_dot_local/bin/executable_mihomo-subscription").read_text()
 mihomo_openvpn = (root / "private_dot_local/bin/executable_mihomo-openvpn").read_text()
 mihomo_ubuntu = (root / "private_dot_local/bin/executable_install-mihomo-ubuntu").read_text()
 assert "__SUBSCRIPTION_URL__" in mihomo_example
 assert "enhanced-mode: fake-ip" in mihomo_example and "proxy-server-nameserver" in mihomo_example
-assert "config.yaml" in mihomo_service and "mihomo -t" in mihomo_service
+assert "mihomo-service" in mihomo_service and "/usr/bin/mihomo" not in mihomo_service
 assert "metacubexd" not in mihomo_service.lower()
+assert ".nix-profile/bin" in mihomo_wrapper and "/opt/homebrew/bin" in mihomo_wrapper
+assert "io.github.metacubex.mihomo" in mihomo_launchd
+assert "mihomo-service" in mihomo_launchd
 assert "10809" in mihomo_subscription and "providers/proxies/subscription" in mihomo_subscription
 assert 'group["now"] != "COMPATIBLE"' in mihomo_subscription
 assert "work-openvpn" in mihomo_example and "192.168.168.0/24,WORK" in mihomo_example
@@ -101,9 +113,159 @@ gitignore = (root / ".gitignore").read_text()
 assert "dot_config/mihomo/config.yaml" in gitignore and "*.ovpn" in gitignore
 bootstrap = (root / "bootstrap").read_text()
 assert "config core.hooksPath tests" in bootstrap
+assert "brew update" in bootstrap and "brew upgrade" in bootstrap
+assert "nixpkgs#$package" in bootstrap
+assert "mapfile" not in bootstrap and "declare -A" not in bootstrap
+assert "--platform is only allowed together with --dry-run" in bootstrap
+nix_packages = (root / "packages/nix-common.txt").read_text().splitlines()
+brew_packages = (root / "packages/brew-common.txt").read_text().splitlines()
+assert "mihomo" in nix_packages and "mise" in nix_packages
+assert "mihomo" in brew_packages and "mise" in brew_packages
+chezmoi_ignore = (root / ".chezmoiignore").read_text()
+assert '.config/systemd/**' in chezmoi_ignore
+assert 'Library/LaunchAgents/**' in chezmoi_ignore
+assert '.config/vicinae/**' in chezmoi_ignore
+pi_mcp = (root / "private_dot_pi/private_agent/private_mcp.json.tmpl").read_text()
+assert "/home/final" not in pi_mcp
+assert "{{ .chezmoi.homeDir }}" in pi_mcp
+assert not (root / "private_dot_pi/private_agent/skills").exists()
+pi_skills = (root / "packages/pi-skills.txt").read_text()
+assert "codex-system" in pi_skills and "codex-plugin" in pi_skills
+pi_skill_sync = (root / "scripts/sync-pi-skills").read_text()
+assert "ln -s" in pi_skill_sync and "source unavailable" in pi_skill_sync
 doctor = (root / "doctor").read_text()
 assert 'tests/pre-commit" worktree' in doctor and 'tests/pre-commit" staged' in doctor
+assert "launchctl print" in doctor and 'systemctl --user' in doctor
 PY
+
+macos_plan=$("$repo_dir/bootstrap" --dry-run --platform macos --profile portable)
+grep -Fq 'Platform: macos' <<<"$macos_plan"
+grep -Fq 'Homebrew formulae:' <<<"$macos_plan"
+grep -Fq '  mihomo' <<<"$macos_plan"
+
+linux_plan=$("$repo_dir/bootstrap" --dry-run --platform linux --profile portable)
+grep -Fq 'Platform: linux' <<<"$linux_plan"
+grep -Fq 'Nix profile packages:' <<<"$linux_plan"
+grep -Fq '  mihomo' <<<"$linux_plan"
+
+arch_plan=$("$repo_dir/bootstrap" --dry-run --platform arch --profile desktop)
+grep -Fq 'Platform: arch' <<<"$arch_plan"
+grep -Fq 'Pacman packages:' <<<"$arch_plan"
+grep -Fq 'AUR packages:' <<<"$arch_plan"
+
+if "$repo_dir/bootstrap" --platform macos --profile portable >/dev/null 2>&1; then
+    printf '%s\n' 'bootstrap accepted a platform override without --dry-run' >&2
+    exit 1
+fi
+
+python3 - "$repo_dir/Library/LaunchAgents/private_io.github.metacubex.mihomo.plist.tmpl" <<'PY'
+import plistlib
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text().replace(
+    "{{ .chezmoi.homeDir }}", "/Users/tester"
+)
+payload = plistlib.loads(text.encode())
+assert payload["Label"] == "io.github.metacubex.mihomo"
+assert payload["ProgramArguments"] == ["/Users/tester/.local/bin/mihomo-service"]
+assert payload["KeepAlive"]["SuccessfulExit"] is False
+PY
+
+template_home="$test_root/template-home"
+mkdir -p "$template_home"
+touch "$template_home/empty-chezmoi.toml"
+HOME="$template_home" chezmoi \
+    --config "$template_home/empty-chezmoi.toml" \
+    --source "$repo_dir" \
+    execute-template \
+    < "$repo_dir/private_dot_pi/private_agent/private_mcp.json.tmpl" \
+    > "$test_root/pi-mcp.json"
+python3 - "$test_root/pi-mcp.json" "$template_home" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+config_path, home_path = map(Path, sys.argv[1:])
+payload = json.loads(config_path.read_text())
+servers = payload["mcpServers"]
+assert servers["filesystem"]["args"] == [str(home_path)]
+assert servers["atuin"]["command"] == str(
+    home_path / ".local/share/mise/shims/atuin"
+)
+PY
+
+for platform in macos linux arch; do
+    platform_home="$test_root/platform-$platform"
+    mkdir -p "$platform_home"
+    printf '[data]\nplatform = "%s"\n' "$platform" \
+        > "$platform_home/chezmoi.toml"
+    HOME="$platform_home" chezmoi \
+        --config "$platform_home/chezmoi.toml" \
+        --source "$repo_dir" \
+        --destination "$platform_home" \
+        apply --force
+done
+test -f "$test_root/platform-macos/Library/LaunchAgents/io.github.metacubex.mihomo.plist"
+test ! -e "$test_root/platform-macos/.config/systemd"
+test ! -e "$test_root/platform-macos/.config/vicinae"
+test ! -e "$test_root/platform-macos/.config/kdeglobals"
+test ! -e "$test_root/platform-macos/.config/chrome-flags.conf"
+test ! -e "$test_root/platform-macos/.config/fontconfig"
+test ! -e "$test_root/platform-macos/.config/gtk-3.0"
+test ! -e "$test_root/platform-macos/.config/gtk-4.0"
+test -f "$test_root/platform-linux/.config/systemd/user/mihomo.service"
+test ! -e "$test_root/platform-linux/Library/LaunchAgents"
+test ! -e "$test_root/platform-linux/.config/vicinae"
+test ! -e "$test_root/platform-linux/.config/kdeglobals"
+test -f "$test_root/platform-linux/.config/chrome-flags.conf"
+test -f "$test_root/platform-arch/.config/systemd/user/mihomo.service"
+test ! -e "$test_root/platform-arch/Library/LaunchAgents"
+test -d "$test_root/platform-arch/.config/vicinae"
+test -f "$test_root/platform-arch/.config/kdeglobals"
+
+fake_codex="$test_root/fake-codex"
+fake_pi_skills="$test_root/fake-pi-skills"
+fake_manifest="$test_root/pi-skills.txt"
+mkdir -p \
+    "$fake_codex/skills/.system/imagegen" \
+    "$fake_codex/skills/skill-creator" \
+    "$fake_codex/plugins/cache/kami/kami/1.9.0/skills/kami" \
+    "$fake_codex/plugins/cache/kami/kami/1.11.0/skills/kami"
+touch \
+    "$fake_codex/skills/.system/imagegen/SKILL.md" \
+    "$fake_codex/skills/skill-creator/SKILL.md" \
+    "$fake_codex/plugins/cache/kami/kami/1.9.0/skills/kami/SKILL.md" \
+    "$fake_codex/plugins/cache/kami/kami/1.11.0/skills/kami/SKILL.md"
+printf '%s\n' \
+    'imagegen codex-system imagegen' \
+    'skill-creator codex-user skill-creator' \
+    'kami codex-plugin kami@kami' \
+    > "$fake_manifest"
+CODEX_HOME="$fake_codex" \
+PI_SKILLS_TARGET_ROOT="$fake_pi_skills" \
+PI_SKILLS_MANIFEST="$fake_manifest" \
+    "$repo_dir/scripts/sync-pi-skills" >/dev/null
+test "$(readlink "$fake_pi_skills/imagegen")" = \
+    "$fake_codex/skills/.system/imagegen"
+test "$(readlink "$fake_pi_skills/skill-creator")" = \
+    "$fake_codex/skills/skill-creator"
+test "$(readlink "$fake_pi_skills/kami")" = \
+    "$fake_codex/plugins/cache/kami/kami/1.11.0/skills/kami"
+rm "$fake_pi_skills/imagegen"
+mkdir "$fake_pi_skills/imagegen"
+touch "$fake_pi_skills/imagegen/local-work"
+CODEX_HOME="$fake_codex" \
+PI_SKILLS_TARGET_ROOT="$fake_pi_skills" \
+PI_SKILLS_MANIFEST="$fake_manifest" \
+    "$repo_dir/scripts/sync-pi-skills" >/dev/null 2>&1
+test -f "$fake_pi_skills/imagegen/local-work"
+CODEX_HOME="$fake_codex" \
+PI_SKILLS_TARGET_ROOT="$fake_pi_skills" \
+PI_SKILLS_MANIFEST="$fake_manifest" \
+    "$repo_dir/scripts/sync-pi-skills" --replace >/dev/null
+test "$(readlink "$fake_pi_skills/imagegen")" = \
+    "$fake_codex/skills/.system/imagegen"
 
 secret_repo="$test_root/secret-repo"
 mkdir -p "$secret_repo/tests"

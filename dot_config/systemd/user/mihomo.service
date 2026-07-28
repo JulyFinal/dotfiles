@@ -5,9 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStartPre=/usr/bin/test -s %h/.config/mihomo/config.yaml
-ExecStartPre=/usr/bin/mihomo -t -d %h/.local/share/mihomo -f %h/.config/mihomo/config.yaml
-ExecStart=/usr/bin/mihomo -d %h/.local/share/mihomo -f %h/.config/mihomo/config.yaml
+ExecStart=%h/.local/bin/mihomo-service
 Restart=on-failure
 RestartSec=2
 NoNewPrivileges=true

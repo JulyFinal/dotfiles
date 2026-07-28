@@ -100,9 +100,12 @@ PY
 
     chmod 600 "$provider"
     if [[ -s $config ]]; then
-        /usr/bin/mihomo -t -d "$data_dir" -f "$config"
-        if systemctl --user is-active mihomo.service >/dev/null 2>&1; then
-            systemctl --user restart mihomo.service
+        local mihomo_path
+        mihomo_path=$(command -v mihomo-managed || command -v mihomo || true)
+        [[ -n $mihomo_path ]] || { printf '%s\n' '缺少 mihomo' >&2; exit 1; }
+        "$mihomo_path" -t -d "$data_dir" -f "$config"
+        if command -v proxyctl >/dev/null 2>&1; then
+            proxyctl restart
         fi
     fi
     printf '已生成 Mihomo 原生 OpenVPN provider：%s\n' "$provider"

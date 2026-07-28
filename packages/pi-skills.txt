@@ -1,0 +1,7 @@
+# target-name  source-kind   source-name
+imagegen       codex-system  imagegen
+openai-docs    codex-system  openai-docs
+plugin-creator codex-system  plugin-creator
+skill-installer codex-system skill-installer
+skill-creator  codex-user    skill-creator
+kami           codex-plugin  kami@kami

@@ -33,10 +33,15 @@ destination.write_text(text.replace("__SUBSCRIPTION_URL__", json.dumps(url)))
 os.chmod(destination, 0o600)
 PY
     printf '已写入私有配置：%s\n' "$config"
+    if command -v proxyctl >/dev/null 2>&1; then
+        proxyctl restart
+    fi
 }
 
 test_subscription() {
-    [[ -x /usr/bin/mihomo ]] || { printf '%s\n' '请先安装 mihomo-bin' >&2; exit 1; }
+    local mihomo_path
+    mihomo_path=$(command -v mihomo-managed || command -v mihomo || true)
+    [[ -n $mihomo_path ]] || { printf '%s\n' '请先通过系统包管理器安装 mihomo' >&2; exit 1; }
     [[ -s $config ]] || { printf '%s\n' '请先运行 mihomo-subscription configure' >&2; exit 1; }
 
     local listening=false
@@ -52,12 +57,16 @@ test_subscription() {
         -e 's/^mixed-port: 10808$/mixed-port: 10809/' \
         -e 's/^external-controller: 127\.0\.0\.1:9090$/external-controller: 127.0.0.1:19090/' \
         "$config" > "$test_dir/config.yaml"
-    /usr/bin/mihomo -t -d "$test_dir" -f "$test_dir/config.yaml"
-    /usr/bin/mihomo -d "$test_dir" -f "$test_dir/config.yaml" > "$test_dir/mihomo.log" 2>&1 &
+    "$mihomo_path" -t -d "$test_dir" -f "$test_dir/config.yaml"
+    "$mihomo_path" -d "$test_dir" -f "$test_dir/config.yaml" > "$test_dir/mihomo.log" 2>&1 &
     test_pid=$!
 
     for _ in {1..150}; do
-        if ss -ltn | grep -q '127\.0\.0\.1:10809'; then
+        if (
+            exec 3<>/dev/tcp/127.0.0.1/10809
+            exec 3>&-
+            exec 3<&-
+        ) 2>/dev/null; then
             listening=true
             break
         fi

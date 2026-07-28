@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+PATH="/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+export PATH
+
+jq -S -s '
+  (.[0] // {})
+  | .npmCommand = ["npm", "--ignore-scripts"]
+  | .packages = (((.packages // []) + ["npm:pi-mcp-adapter"]) | unique)
+  | .enableSkillCommands = true
+  | (.skills // []
+      | map(select(
+          test("(^~|/)[.]codex(/|$)")
+          | not
+        ))) as $pi_skills
+  | if ($pi_skills | length) == 0
+    then del(.skills)
+    else .skills = $pi_skills
+    end
+'
