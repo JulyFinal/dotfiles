@@ -243,10 +243,11 @@ manually after bootstrap.
 
 ## Local proxy
 
-The platform Mihomo user service loads the private subscription provider and
-exposes a single mixed HTTP/SOCKS endpoint on `127.0.0.1:10808`. Linux uses
-`mihomo.service`; macOS uses `io.github.metacubex.mihomo`. Both are controlled
-through the same commands:
+The platform Mihomo user service exposes both HTTP and SOCKS5 through the mixed
+endpoint on `127.0.0.1:10808`. It keeps the two private providers in a single
+global selection path and does not use rules, TUN, DNS interception or sniffing.
+Linux uses `mihomo.service`; macOS uses `io.github.metacubex.mihomo`. Both are
+controlled through the same commands:
 
 ```bash
 proxyctl status
@@ -255,32 +256,20 @@ proxyctl restart
 proxyctl logs
 ```
 
-Update or verify the private subscription with:
+Update one provider URL without changing ports, controller/UI access, secret
+or policy groups, then verify the proxy with:
 
 ```bash
-mihomo-subscription configure
+mihomo-subscription configure mxlsub
+mihomo-subscription configure pokemon
 mihomo-subscription test
 ```
 
-The private `~/.config/mihomo/config.yaml` is generated from the tracked
-example and is not managed by Chezmoi or Git. Retired proxy clients are not
-installed by the bootstrap.
-
-The `work` OpenVPN profile is imported into Mihomo as a private file provider;
-NetworkManager does not need to activate it. The server pushes `comp-lzo no`,
-which OpenVPN implements as uncompressed stub framing. Mihomo 1.19.29 omits
-that frame for `no`, so the generated provider uses `comp-lzo: "yes"` to emit
-the compatible uncompressed frame. Configure and verify it with:
-
-```bash
-mihomo-openvpn configure work
-mihomo-openvpn test
-```
-
-The generated provider contains the decrypted client key, is mode `0600`, and
-lives only under `~/.local/share/mihomo/providers/`; it is never tracked by
-Chezmoi. Traffic for `192.168.168.0/24` selects the `WORK` group, while all
-other traffic continues to use the normal subscription `PROXY` group.
+The tracked `config.yaml.example` mirrors the private configuration shape but
+uses `https://xxxx.yyy` for subscription URLs and `xxxx` for the controller
+secret. Copy it to `~/.config/mihomo/config.yaml`, replace those values, and
+keep the result mode `0600`. The private file is not managed by Chezmoi or Git.
+Retired proxy clients are not installed by the bootstrap.
 
 ### Standalone Ubuntu/Debian installation
 

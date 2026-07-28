@@ -77,20 +77,29 @@ mihomo_launchd = (
     root / "Library/LaunchAgents/private_io.github.metacubex.mihomo.plist.tmpl"
 ).read_text()
 mihomo_subscription = (root / "private_dot_local/bin/executable_mihomo-subscription").read_text()
-mihomo_openvpn = (root / "private_dot_local/bin/executable_mihomo-openvpn").read_text()
 mihomo_ubuntu = (root / "private_dot_local/bin/executable_install-mihomo-ubuntu").read_text()
-assert "__SUBSCRIPTION_URL__" in mihomo_example
-assert "enhanced-mode: fake-ip" in mihomo_example and "proxy-server-nameserver" in mihomo_example
+assert mihomo_example.count("url: https://xxxx.yyy") == 2
+assert "secret: xxxx" in mihomo_example
+assert "mixed-port: 10808" in mihomo_example
+assert "port: 10809" not in mihomo_example and "socks-port:" not in mihomo_example
+assert "mode: global" in mihomo_example
+assert "unified-delay: true" in mihomo_example and "tcp-concurrent: true" in mihomo_example
+assert "additional-prefix: '[mxlsub]'" in mihomo_example
+assert "additional-prefix: '[pokemon]'" in mihomo_example
+assert "rules:" not in mihomo_example
+assert "tun:" not in mihomo_example and "dns:" not in mihomo_example
+assert "sniffer:" not in mihomo_example and "geox-url:" not in mihomo_example
 assert "mihomo-service" in mihomo_service and "/usr/bin/mihomo" not in mihomo_service
 assert "metacubexd" not in mihomo_service.lower()
 assert ".nix-profile/bin" in mihomo_wrapper and "/opt/homebrew/bin" in mihomo_wrapper
 assert "io.github.metacubex.mihomo" in mihomo_launchd
 assert "mihomo-service" in mihomo_launchd
-assert "10809" in mihomo_subscription and "providers/proxies/subscription" in mihomo_subscription
-assert 'group["now"] != "COMPATIBLE"' in mihomo_subscription
-assert "work-openvpn" in mihomo_example and "192.168.168.0/24,WORK" in mihomo_example
-assert '"comp-lzo": "yes"' in mihomo_openvpn and '"auth": "SHA1"' in mihomo_openvpn
-assert "nmcli connection up" not in mihomo_openvpn
+assert "expected one URL for provider" in mihomo_subscription
+assert "端口、UI/controller、密码和策略组保持不变" in mihomo_subscription
+assert "proxyctl test" in mihomo_subscription
+assert "work-openvpn" not in mihomo_example and "192.168.168.0/24,WORK" not in mihomo_example
+assert not (root / "private_dot_local/bin/executable_mihomo-openvpn").exists()
+assert "networkmanager-openvpn" not in pacman_packages and "openvpn" not in pacman_packages
 assert "mihomo-linux-amd64-v1-" in mihomo_ubuntu
 assert "sha256sum --check" in mihomo_ubuntu and "metacubexd" not in mihomo_ubuntu.lower()
 assert "systemctl enable --now mihomo.service" in mihomo_ubuntu
@@ -223,6 +232,32 @@ test -f "$test_root/platform-arch/.config/systemd/user/mihomo.service"
 test ! -e "$test_root/platform-arch/Library/LaunchAgents"
 test -d "$test_root/platform-arch/.config/vicinae"
 test -f "$test_root/platform-arch/.config/kdeglobals"
+
+url_update_root="$test_root/url-update"
+mkdir -p "$url_update_root/config/mihomo" "$url_update_root/bin"
+cp "$repo_dir/dot_config/mihomo/config.yaml.example" \
+    "$url_update_root/config/mihomo/config.yaml"
+ln -s "$(command -v python3)" "$url_update_root/bin/python3"
+PATH="$url_update_root/bin" \
+XDG_CONFIG_HOME="$url_update_root/config" \
+    /usr/bin/bash "$repo_dir/private_dot_local/bin/executable_mihomo-subscription" \
+    configure mxlsub https://example.com/private >/dev/null
+python3 - "$url_update_root/config/mihomo/config.yaml" <<'PY'
+import sys
+from pathlib import Path
+
+config = Path(sys.argv[1])
+text = config.read_text()
+assert 'url: "https://example.com/private"' in text
+assert text.count("url: https://xxxx.yyy") == 1
+assert "mixed-port: 10808" in text
+assert "port: 10809" not in text and "socks-port:" not in text
+assert "external-controller: 0.0.0.0:9090" in text
+assert "secret: xxxx" in text and "mode: global" in text
+assert "additional-prefix: '[mxlsub]'" in text
+assert "additional-prefix: '[pokemon]'" in text
+assert config.stat().st_mode & 0o777 == 0o600
+PY
 
 fake_codex="$test_root/fake-codex"
 fake_pi_skills="$test_root/fake-pi-skills"

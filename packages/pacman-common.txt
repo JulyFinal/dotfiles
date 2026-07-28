@@ -17,13 +17,11 @@ mesa
 mise
 neovim
 networkmanager
-networkmanager-openvpn
 ninja
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
 openssh
-openvpn
 pipewire-alsa
 pipewire-pulse
 polkit

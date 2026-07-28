@@ -28,7 +28,7 @@ SIGNATURE_SOURCES = {"doctor", "tests/pre-commit"}
 FORBIDDEN_PATHS = (
     re.compile(r"(^|/)\.env($|\.)", re.IGNORECASE),
     re.compile(r"(^|/)id_(rsa|ecdsa|ed25519)(\.|$)", re.IGNORECASE),
-    re.compile(r"(^|/)(rclone\.conf|work-openvpn\.ya?ml)$", re.IGNORECASE),
+    re.compile(r"(^|/)rclone\.conf$", re.IGNORECASE),
     re.compile(r"(^|/).*\.remmina$", re.IGNORECASE),
     re.compile(r"(^|/).*\.(ovpn|p12|pfx)$", re.IGNORECASE),
     re.compile(
@@ -113,7 +113,13 @@ def local_secret_fingerprints() -> list[tuple[str, bytes]]:
 
     mihomo = Path.home() / ".config/mihomo/config.yaml"
     if mihomo.is_file():
-        for match in re.finditer(rb"^\s*url:\s*(.+?)\s*$", mihomo.read_bytes(), re.M):
+        provider_section = re.search(
+            rb"^proxy-providers:\s*$\n((?:^[ \t].*(?:\n|$))*)",
+            mihomo.read_bytes(),
+            re.M,
+        )
+        provider_body = provider_section.group(1) if provider_section else b""
+        for match in re.finditer(rb"^ {4}url:\s*(.+?)\s*$", provider_body, re.M):
             value = match.group(1).strip().strip(b"\"'")
             if len(value) >= 12 and b"SUBSCRIPTION" not in value:
                 fingerprints.append(("live Mihomo URL", value))
@@ -130,15 +136,6 @@ def local_secret_fingerprints() -> list[tuple[str, bytes]]:
                     fingerprints.append(("live rclone password", value))
         except configparser.Error:
             pass
-
-    provider = Path.home() / ".local/share/mihomo/providers/work-openvpn.yaml"
-    if provider.is_file():
-        lines = provider.read_bytes().splitlines()
-        for index, line in enumerate(lines[:-1]):
-            if b"BEGIN PRIVATE KEY" in line or b"BEGIN OpenVPN Static key" in line:
-                value = lines[index + 1].strip()
-                if len(value) >= 16:
-                    fingerprints.append(("live OpenVPN key fingerprint", value))
 
     remmina_dir = Path.home() / ".local/share/remmina"
     for profile in remmina_dir.glob("*.remmina") if remmina_dir.is_dir() else ():
