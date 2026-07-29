@@ -1,3 +1,0 @@
-NetworkManager.service
-bluetooth.service
-reflector.timer

@@ -24,6 +24,28 @@ if not uv.fs_stat(lazy_module) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local dashboard_header = table.concat({
+  "",
+  "",
+  "        ⢀⣴⡾⠃⠄⠄⠄⠄⠄⠈⠺⠟⠛⠛⠛⠛⠻⢿⣿⣿⣿⣿⣶⣤⡀  ",
+  "      ⢀⣴⣿⡿⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣸⣿⣿⣿⣿⣿⣿⣿⣷ ",
+  "     ⣴⣿⡿⡟⡼⢹⣷⢲⡶⣖⣾⣶⢄⠄⠄⠄⠄⠄⢀⣼⣿⢿⣿⣿⣿⣿⣿⣿⣿ ",
+  "    ⣾⣿⡟⣾⡸⢠⡿⢳⡿⠍⣼⣿⢏⣿⣷⢄⡀⠄⢠⣾⢻⣿⣸⣿⣿⣿⣿⣿⣿⣿ ",
+  "  ⣡⣿⣿⡟⡼⡁⠁⣰⠂⡾⠉⢨⣿⠃⣿⡿⠍⣾⣟⢤⣿⢇⣿⢇⣿⣿⢿⣿⣿⣿⣿⣿ ",
+  " ⣱⣿⣿⡟⡐⣰⣧⡷⣿⣴⣧⣤⣼⣯⢸⡿⠁⣰⠟⢀⣼⠏⣲⠏⢸⣿⡟⣿⣿⣿⣿⣿⣿ ",
+  " ⣿⣿⡟⠁⠄⠟⣁⠄⢡⣿⣿⣿⣿⣿⣿⣦⣼⢟⢀⡼⠃⡹⠃⡀⢸⡿⢸⣿⣿⣿⣿⣿⡟ ",
+  " ⣿⣿⠃⠄⢀⣾⠋⠓⢰⣿⣿⣿⣿⣿⣿⠿⣿⣿⣾⣅⢔⣕⡇⡇⡼⢁⣿⣿⣿⣿⣿⣿⢣ ",
+  " ⣿⡟⠄⠄⣾⣇⠷⣢⣿⣿⣿⣿⣿⣿⣿⣭⣀⡈⠙⢿⣿⣿⡇⡧⢁⣾⣿⣿⣿⣿⣿⢏⣾ ",
+  " ⣿⡇⠄⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⢻⠇⠄⠄⢿⣿⡇⢡⣾⣿⣿⣿⣿⣿⣏⣼⣿ ",
+  " ⣿⣷⢰⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⢰⣧⣀⡄⢀⠘⡿⣰⣿⣿⣿⣿⣿⣿⠟⣼⣿⣿ ",
+  " ⢹⣿⢸⣿⣿⠟⠻⢿⣿⣿⣿⣿⣿⣿⣿⣶⣭⣉⣤⣿⢈⣼⣿⣿⣿⣿⣿⣿⠏⣾⣹⣿⣿ ",
+  " ⢸⠇⡜⣿⡟⠄⠄⠄⠈⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟⣱⣻⣿⣿⣿⣿⣿⠟⠁⢳⠃⣿⣿⣿ ",
+  "  ⣰⡗⠹⣿⣄⠄⠄⠄⢀⣿⣿⣿⣿⣿⣿⠟⣅⣥⣿⣿⣿⣿⠿⠋  ⣾⡌⢠⣿⡿⠃ ",
+  " ⠜⠋⢠⣷⢻⣿⣿⣶⣾⣿⣿⣿⣿⠿⣛⣥⣾⣿⠿⠟⠛⠉            ",
+  "",
+  "",
+}, "\n")
+
 -- install plugins
 local plugins = {
   -- theme
@@ -42,66 +64,47 @@ local plugins = {
   },
 
   {
-    "nvimdev/dashboard-nvim",
-    event = "VimEnter",
-    config = function()
-      require("dashboard").setup({
-        config = {
-          header = {
-            "",
-            "",
-            "        ⢀⣴⡾⠃⠄⠄⠄⠄⠄⠈⠺⠟⠛⠛⠛⠛⠻⢿⣿⣿⣿⣿⣶⣤⡀  ",
-            "      ⢀⣴⣿⡿⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣸⣿⣿⣿⣿⣿⣿⣿⣷ ",
-            "     ⣴⣿⡿⡟⡼⢹⣷⢲⡶⣖⣾⣶⢄⠄⠄⠄⠄⠄⢀⣼⣿⢿⣿⣿⣿⣿⣿⣿⣿ ",
-            "    ⣾⣿⡟⣾⡸⢠⡿⢳⡿⠍⣼⣿⢏⣿⣷⢄⡀⠄⢠⣾⢻⣿⣸⣿⣿⣿⣿⣿⣿⣿ ",
-            "  ⣡⣿⣿⡟⡼⡁⠁⣰⠂⡾⠉⢨⣿⠃⣿⡿⠍⣾⣟⢤⣿⢇⣿⢇⣿⣿⢿⣿⣿⣿⣿⣿ ",
-            " ⣱⣿⣿⡟⡐⣰⣧⡷⣿⣴⣧⣤⣼⣯⢸⡿⠁⣰⠟⢀⣼⠏⣲⠏⢸⣿⡟⣿⣿⣿⣿⣿⣿ ",
-            " ⣿⣿⡟⠁⠄⠟⣁⠄⢡⣿⣿⣿⣿⣿⣿⣦⣼⢟⢀⡼⠃⡹⠃⡀⢸⡿⢸⣿⣿⣿⣿⣿⡟ ",
-            " ⣿⣿⠃⠄⢀⣾⠋⠓⢰⣿⣿⣿⣿⣿⣿⠿⣿⣿⣾⣅⢔⣕⡇⡇⡼⢁⣿⣿⣿⣿⣿⣿⢣ ",
-            " ⣿⡟⠄⠄⣾⣇⠷⣢⣿⣿⣿⣿⣿⣿⣿⣭⣀⡈⠙⢿⣿⣿⡇⡧⢁⣾⣿⣿⣿⣿⣿⢏⣾ ",
-            " ⣿⡇⠄⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⢻⠇⠄⠄⢿⣿⡇⢡⣾⣿⣿⣿⣿⣿⣏⣼⣿ ",
-            " ⣿⣷⢰⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⢰⣧⣀⡄⢀⠘⡿⣰⣿⣿⣿⣿⣿⣿⠟⣼⣿⣿ ",
-            " ⢹⣿⢸⣿⣿⠟⠻⢿⣿⣿⣿⣿⣿⣿⣿⣶⣭⣉⣤⣿⢈⣼⣿⣿⣿⣿⣿⣿⠏⣾⣹⣿⣿ ",
-            " ⢸⠇⡜⣿⡟⠄⠄⠄⠈⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟⣱⣻⣿⣿⣿⣿⣿⠟⠁⢳⠃⣿⣿⣿ ",
-            "  ⣰⡗⠹⣿⣄⠄⠄⠄⢀⣿⣿⣿⣿⣿⣿⠟⣅⣥⣿⣿⣿⣿⠿⠋  ⣾⡌⢠⣿⡿⠃ ",
-            " ⠜⠋⢠⣷⢻⣿⣿⣶⣾⣿⣿⣿⣿⠿⣛⣥⣾⣿⠿⠟⠛⠉            ",
-            "",
-            "",
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {
+      picker = { enabled = true },
+      explorer = {
+        enabled = true,
+        replace_netrw = true,
+      },
+      dashboard = {
+        enabled = true,
+        preset = {
+          header = dashboard_header,
+          keys = {
+            { icon = "󰏕 ", key = "u", desc = "Update", action = ":Lazy update" },
+            { icon = " ", key = "f", desc = "Files", action = function() Snacks.picker.files() end },
+            { icon = " ", key = "o", desc = "Old Files", action = function() Snacks.picker.recent() end },
+            { icon = "󰮗 ", key = "g", desc = "Live Grep", action = function() Snacks.picker.grep() end },
+            { icon = "󰈆 ", key = "q", desc = "Exit", action = ":qa" },
           },
-          shortcut = {
-            { icon = "󰏕  ", desc = "Update", icon_hl = "@property", action = "Lazy update", key = "u" },
-            {
-              icon = "  ",
-              icon_hl = "@variable",
-              desc = "Files",
-              group = "Label",
-              action = "Telescope find_files",
-              key = "f",
-            },
-            {
-              icon = "  ",
-              desc = "Old Files",
-              action = "Telescope oldfiles",
-              key = "o",
-            },
-            {
-              icon = "󰮗  ",
-              desc = "Live Grep",
-              action = "Telescope live_grep",
-              key = "g",
-            },
-            {
-              icon = "󰈆  ",
-              desc = "Exit",
-              action = "exit",
-              key = "q",
-            },
-          },
-          footer = {},
         },
-      })
-    end,
-    dependencies = { { "nvim-tree/nvim-web-devicons" } },
+        sections = {
+          { section = "header" },
+          { section = "keys", gap = 1, padding = 1 },
+          { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+          { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
+          { section = "startup" },
+        },
+      },
+    },
+    keys = {
+      { "<leader>F", function() Snacks.picker() end, desc = "Pickers" },
+      { "<leader>ff", function() Snacks.picker.files() end, desc = "Find files" },
+      { "<leader>fg", function() Snacks.picker.grep() end, desc = "Live grep" },
+      { "<leader>fh", function() Snacks.picker.help() end, desc = "Help tags" },
+      { "<leader>fe", function() Snacks.picker.keymaps() end, desc = "Keymaps" },
+      { "<leader>s", function() Snacks.picker.lsp_symbols() end, desc = "Search symbols" },
+      { "<leader>fs", function() Snacks.picker.lsp_workspace_symbols() end, desc = "Search all symbols" },
+      { "\\", function() Snacks.explorer.reveal() end, desc = "Explorer reveal" },
+    },
   },
 
   -- chunk
@@ -120,29 +123,6 @@ local plugins = {
     end,
   },
 
-  -- telescope
-  {
-    "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    keys = {
-      { "<leader>F",  "<cmd>Telescope<cr>",                                     desc = "find_files" },
-      { "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<cr>", desc = "find_files" },
-      { "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<cr>",  desc = "live_grep" },
-      { "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<cr>",  desc = "help_tags" },
-      { "<leader>fe", "<cmd>lua require('telescope.builtin').keymaps()<cr>",    desc = "keymappings" },
-      {
-        "<leader>s",
-        "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>",
-        desc = "search symbols",
-      },
-      {
-        "<leader>fs",
-        "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<cr>",
-        desc = "search all symbols",
-      },
-    },
-  },
-
   {
     "kylechui/nvim-surround",
     event = "BufReadPost",
@@ -153,70 +133,27 @@ local plugins = {
 
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = 'master',
-    event = "BufReadPre",
-    opts = {
-      ensure_installed = { "lua", "python", "toml", "bash", "json" },
-      sync_install = false,
-      auto_install = true,
-      ignore_install = {},
-      highlight = {
-        enable = true,
-        disable = {},
-        additional_vim_regex_highlighting = false,
-      },
-      indent = {
-        enable = true,
-      },
-    },
-    config = function(_, opts)
-      -- for _, config in pairs(require("nvim-treesitter.parsers").get_parser_configs()) do
-      --   config.install_info.url = config.install_info.url:gsub("https://github.com/", "https://ghproxy.net/https://github.com/")
-      -- end
-      require("nvim-treesitter.configs").setup(opts)
-    end,
-  },
-
-  {
-    "nvim-neo-tree/neo-tree.nvim",
+    branch = "main",
     lazy = false,
-    version = "*",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-      "MunifTanjim/nui.nvim",
-    },
-    keys = {
-      { "\\", ":Neotree float reveal<CR>", desc = "NeoTree reveal", silent = true },
-    },
+    build = ":TSUpdate",
     config = function()
-      require("neo-tree").setup({
-        popup_border_style = "rounded",
-        sources = { "filesystem", "buffers", "git_status", "document_symbols" },
-        source_selector = {
-          winbar = true,
-          content_layout = "center",
-          sources = {
-            { source = "filesystem" },
-            { source = "buffers" },
-            { source = "git_status" },
-            { source = "document_symbols" },
-          },
-        },
-        filesystem = {
-          check_gitignore_in_search = true, -- Check gitignore status for files/directories when searching.
-          find_by_full_path_words = false,
-          follow_current_file = {
-            enabled = true,
-          },
-        },
-        buffers = {
-          leave_dirs_open = false,
-          follow_current_file = {
-            enabled = true,
-          },
-        },
-        git_status = {},
+      local treesitter = require("nvim-treesitter")
+      -- The former master branch installed parsers inside the plugin checkout.
+      -- On main they live under stdpath("data")/site; remove the legacy
+      -- directory so stale binaries cannot shadow Neovim's bundled parsers.
+      local legacy_parser_dir = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/parser"
+      if vim.uv.fs_stat(legacy_parser_dir) then
+        vim.fn.delete(legacy_parser_dir, "rf")
+      end
+      treesitter.setup({})
+      treesitter.install({ "lua", "python", "toml", "bash", "json" })
+
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(args)
+          if pcall(vim.treesitter.start, args.buf) then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
       })
     end,
   },
@@ -250,15 +187,6 @@ local plugins = {
           ["_"] = { "trim_whitespace" },
         },
       })
-    end,
-  },
-
-  -- comment
-  {
-    "numToStr/Comment.nvim",
-    event = "BufReadPost",
-    config = function()
-      require("Comment").setup()
     end,
   },
 
@@ -324,7 +252,9 @@ local plugins = {
   {
     "folke/todo-comments.nvim",
     event = "VimEnter",
-    keys = { { "<leader>ft", "<cmd> TodoTelescope <cr>", desc = "TodoTelescope" } },
+    keys = {
+      { "<leader>ft", function() Snacks.picker.todo_comments() end, desc = "Todo comments" },
+    },
     config = function()
       require("todo-comments").setup()
     end,
@@ -426,73 +356,6 @@ local plugins = {
     opts_extend = { "sources.default" },
   },
 
-  {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      "saghen/blink.cmp",
-    },
-    enabled = true,
-    lazy = false,
-    opts = {
-      servers = {
-        ruff = {
-          cmd = { "ruff", "server" },
-          filetypes = { "python" },
-          root_markers = { "pyproject.toml", ".git" },
-        },
-
-        ty = {
-          cmd = { "ty", "server" },
-          filetypes = { "python" },
-          root_markers = { "ty.toml", "pyproject.toml" },
-        },
-
-        lua_ls = {
-          cmd = { "lua-language-server" },
-          filetypes = { "lua" },
-          root_markers = { ".luarc.json", ".luarc.jsonc", "lazy-lock.json" },
-          settings = {
-            Lua = {
-              runtime = {
-                version = "LuaJIT",
-              },
-              completion = {
-                callSnippet = "Replace",
-              },
-              diagnostics = { disable = { "missing-fields" }, globals = { "vim" } },
-            },
-          },
-        },
-      },
-    },
-
-    config = function(_, opts)
-      for server, config in pairs(opts.servers) do
-        config.capabilities = require("blink.cmp").get_lsp_capabilities()
-        vim.lsp.config[server] = config
-        vim.lsp.enable(server)
-      end
-
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(args)
-          local c = vim.lsp.get_client_by_id(args.data.client_id)
-          if not c then
-            return
-          end
-
-          if vim.bo.filetype == "lua" then
-            -- Format the current buffer on save
-            vim.api.nvim_create_autocmd("BufWritePre", {
-              buffer = args.buf,
-              callback = function()
-                vim.lsp.buf.format({ bufnr = args.buf, id = c.id })
-              end,
-            })
-          end
-        end,
-      })
-    end,
-  },
 }
 
 local opts = {
@@ -514,3 +377,62 @@ local opts = {
   },
 }
 require("lazy").setup(plugins, opts)
+
+local lsp_servers = {
+  ruff = {
+    cmd = { "ruff", "server" },
+    filetypes = { "python" },
+    root_markers = { "pyproject.toml", ".git" },
+  },
+
+  ty = {
+    cmd = { "ty", "server" },
+    filetypes = { "python" },
+    root_markers = { "ty.toml", "pyproject.toml" },
+  },
+
+  lua_ls = {
+    cmd = { "lua-language-server" },
+    filetypes = { "lua" },
+    root_markers = { ".luarc.json", ".luarc.jsonc", "lazy-lock.json" },
+    settings = {
+      Lua = {
+        runtime = {
+          version = "LuaJIT",
+        },
+        completion = {
+          callSnippet = "Replace",
+        },
+        diagnostics = { disable = { "missing-fields" }, globals = { "vim" } },
+      },
+    },
+  },
+}
+
+for server, config in pairs(lsp_servers) do
+  config.capabilities = require("blink.cmp").get_lsp_capabilities()
+  vim.lsp.config[server] = config
+  vim.lsp.enable(server)
+end
+
+local lsp_group = vim.api.nvim_create_augroup("user_lsp_config", { clear = true })
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = lsp_group,
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if not client then
+      return
+    end
+
+    if vim.bo[args.buf].filetype == "lua" then
+      -- Format the current buffer on save.
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        group = lsp_group,
+        buffer = args.buf,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
+        end,
+      })
+    end
+  end,
+})

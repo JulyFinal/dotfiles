@@ -8,9 +8,11 @@ trap 'rm -rf -- "$test_root"' EXIT
 bash -n "$repo_dir/bootstrap" "$repo_dir/doctor"
 PYTHONPYCACHEPREFIX="$test_root/pycache" python3 -m py_compile "$repo_dir/tests/pre-commit"
 "$repo_dir/tests/pre-commit" worktree
-for script in "$repo_dir"/private_dot_local/bin/executable_*; do
-    sh -n "$script"
-done
+if [[ -d "$repo_dir/private_dot_local/bin" ]]; then
+    for script in "$repo_dir"/private_dot_local/bin/executable_*; do
+        [[ -e "$script" ]] && sh -n "$script"
+    done
+fi
 while IFS= read -r -d '' toml_file; do
     taplo check "$toml_file"
 done < <(find "$repo_dir" -type f -name '*.toml' -print0)
@@ -126,6 +128,28 @@ assert "brew update" in bootstrap and "brew upgrade" in bootstrap
 assert "nixpkgs#$package" in bootstrap
 assert "mapfile" not in bootstrap and "declare -A" not in bootstrap
 assert "--platform is only allowed together with --dry-run" in bootstrap
+nvim_plugins = (root / "dot_config/nvim/lua/plugins.lua").read_text()
+assert '"folke/snacks.nvim"' in nvim_plugins
+assert "Snacks.picker.files()" in nvim_plugins
+assert "Snacks.picker.todo_comments()" in nvim_plugins
+assert "Snacks.explorer.reveal()" in nvim_plugins
+assert '"nvim-telescope/telescope.nvim"' not in nvim_plugins
+assert '"nvim-neo-tree/neo-tree.nvim"' not in nvim_plugins
+assert '"nvimdev/dashboard-nvim"' not in nvim_plugins
+assert '"nvim-lua/plenary.nvim"' not in nvim_plugins
+assert '"MunifTanjim/nui.nvim"' not in nvim_plugins
+assert 'branch = "main"' in nvim_plugins
+assert 'lazy = false' in nvim_plugins and 'build = ":TSUpdate"' in nvim_plugins
+assert 'require("nvim-treesitter.configs")' not in nvim_plugins
+assert 'legacy_parser_dir = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/parser"' in nvim_plugins
+assert 'vim.fn.delete(legacy_parser_dir, "rf")' in nvim_plugins
+assert '"numToStr/Comment.nvim"' not in nvim_plugins
+assert '"neovim/nvim-lspconfig"' not in nvim_plugins
+assert 'require("nvim-treesitter").install' in bootstrap
+assert "TSUpdateSync" not in bootstrap
+mise_config = (root / "dot_config/mise/config.toml").read_text().splitlines()
+assert '"cargo:tree-sitter-cli" = { version = "0.26.11", default-features = false }' in mise_config
+assert 'fd = "latest"' in mise_config
 nix_packages = (root / "packages/nix-common.txt").read_text().splitlines()
 brew_packages = (root / "packages/brew-common.txt").read_text().splitlines()
 assert "mihomo" in nix_packages and "mise" in nix_packages

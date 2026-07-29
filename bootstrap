@@ -302,8 +302,7 @@ mise install
 # plugin revisions and pre-install the parsers declared by the configuration.
 mise exec -- nvim --headless \
     '+Lazy! restore' \
-    '+Lazy load nvim-treesitter' \
-    '+TSUpdateSync lua python toml bash json' \
+    '+lua require("nvim-treesitter").install({ "lua", "python", "toml", "bash", "json" }):wait(300000)' \
     '+qa'
 
 "$repo_dir/doctor"
