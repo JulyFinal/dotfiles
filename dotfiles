@@ -137,7 +137,7 @@ method_for() {
     fi
     awk -v wanted="$wanted" '
         $1 !~ /^#/ && NF >= 2 && $2 == wanted { result = $1 }
-        END { print result == "" ? "link" : result }
+        END { print (result == "" ? "link" : result) }
     ' "$rules_file"
 }
 
@@ -305,11 +305,27 @@ build_plan() {
     printf '\n%d change(s) planned.\n' "$action_count"
 }
 
+clean_parent_symlinks() {
+    target_path=$1
+    dir=${target_path%/*}
+    curr=""
+    OLD_IFS=$IFS
+    IFS='/'
+    for segment in $dir; do
+        [ -n "$segment" ] || continue
+        curr="$curr/$segment"
+        if [ -L "$curr" ] && [ ! -d "$curr" ]; then
+            rm -f "$curr"
+        fi
+    done
+    IFS=$OLD_IFS
+    mkdir -p "$dir"
+}
+
 apply_actions() {
     while IFS='	' read -r method relative desired target mode; do
         [ -n "$target" ] || continue
-        parent=${target%/*}
-        mkdir -p "$parent"
+        clean_parent_symlinks "$target"
         if [ -d "$target" ] && [ ! -L "$target" ]; then
             rm -rf "$target"
         else
