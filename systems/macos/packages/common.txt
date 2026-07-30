@@ -1,0 +1,12 @@
+cmake
+coreutils
+curl
+git
+gh
+mise
+mihomo
+neovim
+ninja
+tmux
+zsh
+bottom

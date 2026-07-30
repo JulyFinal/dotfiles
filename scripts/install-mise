@@ -1,0 +1,33 @@
+#!/bin/sh
+set -eu
+
+if command -v mise >/dev/null 2>&1; then
+    printf '%s\n' "mise already available: $(mise --version)"
+    if mise self-update --yes --no-plugins; then
+        mise --version
+    else
+        printf '%s\n' \
+            'mise is managed by a system package manager; update it there.' >&2
+    fi
+    exit 0
+fi
+
+MISE_INSTALL_PATH=${MISE_INSTALL_PATH:-"$HOME/.local/bin/mise"}
+install_dir=${MISE_INSTALL_PATH%/*}
+export MISE_INSTALL_PATH
+mkdir -p "$install_dir"
+
+installer=$(mktemp "${TMPDIR:-/tmp}/mise-install.XXXXXX")
+trap 'rm -f "$installer"' EXIT HUP INT TERM
+
+if command -v curl >/dev/null 2>&1; then
+    curl --fail --silent --show-error --location https://mise.run --output "$installer"
+elif command -v wget >/dev/null 2>&1; then
+    wget -qO "$installer" https://mise.run
+else
+    printf '%s\n' 'mise installation needs curl or wget.' >&2
+    exit 1
+fi
+
+sh "$installer"
+"$MISE_INSTALL_PATH" --version

@@ -1,0 +1,22 @@
+[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
+if [ -x /opt/homebrew/bin/brew ]; then eval "$(/opt/homebrew/bin/brew shellenv)"; fi
+if [ -d "$HOME/.cargo/bin" ]; then source "$HOME/.cargo/env"; fi
+
+# eval
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+
+# zsh plugins
+if [ -d "$HOME/.zsh/zsh-autosuggestions" ]; then source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh; fi
+
+autoload -U compinit; compinit
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
+
+command -v navi >/dev/null 2>&1 && eval "$(navi widget zsh)"
+
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+export GO111MODULE=on
+export GOPROXY=https://goproxy.cn

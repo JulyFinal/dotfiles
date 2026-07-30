@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+profile=desktop
+dry_run=false
+
+usage() {
+    printf '%s\n' \
+        'Usage: systems/arch/install [--profile desktop|laptop-intel|laptop-amd] [--dry-run]'
+}
+
+while (($#)); do
+    case "$1" in
+        --profile)
+            profile=${2:?missing profile}
+            shift 2
+            ;;
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+case "$profile" in
+    desktop) extra_files=() ;;
+    laptop-intel) extra_files=(laptop.txt intel.txt) ;;
+    laptop-amd) extra_files=(laptop.txt amd.txt) ;;
+    *)
+        printf 'Unsupported profile: %s\n' "$profile" >&2
+        exit 2
+        ;;
+esac
+
+if ! $dry_run && [[ ! -e /etc/arch-release ]]; then
+    printf '%s\n' 'This installer only supports Arch Linux.' >&2
+    exit 1
+fi
+
+read_packages() {
+    sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$@"
+}
+
+mapfile -t pacman_packages < <(
+    read_packages "$script_dir/packages/common.txt"
+    for file in "${extra_files[@]}"; do
+        read_packages "$script_dir/packages/$file"
+    done
+)
+mapfile -t aur_packages < <(read_packages "$script_dir/packages/aur.txt")
+
+printf 'Arch profile: %s\n\nPacman packages:\n' "$profile"
+printf '  %s\n' "${pacman_packages[@]}"
+printf '\nAUR packages:\n'
+printf '  %s\n' "${aur_packages[@]}"
+
+$dry_run && exit 0
+
+sudo pacman -Syu --needed --noconfirm "${pacman_packages[@]}"
+if ! command -v paru >/dev/null 2>&1; then
+    printf '%s\n' 'Install paru before applying the AUR package list.' >&2
+    exit 1
+fi
+paru -S --needed --noconfirm "${aur_packages[@]}"

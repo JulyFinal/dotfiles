@@ -1,0 +1,33 @@
+#!/bin/sh
+set -eu
+
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+manifest=$repo_dir/manifests/latest-git.conf
+
+while IFS=' ' read -r name url target extra; do
+    case "$name" in
+        '' | '#'*) continue ;;
+    esac
+    if [ -z "$url" ] || [ -z "$target" ] || [ -n "${extra:-}" ]; then
+        printf 'Invalid latest-git entry: %s %s %s\n' "$name" "$url" "$target" >&2
+        exit 1
+    fi
+    case "$target" in
+        /* | .. | ../* | */../* | */..)
+            printf 'Unsafe target: %s\n' "$target" >&2
+            exit 1
+            ;;
+    esac
+
+    destination=$HOME/$target
+    if [ -d "$destination/.git" ]; then
+        printf 'UPDATE  %s\n' "$name"
+        git -C "$destination" pull --ff-only
+    elif [ -e "$destination" ] || [ -L "$destination" ]; then
+        printf 'SKIP    %s (target already exists: %s)\n' "$name" "$destination" >&2
+    else
+        printf 'INSTALL %s\n' "$name"
+        mkdir -p "$(dirname "$destination")"
+        git clone --depth 1 "$url" "$destination"
+    fi
+done <"$manifest"

@@ -1,0 +1,15 @@
+version: 1
+
+# Install one shared copy and expose it to each agent with symlinks.
+agents:
+  - codex
+  - claude-code
+  - pi
+
+sources:
+  - name: waza
+    source: tw93/Waza
+  - name: kami
+    source: tw93/kami/plugins/kami
+  - name: mattpocock
+    source: mattpocock/skills

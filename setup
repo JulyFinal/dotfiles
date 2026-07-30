@@ -1,0 +1,92 @@
+#!/bin/sh
+set -eu
+
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+if [ -t 1 ]; then
+    blue=$(printf '\033[38;5;75m')
+    green=$(printf '\033[38;5;114m')
+    dim=$(printf '\033[2m')
+    bold=$(printf '\033[1m')
+    reset=$(printf '\033[0m')
+else
+    blue= green= dim= bold= reset=
+fi
+
+case "$(uname -s)" in
+    Darwin) platform='macOS' ;;
+    Linux)
+        if [ -e /etc/arch-release ]; then platform='Arch Linux'; else platform='Linux'; fi
+        ;;
+    *) platform='Unsupported' ;;
+esac
+
+printf '\n%s%s◆ Personal Environment Kit%s\n' "$bold" "$blue" "$reset"
+printf '%s%sA small, direct and disposable-machine-friendly setup.%s\n\n' "$dim" "$green" "$reset"
+printf '  Platform  %s%s%s\n' "$bold" "$platform" "$reset"
+printf '  Source    %s\n\n' "$repo_dir"
+printf '%sSelect one or more actions:%s\n\n' "$bold" "$reset"
+printf '  %s1%s  Core configurations\n' "$blue" "$reset"
+printf '     %sZsh · Bash · Tmux · Navi · Mise · Starship%s\n\n' "$dim" "$reset"
+printf '  %s2%s  Personal configurations\n' "$blue" "$reset"
+printf '     %sEditors · terminal · Yazi · Atuin · agent configs%s\n\n' "$dim" "$reset"
+printf '  %s3%s  Private local files\n' "$blue" "$reset"
+printf '     %sOptional private.local/home overlay%s\n\n' "$dim" "$reset"
+printf '  %s4%s  Install selected tools\n' "$blue" "$reset"
+printf '     %sExplicit network access through Mise and manifests%s\n\n' "$dim" "$reset"
+printf '  %s5%s  Run diagnostics after setup\n\n' "$blue" "$reset"
+
+if [ -n "${DOTFILES_SETUP_SELECTION:-}" ]; then
+    selection=$DOTFILES_SETUP_SELECTION
+    printf '  Selection %s\n\n' "$selection"
+else
+    printf 'Enter numbers separated by spaces %s[default: 1]%s: ' "$dim" "$reset"
+    IFS= read -r selection
+    selection=${selection:-1}
+fi
+
+core=false
+personal=false
+private=false
+install=false
+doctor=false
+for item in $selection; do
+    case "$item" in
+        1) core=true ;;
+        2) personal=true ;;
+        3) private=true ;;
+        4) install=true ;;
+        5) doctor=true ;;
+        *)
+            printf 'Unknown selection: %s\n' "$item" >&2
+            exit 2
+            ;;
+    esac
+done
+
+scopes=
+$core && scopes="$scopes core"
+$personal && scopes="$scopes personal"
+$private && scopes="$scopes private"
+
+if [ -n "$scopes" ]; then
+    # Scope values are fixed words selected above.
+    # shellcheck disable=SC2086
+    "$repo_dir/dotfiles" apply $scopes
+fi
+
+if $install; then
+    install_scopes=$scopes
+    [ -n "$install_scopes" ] || install_scopes=' core'
+    # shellcheck disable=SC2086
+    "$repo_dir/dotfiles" install $install_scopes
+fi
+
+if $doctor; then
+    doctor_scopes=$scopes
+    [ -n "$doctor_scopes" ] || doctor_scopes=' core'
+    # shellcheck disable=SC2086
+    "$repo_dir/dotfiles" doctor $doctor_scopes
+fi
+
+printf '\n%sDone.%s\n' "$green" "$reset"
