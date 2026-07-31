@@ -3,7 +3,7 @@ atuin = "latest"
 go = "latest"
 node = "24"
 npm = "12"
-"npm:@anthropic-ai/claude-code" = "latest"
+"npm:@anthropic-ai/claude-code" = { version = "latest", npm_args = "--ignore-scripts=true" }
 "npm:@earendil-works/pi-coding-agent" = { version = "latest", npm_args = "--ignore-scripts=true" }
 "npm:@google/gemini-cli" = "latest"
 "npm:@openai/codex" = "latest"
@@ -35,6 +35,8 @@ yq = "latest"
 zoxide = "latest"
 agy = "latest"
 lua-language-server = "latest"
+neovim = "latest"
+"npm:happy" = "latest"
 
 [settings]
 minimum_release_age = "0"

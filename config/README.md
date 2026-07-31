@@ -10,7 +10,9 @@ The deployment mapping is defined in [`../manifests/files.yaml`](../manifests/fi
   `.tmux.conf`, and `.zshrc`.
 - `shell/` contains the shared shell configuration linked below
   `.config/shell/`.
-- `agents/` contains Codex and Pi templates and settings.
+- `agents/` contains Codex MCP and Pi templates/settings. Agent merge entries
+  only update repository-owned fields; local model, trust, Feishu, and other
+  personalized values remain in place.
 - `mise/`, `nvim/`, `helix/`, `kitty/`, `yazi/`, and the other top-level
   directories contain application configuration.
 - `navi/` contains the cheat file deployed below `.local/share/navi/`.

@@ -1,7 +1,5 @@
-[[plugin.deps]]
-use = "stelcodes/bunny"
-rev = "a0b4e18"
-hash = "7acba2bb504c67dd7f2da135b88aae1b"
+[plugin]
+deps = []
 
 [[flavor.deps]]
 use = "yazi-rs/flavors:catppuccin-mocha"

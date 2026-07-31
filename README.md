@@ -35,10 +35,10 @@ tests/                    smoke test and secret scanner
 
 The repository source path does not have to match the destination path. For
 example, `config/mise/config.toml` maps to
-`~/.config/mise/config.toml`, while `config/agents/codex/config.toml.j2` maps
-to `~/.codex/config.toml`. See [`config/README.md`](config/README.md) for the
-visible layout and [`manifests/files.yaml`](manifests/files.yaml) for the
-complete mapping.
+`~/.config/mise/config.toml`, while `config/agents/codex/mcp.toml.j2` merges
+only its managed MCP keys into `~/.codex/config.toml`. See
+[`config/README.md`](config/README.md) for the visible layout and
+[`manifests/files.yaml`](manifests/files.yaml) for the complete mapping.
 
 ## Scopes
 
@@ -62,10 +62,10 @@ cp secrets.example.toml secrets.toml
 chmod 600 secrets.toml
 ```
 
-The file is never linked into `$HOME`. A `.j2` source is rendered only when its
-manifest entry says `method: template`; all other files are linked or copied
-directly. MiniJinja receives the root TOML file as template data, so a template
-can use values such as:
+The file is never linked into `$HOME`. A `.j2` source is rendered when its
+manifest entry uses `template` or a merge method; ordinary `link` and `copy`
+entries use the source directly. MiniJinja receives the root TOML file as
+template data, so a template can use values such as:
 
 ```jinja
 {{ service.api_token }}
@@ -129,7 +129,7 @@ The manifest parser intentionally uses a small, flat YAML subset so the core
 workflow still works on a fresh POSIX machine. `yq`, when available, validates
 the manifest in the smoke test; it is not required to apply core files.
 
-## Link, copy, and template behavior
+## Link, copy, template, and merge behavior
 
 The `method` field in [`manifests/files.yaml`](manifests/files.yaml) is the
 source of truth:
@@ -138,10 +138,19 @@ source of truth:
 - `copy` creates an independent file and reapplies the declared mode.
 - `template` renders a `.j2` source through MiniJinja and applies the declared
   mode.
+- `merge-json` recursively updates only fields present in the source; the
+  `packages` array is add-only, and unknown fields remain untouched.
+- `merge-toml` updates only TOML keys present in the source fragment; other
+  tables and fields remain untouched, and absent managed sections are not
+  deleted.
+- Existing JSON/TOML merge targets require `jq` or `python3`; if neither is
+  available, `apply` refuses to overwrite the target.
 
 Shell entrypoints such as `~/.zshrc` are copied because installers often append
 to them. Their repository-owned configuration lives in `config/shell/`.
-Reapplying shows a diff and recreates the thin entrypoint.
+Reapplying shows a diff and recreates the thin entrypoint. Codex and Pi agent
+settings use merge methods so model choices, project trust, Feishu values, and
+other machine-specific fields are preserved.
 
 ## Installing tools
 
@@ -179,7 +188,7 @@ mise run skills-sync -- --dry-run
 
 See [`recipes/mise.md`](recipes/mise.md) for the direct commands.
 
-Yazi keeps only its flavor selection and package lock in the repository:
+Yazi keeps only its flavor selection and flavor dependency lock in the repository:
 [`config/yazi/theme.toml`](config/yazi/theme.toml) and
 [`config/yazi/package.toml`](config/yazi/package.toml). Applying personal
 configuration is offline; install the locked Yazi plugin/flavor explicitly

@@ -23,14 +23,18 @@ test -f "$repo_dir/config/mise/config.toml"
 test -x "$repo_dir/config/mise/tasks/skills-sync"
 test -f "$repo_dir/config/shell/zshrc"
 test -f "$repo_dir/config/nvim/init.lua"
+test ! -e "$repo_dir/config/nvim/lazy-lock.json"
 test -f "$repo_dir/config/yazi/package.toml"
 test -f "$repo_dir/config/yazi/theme.toml"
+! grep -Fq 'stelcodes/bunny' "$repo_dir/config/yazi/package.toml"
+grep -Fq 'yazi-rs/flavors:catppuccin-mocha' "$repo_dir/config/yazi/package.toml"
 test ! -e "$repo_dir/config/yazi/init.lua"
 test ! -e "$repo_dir/config/yazi/keymap.toml"
 test ! -e "$repo_dir/config/yazi/yazi.toml"
 test ! -e "$repo_dir/config/yazi/plugins"
 test ! -e "$repo_dir/config/yazi/flavors"
-test -f "$repo_dir/config/agents/codex/config.toml.j2"
+test -f "$repo_dir/config/agents/codex/mcp.toml.j2"
+test ! -e "$repo_dir/config/agents/codex/config.toml.j2"
 test -f "$repo_dir/config/agents/pi/agent/mcp.json.j2"
 test -f "$repo_dir/config/README.md"
 test -z "$(find "$repo_dir/config" -name '.*' -print -quit)"
@@ -40,7 +44,7 @@ test "$(grep -Fxc 'git config --global core.editor "nvim"' "$navi_cheat")" = 1
 test "$(grep -Fxc 'git config --global pull.rebase true' "$navi_cheat")" = 1
 test "$(grep -Fxc 'git config --global rebase.autoStash true' "$navi_cheat")" = 1
 test "$(grep -Fxc '% git, init' "$navi_cheat")" = 0
-! grep -Fq 'credential.helper store' "$navi_cheat"
+test "$(grep -Fxc 'git config --global credential.helper store' "$navi_cheat")" = 1
 grep -Fq 'caddy file-server --browse' "$navi_cheat"
 grep -Fq 'uvx python -m http.server 8000' "$navi_cheat"
 grep -Fq 'rclone serve http . --addr :8000' "$navi_cheat"
@@ -50,6 +54,18 @@ test -f "$repo_dir/config/helix/snippets/python.toml"
 grep -Fq 'rclone = "latest"' "$repo_dir/config/mise/config.toml"
 grep -Fq 'cargo:https://github.com/estin/simple-completion-language-server' \
     "$repo_dir/config/mise/config.toml"
+mise_installer_bin=$test_root/mise-installer-bin
+mise_installer_log=$test_root/mise-installer-calls
+mkdir -p "$mise_installer_bin"
+printf '%s\n' \
+    '#!/bin/sh' \
+    'printf "%s\\n" "$*" >>"$MISE_INSTALLER_LOG"' \
+    >"$mise_installer_bin/mise"
+chmod +x "$mise_installer_bin/mise"
+PATH="$mise_installer_bin:$PATH" MISE_INSTALLER_LOG="$mise_installer_log" \
+    "$repo_dir/scripts/install-mise" >/dev/null
+test "$(wc -l <"$mise_installer_log")" = 1
+! grep -Fq 'self-update' "$mise_installer_log"
 test -f "$repo_dir/manifests/agent-skills.yaml"
 test -f "$repo_dir/manifests/files.yaml"
 test -f "$repo_dir/systems/arch/packages/common.txt"
@@ -98,6 +114,7 @@ mkdir -p "$personal_home"
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" apply core personal --yes >/dev/null
 test -L "$personal_home/.config/nvim/init.lua"
+test ! -e "$personal_home/.config/nvim/lazy-lock.json"
 test -L "$personal_home/.config/yazi/package.toml"
 test -L "$personal_home/.config/yazi/theme.toml"
 test ! -e "$personal_home/.config/yazi/init.lua"
@@ -109,11 +126,76 @@ test -f "$personal_home/.codex/config.toml"
 test ! -L "$personal_home/.codex/config.toml"
 grep -Fq "$personal_home/.local/share/mise/shims/context7-mcp" \
     "$personal_home/.codex/config.toml"
+! grep -Fq '^model =' "$personal_home/.codex/config.toml"
+! grep -Fq '[projects.' "$personal_home/.codex/config.toml"
 ! grep -Fq '[marketplaces.waza]' "$personal_home/.codex/config.toml"
 ! grep -Fq '[marketplaces.kami]' "$personal_home/.codex/config.toml"
 ! grep -Fq 'waza@waza' "$personal_home/.codex/config.toml"
 ! grep -Fq 'kami@kami' "$personal_home/.codex/config.toml"
 test "$(stat -c '%a' "$personal_home/.codex/config.toml" 2>/dev/null || stat -f '%Lp' "$personal_home/.codex/config.toml")" = 600
+test -f "$personal_home/.pi/agent/mcp.json"
+test ! -L "$personal_home/.pi/agent/mcp.json"
+grep -Fq 'context7' "$personal_home/.pi/agent/mcp.json"
+
+merge_home=$test_root/merge
+mkdir -p "$merge_home/.codex" "$merge_home/.pi/agent"
+printf '%s\n' \
+    'model = "gpt-local"' \
+    'model_reasoning_effort = "max"' \
+    '' \
+    '[projects."/tmp/keep"]' \
+    'trust_level = "trusted"' \
+    '' \
+    '[mcp_servers]' \
+    'custom = "keep"' \
+    '' \
+    '[mcp_servers.context7]' \
+    'command = "old-command"' \
+    'args = ["old"]' \
+    'custom_option = "keep"' \
+    >"$merge_home/.codex/config.toml"
+printf '%s\n' \
+    '{' \
+    '  "defaultModel": "local-model",' \
+    '  "defaultProvider": "local",' \
+    '  "defaultThinkingLevel": "low",' \
+    '  "feishu": {"domain": "feishu"},' \
+    '  "customField": "keep",' \
+    '  "packages": ["custom-package"]' \
+    '}' \
+    >"$merge_home/.pi/agent/settings.json"
+printf '%s\n' \
+    '{' \
+    '  "settings": {"directTools": false, "customSetting": true},' \
+    '  "mcpServers": {' \
+    '    "custom": {"command": "keep"},' \
+    '    "context7": {"command": "old-command", "customField": "keep"}' \
+    '  }' \
+    '}' \
+    >"$merge_home/.pi/agent/mcp.json"
+DOTFILES_HOME="$merge_home" DOTFILES_PLATFORM=linux \
+    "$repo_dir/dotfiles" apply personal --yes >/dev/null
+grep -Fq 'model = "gpt-local"' "$merge_home/.codex/config.toml"
+grep -Fq 'model_reasoning_effort = "max"' "$merge_home/.codex/config.toml"
+grep -Fq '[projects."/tmp/keep"]' "$merge_home/.codex/config.toml"
+grep -Fq 'custom = "keep"' "$merge_home/.codex/config.toml"
+grep -Fq 'custom_option = "keep"' "$merge_home/.codex/config.toml"
+grep -Fq "$merge_home/.local/share/mise/shims/context7-mcp" \
+    "$merge_home/.codex/config.toml"
+grep -Fq '"defaultModel": "local-model"' "$merge_home/.pi/agent/settings.json"
+grep -Fq '"defaultThinkingLevel": "low"' "$merge_home/.pi/agent/settings.json"
+grep -Fq '"domain": "feishu"' "$merge_home/.pi/agent/settings.json"
+grep -Fq '"customField": "keep"' "$merge_home/.pi/agent/settings.json"
+grep -Fq '"custom-package"' "$merge_home/.pi/agent/settings.json"
+grep -Fq '"npm:pi-mcp-adapter"' "$merge_home/.pi/agent/settings.json"
+grep -Fq '"customSetting": true' "$merge_home/.pi/agent/mcp.json"
+grep -Fq '"custom": {' "$merge_home/.pi/agent/mcp.json"
+grep -Fq '"customField": "keep"' "$merge_home/.pi/agent/mcp.json"
+grep -Fq '"directTools": true' "$merge_home/.pi/agent/mcp.json"
+grep -Fq '"context7"' "$merge_home/.pi/agent/mcp.json"
+DOTFILES_HOME="$merge_home" DOTFILES_PLATFORM=linux \
+    "$repo_dir/dotfiles" doctor personal >"$test_root/merge-doctor"
+grep -Fq '0 drifted or missing path(s).' "$test_root/merge-doctor"
 
 macos_home=$test_root/macos
 mkdir -p "$macos_home"
@@ -127,7 +209,7 @@ grep -Fq '0 drifted or missing path(s).' "$test_root/doctor"
 chmod 0644 "$personal_home/.codex/config.toml"
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" plan personal >"$test_root/plan-mode"
-grep -Fq "REPLACE  $personal_home/.codex/config.toml  (template)" \
+grep -Fq "REPLACE  $personal_home/.codex/config.toml  (merge-toml)" \
     "$test_root/plan-mode"
 if DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" doctor personal >"$test_root/doctor-mode" 2>&1; then

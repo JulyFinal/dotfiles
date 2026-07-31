@@ -1,7 +1,8 @@
 version: 1
 
 # This is the deployment menu. source paths use the visible config tree and
-# target paths are relative to the destination home. method is link, copy, or template;
+# target paths are relative to the destination home. method is link, copy, template,
+# merge-json, or merge-toml;
 # template sources conventionally use the .j2 suffix. Omit platforms for all
 # supported systems. requires names commands that must exist before rendering.
 groups:
@@ -74,9 +75,9 @@ entries:
 
   - id: codex.config
     group: personal
-    source: config/agents/codex/config.toml.j2
+    source: config/agents/codex/mcp.toml.j2
     target: .codex/config.toml
-    method: template
+    method: merge-toml
     mode: "0600"
     requires: [minijinja-cli]
   - id: atuin.config
@@ -119,12 +120,6 @@ entries:
     group: personal
     source: config/nvim/init.lua
     target: .config/nvim/init.lua
-    method: link
-    mode: "0644"
-  - id: nvim.lock
-    group: personal
-    source: config/nvim/lazy-lock.json
-    target: .config/nvim/lazy-lock.json
     method: link
     mode: "0644"
   - id: nvim.configs
@@ -173,12 +168,12 @@ entries:
     group: personal
     source: config/agents/pi/agent/mcp.json.j2
     target: .pi/agent/mcp.json
-    method: template
+    method: merge-json
     mode: "0600"
     requires: [minijinja-cli]
   - id: pi.settings
     group: personal
     source: config/agents/pi/agent/settings.json
     target: .pi/agent/settings.json
-    method: copy
+    method: merge-json
     mode: "0600"
