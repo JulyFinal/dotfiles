@@ -1,3 +1,5 @@
+# Manual Homebrew formula reference; no generic dotfiles installer consumes this file.
+
 cmake
 coreutils
 curl

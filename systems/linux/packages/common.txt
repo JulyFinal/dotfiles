@@ -1,3 +1,5 @@
+# Manual reference list; no generic dotfiles installer consumes this file.
+
 bottom
 cmake
 curl

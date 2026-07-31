@@ -1,2 +1,4 @@
+# Manual Homebrew cask reference; no generic dotfiles installer consumes this file.
+
 kitty
 font-maple-mono-nf-cn

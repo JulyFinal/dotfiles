@@ -34,6 +34,16 @@ test -f "$repo_dir/config/agents/codex/config.toml.j2"
 test -f "$repo_dir/config/agents/pi/agent/mcp.json.j2"
 test -f "$repo_dir/config/README.md"
 test -z "$(find "$repo_dir/config" -name '.*' -print -quit)"
+navi_cheat=$repo_dir/config/navi/cheats/personal.cheat
+test "$(grep -Fxc '% git' "$navi_cheat")" = 1
+test "$(grep -Fxc 'git config --global core.editor "nvim"' "$navi_cheat")" = 1
+test "$(grep -Fxc 'git config --global pull.rebase true' "$navi_cheat")" = 1
+test "$(grep -Fxc 'git config --global rebase.autoStash true' "$navi_cheat")" = 1
+test "$(grep -Fxc '% git, init' "$navi_cheat")" = 0
+! grep -Fq 'credential.helper store' "$navi_cheat"
+grep -Fq 'caddy file-server --browse' "$navi_cheat"
+grep -Fq 'uvx python -m http.server 8000' "$navi_cheat"
+grep -Fq 'rclone serve http . --addr :8000' "$navi_cheat"
 test -f "$repo_dir/manifests/agent-skills.yaml"
 test -f "$repo_dir/manifests/files.yaml"
 test -f "$repo_dir/systems/arch/packages/common.txt"

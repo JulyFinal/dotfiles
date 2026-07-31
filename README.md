@@ -27,7 +27,7 @@ manifests/agent-skills.yaml
 secrets.example.toml      copyable secret-file shape; secrets.toml is ignored
 minijinja.toml            repository-local template defaults
 scripts/install-mise      standalone Mise installer
-systems/                  Arch, Linux, and macOS package/install notes
+systems/                  Arch installer inputs plus Linux/macOS package references
 recipes/                  commands worth keeping, not deployed configuration
 docs/                     maintenance and contributor notes
 tests/                    smoke test and secret scanner
@@ -193,6 +193,17 @@ systems/arch/install --profile desktop
 ```
 
 `setup` and `dotfiles apply` never call this installer.
+
+The Arch package files are consumed by `systems/arch/install`. The Linux and
+macOS files are deliberately manual reference lists for package-manager
+translation; no generic `dotfiles` command pretends to install them.
+
+## Deferred decisions
+
+- Helix snippets and the `simple-completion-language-server` dependency need a
+  separate review before changing the personal scope.
+- The Navi `rclone serve http` entry is marked legacy; remove it only after
+  confirming it is no longer useful.
 
 ## Safety and verification
 
