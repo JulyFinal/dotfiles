@@ -1,11 +1,10 @@
-.chezmoi.toml
 state.yml
 runtime/
 *.swp
 *.tmp
 
-# Private machine state: keep examples, never the generated/live credentials.
-private.local/
+# Keep generated/live credentials out of Git.
+/secrets.toml
 *.ovpn
 *.p12
 *.pfx

@@ -1,6 +1,7 @@
 # 装机记录
 
-这里保存实际用过之后留下的经验和想法。它们会进入 Git 历史，但不会由 Chezmoi 部署到主目录。
+这里保存实际用过之后留下的经验和想法。它们会进入 Git 历史，但不会由
+`dotfiles apply` 部署到主目录。
 
 - [2026 年 7 月 Arch 装机复盘](2026-07-arch-installation.md)
 - [目前对几项工具的看法](tool-observations.md)

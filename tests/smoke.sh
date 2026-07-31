@@ -8,11 +8,8 @@ trap 'rm -rf "$test_root"' EXIT HUP INT TERM
 for script in \
     "$repo_dir/dotfiles" \
     "$repo_dir/setup" \
-    "$repo_dir/bootstrap" \
-    "$repo_dir/doctor" \
     "$repo_dir/scripts/install-mise" \
-    "$repo_dir/scripts/install-latest-git" \
-    "$repo_dir/home/.config/mise/tasks/skills-sync"; do
+    "$repo_dir/config/mise/tasks/skills-sync"; do
     sh -n "$script"
 done
 bash -n "$repo_dir/systems/arch/install"
@@ -21,14 +18,29 @@ bash -n "$repo_dir/systems/arch/install"
 
 test ! -e "$repo_dir/.chezmoi.toml.tmpl"
 test ! -e "$repo_dir/.chezmoiignore"
-test -f "$repo_dir/home/.config/mise/config.toml"
-test -x "$repo_dir/home/.config/mise/tasks/skills-sync"
-test -f "$repo_dir/home/.config/shell/zshrc"
+test ! -e "$repo_dir/.gitattributes"
+test -f "$repo_dir/config/mise/config.toml"
+test -x "$repo_dir/config/mise/tasks/skills-sync"
+test -f "$repo_dir/config/shell/zshrc"
+test -f "$repo_dir/config/nvim/init.lua"
+test -f "$repo_dir/config/agents/codex/config.toml.j2"
+test -f "$repo_dir/config/agents/pi/agent/mcp.json.j2"
+test -f "$repo_dir/config/README.md"
+test -z "$(find "$repo_dir/config" -name '.*' -print -quit)"
 test -f "$repo_dir/manifests/agent-skills.yaml"
-test -f "$repo_dir/personal/home/.config/nvim/init.lua"
+test -f "$repo_dir/manifests/files.yaml"
 test -f "$repo_dir/systems/arch/packages/common.txt"
-grep -Fq 'copy         .zshrc' "$repo_dir/deploy.conf"
-grep -Fq 'template     .codex/config.toml' "$repo_dir/deploy.conf"
+test -f "$repo_dir/minijinja.toml"
+test -f "$repo_dir/secrets.example.toml"
+test ! -e "$repo_dir/personal"
+test ! -e "$repo_dir/overlays"
+test ! -e "$repo_dir/deploy.conf"
+test ! -e "$repo_dir/home"
+test ! -e "$repo_dir/bootstrap"
+test ! -e "$repo_dir/doctor"
+test ! -e "$repo_dir/scripts/install-latest-git"
+test ! -e "$repo_dir/manifests/latest-git.conf"
+git -C "$repo_dir" check-ignore -q --no-index secrets.toml
 
 core_home=$test_root/core
 mkdir -p "$core_home"
@@ -48,7 +60,7 @@ test -L "$core_home/.local/share/navi/cheats/personal.cheat"
 grep -Fq 'source "$HOME/.config/shell/zshrc"' "$core_home/.zshrc"
 
 printf '%s\n' '# third-party installer line' >>"$core_home/.zshrc"
-test "$(tail -n 1 "$repo_dir/home/.zshrc")" != '# third-party installer line'
+test "$(tail -n 1 "$repo_dir/config/shell/entrypoints/zshrc")" != '# third-party installer line'
 DOTFILES_HOME="$core_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" plan core >"$test_root/core-drift"
 grep -Fq -- '-# third-party installer line' "$test_root/core-drift"
@@ -61,7 +73,7 @@ mkdir -p "$personal_home"
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" apply core personal --yes >/dev/null
 test -L "$personal_home/.config/nvim/init.lua"
-test -L "$personal_home/.config/systemd/user/mihomo.service"
+test -L "$personal_home/.config/yazi/flavors/catppuccin-mocha.yazi/tmtheme.xml"
 test -f "$personal_home/.codex/config.toml"
 test ! -L "$personal_home/.codex/config.toml"
 grep -Fq "$personal_home/.local/share/mise/shims/context7-mcp" \
@@ -72,25 +84,34 @@ grep -Fq "$personal_home/.local/share/mise/shims/context7-mcp" \
 ! grep -Fq 'kami@kami' "$personal_home/.codex/config.toml"
 test "$(stat -c '%a' "$personal_home/.codex/config.toml" 2>/dev/null || stat -f '%Lp' "$personal_home/.codex/config.toml")" = 600
 
+macos_home=$test_root/macos
+mkdir -p "$macos_home"
+DOTFILES_HOME="$macos_home" DOTFILES_PLATFORM=macos \
+    "$repo_dir/dotfiles" apply personal --yes >/dev/null
+
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" doctor core personal >"$test_root/doctor"
 grep -Fq '0 drifted or missing path(s).' "$test_root/doctor"
 
+chmod 0644 "$personal_home/.codex/config.toml"
+DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
+    "$repo_dir/dotfiles" plan personal >"$test_root/plan-mode"
+grep -Fq "REPLACE  $personal_home/.codex/config.toml  (template)" \
+    "$test_root/plan-mode"
+if DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
+    "$repo_dir/dotfiles" doctor personal >"$test_root/doctor-mode" 2>&1; then
+    printf '%s\n' 'doctor unexpectedly ignored a mode drift' >&2
+    exit 1
+fi
+grep -Fq "DRIFT    $personal_home/.codex/config.toml" "$test_root/doctor-mode"
+DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
+    "$repo_dir/dotfiles" apply personal --yes >/dev/null
+
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" explain "$personal_home/.zshrc" >"$test_root/explain"
+grep -Fq "Target:   $personal_home/.zshrc" "$test_root/explain"
+grep -Fq 'Platform: linux' "$test_root/explain"
 grep -Fq 'Method:   copy' "$test_root/explain"
-
-private_source=$test_root/private-home
-private_target=$test_root/private-target
-mkdir -p "$private_source/.config/example" "$private_target"
-printf '%s\n' 'private=true' >"$private_source/.config/example/config"
-DOTFILES_HOME="$private_target" \
-    DOTFILES_PRIVATE_HOME="$private_source" \
-    DOTFILES_PLATFORM=macos \
-    "$repo_dir/dotfiles" apply private --yes >/dev/null
-test -f "$private_target/.config/example/config"
-test ! -L "$private_target/.config/example/config"
-test "$(stat -c '%a' "$private_target/.config/example/config" 2>/dev/null || stat -f '%Lp' "$private_target/.config/example/config")" = 644
 
 setup_home=$test_root/setup
 mkdir -p "$setup_home"
@@ -101,37 +122,52 @@ printf 'y\n' \
         "$repo_dir/setup" >"$test_root/setup-output"
 test -f "$setup_home/.zshrc"
 grep -Fq 'Personal Environment Kit' "$test_root/setup-output"
+grep -Fq 'Platform  macOS' "$test_root/setup-output"
+
+secret_manifest=$test_root/secret-manifest.yaml
+secret_target=$test_root/secret-target
+mkdir -p "$secret_target"
+printf '%s\n' \
+    'version: 1' \
+    'groups:' \
+    '  - id: secrets' \
+    '    label: Secret fixture' \
+    'entries:' \
+    '  - id: secret.fixture' \
+    '    group: secrets' \
+    '    source: tests/fixtures/secret.toml.j2' \
+    '    target: .config/example/config.toml' \
+    '    method: template' \
+    '    mode: "0600"' \
+    '    requires: [minijinja-cli]' \
+    >"$secret_manifest"
+printf '%s\n' \
+    '[mihomo]' \
+    'subscription_url = "https://example.invalid/latest"' \
+    >"$test_root/secrets.toml"
+DOTFILES_HOME="$secret_target" \
+    DOTFILES_MANIFEST_FILE="$secret_manifest" \
+    DOTFILES_SECRETS_FILE="$test_root/secrets.toml" \
+    DOTFILES_PLATFORM=linux \
+    "$repo_dir/dotfiles" apply secrets --yes >/dev/null
+grep -Fq 'https://example.invalid/latest' \
+    "$secret_target/.config/example/config.toml"
+test "$(stat -c '%a' "$secret_target/.config/example/config.toml" 2>/dev/null || stat -f '%Lp' "$secret_target/.config/example/config.toml")" = 600
 
 if command -v taplo >/dev/null 2>&1; then
-    find "$repo_dir/home" "$repo_dir/personal/home" -type f -name '*.toml' \
+    taplo check --no-schema "$repo_dir/minijinja.toml"
+    taplo check --no-schema "$repo_dir/secrets.example.toml"
+    find "$repo_dir/config" -type f -name '*.toml' \
         | while IFS= read -r toml_file; do
-            [ "$toml_file" = "$repo_dir/personal/home/.codex/config.toml" ] \
-                && continue
             taplo check --no-schema "$toml_file"
         done
 
-    template_root=$test_root/private-templates
-    secrets_file=$test_root/secrets.toml
-    secret_target=$test_root/secret-target
-    mkdir -p "$template_root/.config/example" "$secret_target"
-    printf '%s\n' 'url = "@SECRET:mihomo.subscription_url@"' \
-        >"$template_root/.config/example/config.toml"
-    printf '%s\n' \
-        '[mihomo]' \
-        'subscription_url = "https://example.invalid/latest"' \
-        >"$secrets_file"
-    DOTFILES_HOME="$secret_target" \
-        DOTFILES_PRIVATE_TEMPLATES="$template_root" \
-        DOTFILES_PRIVATE_HOME="$test_root/no-private-home" \
-        DOTFILES_SECRETS_FILE="$secrets_file" \
-        DOTFILES_PLATFORM=linux \
-        "$repo_dir/dotfiles" apply private --yes >/dev/null
-    grep -Fq 'https://example.invalid/latest' \
-        "$secret_target/.config/example/config.toml"
 fi
 
 if command -v yq >/dev/null 2>&1; then
     yq -e '.version == 1' "$repo_dir/manifests/agent-skills.yaml" >/dev/null
+    yq -e '.version == 1 and (.entries | length > 0)' \
+        "$repo_dir/manifests/files.yaml" >/dev/null
     "$core_home/.config/mise/tasks/skills-sync" --dry-run \
         >"$test_root/skills-sync"
     grep -Fq 'tw93/Waza --global --agent codex claude-code pi' \

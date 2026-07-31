@@ -1,5 +1,0 @@
-{
-  "npmCommand": ["npm", "--ignore-scripts"],
-  "packages": ["npm:pi-mcp-adapter"],
-  "enableSkillCommands": true
-}

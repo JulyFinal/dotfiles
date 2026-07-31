@@ -1,0 +1,6 @@
+# Keep template rendering explicit and repository-local.
+autoescape = "none"
+include = false
+newline = true
+strict = true
+env = false

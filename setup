@@ -13,12 +13,20 @@ else
     blue= green= dim= bold= reset=
 fi
 
-case "$(uname -s)" in
-    Darwin) platform='macOS' ;;
-    Linux)
-        if [ -e /etc/arch-release ]; then platform='Arch Linux'; else platform='Linux'; fi
+case "${DOTFILES_PLATFORM:-}" in
+    arch) platform='Arch Linux' ;;
+    linux) platform='Linux' ;;
+    macos) platform='macOS' ;;
+    '')
+        case "$(uname -s)" in
+            Darwin) platform='macOS' ;;
+            Linux)
+                if [ -e /etc/arch-release ]; then platform='Arch Linux'; else platform='Linux'; fi
+                ;;
+            *) platform='Unsupported' ;;
+        esac
         ;;
-    *) platform='Unsupported' ;;
+    *) platform=${DOTFILES_PLATFORM} ;;
 esac
 
 printf '\n%s%s◆ Personal Environment Kit%s\n' "$bold" "$blue" "$reset"
@@ -30,11 +38,9 @@ printf '  %s1%s  Core configurations\n' "$blue" "$reset"
 printf '     %sZsh · Bash · Tmux · Navi · Mise · Starship%s\n\n' "$dim" "$reset"
 printf '  %s2%s  Personal configurations\n' "$blue" "$reset"
 printf '     %sEditors · terminal · Yazi · Atuin · agent configs%s\n\n' "$dim" "$reset"
-printf '  %s3%s  Private local files\n' "$blue" "$reset"
-printf '     %sOptional private.local/home overlay%s\n\n' "$dim" "$reset"
-printf '  %s4%s  Install selected tools\n' "$blue" "$reset"
+printf '  %s3%s  Install selected tools\n' "$blue" "$reset"
 printf '     %sExplicit network access through Mise and manifests%s\n\n' "$dim" "$reset"
-printf '  %s5%s  Run diagnostics after setup\n\n' "$blue" "$reset"
+printf '  %s4%s  Run diagnostics after setup\n\n' "$blue" "$reset"
 
 if [ -n "${DOTFILES_SETUP_SELECTION:-}" ]; then
     selection=$DOTFILES_SETUP_SELECTION
@@ -47,16 +53,14 @@ fi
 
 core=false
 personal=false
-private=false
 install=false
 doctor=false
 for item in $selection; do
     case "$item" in
         1) core=true ;;
         2) personal=true ;;
-        3) private=true ;;
-        4) install=true ;;
-        5) doctor=true ;;
+        3) install=true ;;
+        4) doctor=true ;;
         *)
             printf 'Unknown selection: %s\n' "$item" >&2
             exit 2
@@ -67,19 +71,15 @@ done
 scopes=
 $core && scopes="$scopes core"
 $personal && scopes="$scopes personal"
-$private && scopes="$scopes private"
+
+if $install; then
+    "$repo_dir/dotfiles" install core
+fi
 
 if [ -n "$scopes" ]; then
     # Scope values are fixed words selected above.
     # shellcheck disable=SC2086
     "$repo_dir/dotfiles" apply $scopes
-fi
-
-if $install; then
-    install_scopes=$scopes
-    [ -n "$install_scopes" ] || install_scopes=' core'
-    # shellcheck disable=SC2086
-    "$repo_dir/dotfiles" install $install_scopes
 fi
 
 if $doctor; then

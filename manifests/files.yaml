@@ -1,0 +1,274 @@
+version: 1
+
+# This is the deployment menu. source paths use the visible config tree and
+# target paths are relative to the destination home. method is link, copy, or template;
+# template sources conventionally use the .j2 suffix. Omit platforms for all
+# supported systems. requires names commands that must exist before rendering.
+groups:
+  - id: core
+    label: Core configurations
+  - id: personal
+    label: Personal configurations
+
+entries:
+  - id: shell.bashrc
+    group: core
+    source: config/shell/entrypoints/bashrc
+    target: .bashrc
+    method: copy
+    mode: "0644"
+  - id: mise.config
+    group: core
+    source: config/mise/config.toml
+    target: .config/mise/config.toml
+    method: link
+    mode: "0644"
+  - id: mise.skills-task
+    group: core
+    source: config/mise/tasks/skills-sync
+    target: .config/mise/tasks/skills-sync
+    method: link
+    mode: "0755"
+  - id: shell.common
+    group: core
+    source: config/shell/common.sh
+    target: .config/shell/common.sh
+    method: link
+    mode: "0644"
+  - id: shell.zsh-config
+    group: core
+    source: config/shell/zshrc
+    target: .config/shell/zshrc
+    method: link
+    mode: "0644"
+  - id: starship.config
+    group: core
+    source: config/starship.toml
+    target: .config/starship.toml
+    method: link
+    mode: "0644"
+  - id: navi.personal-cheat
+    group: core
+    source: config/navi/cheats/personal.cheat
+    target: .local/share/navi/cheats/personal.cheat
+    method: link
+    mode: "0644"
+  - id: shell.profile
+    group: core
+    source: config/shell/entrypoints/profile
+    target: .profile
+    method: copy
+    mode: "0644"
+  - id: tmux.config
+    group: core
+    source: config/shell/entrypoints/tmux.conf
+    target: .tmux.conf
+    method: link
+    mode: "0644"
+  - id: shell.zshrc
+    group: core
+    source: config/shell/entrypoints/zshrc
+    target: .zshrc
+    method: copy
+    mode: "0644"
+
+  - id: codex.config
+    group: personal
+    source: config/agents/codex/config.toml.j2
+    target: .codex/config.toml
+    method: template
+    mode: "0600"
+    requires: [minijinja-cli]
+  - id: atuin.config
+    group: personal
+    source: config/atuin/config.toml
+    target: .config/atuin/config.toml
+    method: link
+    mode: "0644"
+  - id: helix.config
+    group: personal
+    source: config/helix/config.toml
+    target: .config/helix/config.toml
+    method: link
+    mode: "0644"
+  - id: helix.external-snippets
+    group: personal
+    source: config/helix/external-snippets.toml
+    target: .config/helix/external-snippets.toml
+    method: link
+    mode: "0644"
+  - id: helix.languages
+    group: personal
+    source: config/helix/languages.toml
+    target: .config/helix/languages.toml
+    method: link
+    mode: "0644"
+  - id: helix.python-snippets
+    group: personal
+    source: config/helix/snippets/python.toml
+    target: .config/helix/snippets/python.toml
+    method: link
+    mode: "0644"
+  - id: kitty.config
+    group: personal
+    source: config/kitty/kitty.conf
+    target: .config/kitty/kitty.conf
+    method: link
+    mode: "0644"
+  - id: nvim.init
+    group: personal
+    source: config/nvim/init.lua
+    target: .config/nvim/init.lua
+    method: link
+    mode: "0644"
+  - id: nvim.lock
+    group: personal
+    source: config/nvim/lazy-lock.json
+    target: .config/nvim/lazy-lock.json
+    method: link
+    mode: "0644"
+  - id: nvim.configs
+    group: personal
+    source: config/nvim/lua/configs.lua
+    target: .config/nvim/lua/configs.lua
+    method: link
+    mode: "0644"
+  - id: nvim.mapping
+    group: personal
+    source: config/nvim/lua/mapping.lua
+    target: .config/nvim/lua/mapping.lua
+    method: link
+    mode: "0644"
+  - id: nvim.plugins
+    group: personal
+    source: config/nvim/lua/plugins.lua
+    target: .config/nvim/lua/plugins.lua
+    method: link
+    mode: "0644"
+  - id: tealdeer.config
+    group: personal
+    source: config/tealdeer/config.toml
+    target: .config/tealdeer/config.toml
+    method: link
+    mode: "0644"
+  - id: vicinae.config
+    group: personal
+    source: config/vicinae/settings.json
+    target: .config/vicinae/settings.json
+    method: link
+    mode: "0644"
+  - id: yazi.flavor-license
+    group: personal
+    source: config/yazi/flavors/catppuccin-mocha.yazi/LICENSE
+    target: .config/yazi/flavors/catppuccin-mocha.yazi/LICENSE
+    method: link
+    mode: "0644"
+  - id: yazi.flavor-license-tmtheme
+    group: personal
+    source: config/yazi/flavors/catppuccin-mocha.yazi/LICENSE-tmtheme
+    target: .config/yazi/flavors/catppuccin-mocha.yazi/LICENSE-tmtheme
+    method: link
+    mode: "0644"
+  - id: yazi.flavor-tmtheme
+    group: personal
+    source: config/yazi/flavors/catppuccin-mocha.yazi/tmtheme.xml
+    target: .config/yazi/flavors/catppuccin-mocha.yazi/tmtheme.xml
+    method: link
+    mode: "0644"
+  - id: yazi.flavor-readme
+    group: personal
+    source: config/yazi/flavors/catppuccin-mocha.yazi/README.md
+    target: .config/yazi/flavors/catppuccin-mocha.yazi/README.md
+    method: link
+    mode: "0644"
+  - id: yazi.flavor-preview
+    group: personal
+    source: config/yazi/flavors/catppuccin-mocha.yazi/preview.png
+    target: .config/yazi/flavors/catppuccin-mocha.yazi/preview.png
+    method: link
+    mode: "0644"
+  - id: yazi.flavor
+    group: personal
+    source: config/yazi/flavors/catppuccin-mocha.yazi/flavor.toml
+    target: .config/yazi/flavors/catppuccin-mocha.yazi/flavor.toml
+    method: link
+    mode: "0644"
+  - id: yazi.init
+    group: personal
+    source: config/yazi/init.lua
+    target: .config/yazi/init.lua
+    method: link
+    mode: "0644"
+  - id: yazi.keymap
+    group: personal
+    source: config/yazi/keymap.toml
+    target: .config/yazi/keymap.toml
+    method: link
+    mode: "0644"
+  - id: yazi.package
+    group: personal
+    source: config/yazi/package.toml
+    target: .config/yazi/package.toml
+    method: link
+    mode: "0644"
+  - id: yazi.bookmarks-license
+    group: personal
+    source: config/yazi/plugins/bookmarks.yazi/LICENSE
+    target: .config/yazi/plugins/bookmarks.yazi/LICENSE
+    method: link
+    mode: "0644"
+  - id: yazi.bookmarks-readme
+    group: personal
+    source: config/yazi/plugins/bookmarks.yazi/README.md
+    target: .config/yazi/plugins/bookmarks.yazi/README.md
+    method: link
+    mode: "0644"
+  - id: yazi.bookmarks-main
+    group: personal
+    source: config/yazi/plugins/bookmarks.yazi/main.lua
+    target: .config/yazi/plugins/bookmarks.yazi/main.lua
+    method: link
+    mode: "0644"
+  - id: yazi.bunny-license
+    group: personal
+    source: config/yazi/plugins/bunny.yazi/LICENSE
+    target: .config/yazi/plugins/bunny.yazi/LICENSE
+    method: link
+    mode: "0644"
+  - id: yazi.bunny-readme
+    group: personal
+    source: config/yazi/plugins/bunny.yazi/README.md
+    target: .config/yazi/plugins/bunny.yazi/README.md
+    method: link
+    mode: "0644"
+  - id: yazi.bunny-main
+    group: personal
+    source: config/yazi/plugins/bunny.yazi/main.lua
+    target: .config/yazi/plugins/bunny.yazi/main.lua
+    method: link
+    mode: "0644"
+  - id: yazi.theme
+    group: personal
+    source: config/yazi/theme.toml
+    target: .config/yazi/theme.toml
+    method: link
+    mode: "0644"
+  - id: yazi.config
+    group: personal
+    source: config/yazi/yazi.toml
+    target: .config/yazi/yazi.toml
+    method: link
+    mode: "0644"
+  - id: pi.mcp
+    group: personal
+    source: config/agents/pi/agent/mcp.json.j2
+    target: .pi/agent/mcp.json
+    method: template
+    mode: "0600"
+    requires: [minijinja-cli]
+  - id: pi.settings
+    group: personal
+    source: config/agents/pi/agent/settings.json
+    target: .pi/agent/settings.json
+    method: copy
+    mode: "0600"

@@ -3,15 +3,16 @@ set -eu
 
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 target_home=${DOTFILES_HOME:-$HOME}
-rules_file=$repo_dir/deploy.conf
-secrets_file=${DOTFILES_SECRETS_FILE:-"$repo_dir/private.local/secrets.toml"}
-private_home=${DOTFILES_PRIVATE_HOME:-"$repo_dir/private.local/home"}
-private_templates=${DOTFILES_PRIVATE_TEMPLATES:-"$repo_dir/private/templates/home"}
+manifest_file=${DOTFILES_MANIFEST_FILE:-"$repo_dir/manifests/files.yaml"}
+secrets_file=${DOTFILES_SECRETS_FILE:-"$repo_dir/secrets.toml"}
+minijinja_bin=
 yes=false
 workspace=
+manifest_records=
 sources=
 actions=
 action_count=0
+field_sep=$(printf '\t')
 
 cleanup() {
     [ -z "$workspace" ] || rm -rf "$workspace"
@@ -21,13 +22,14 @@ trap cleanup EXIT HUP INT TERM
 usage() {
     cat <<'EOF'
 Usage:
-  ./dotfiles plan [core] [personal] [private]
-  ./dotfiles apply [core] [personal] [private] [--yes]
-  ./dotfiles install [core] [personal]
-  ./dotfiles doctor [core] [personal] [private]
+  ./dotfiles plan [core] [personal]
+  ./dotfiles apply [core] [personal] [--yes]
+  ./dotfiles install [core]
+  ./dotfiles doctor [core] [personal]
   ./dotfiles explain PATH
 
 `apply` never accesses the network. `install` is the explicit networked action.
+Set DOTFILES_SECRETS_FILE to use a manually moved secrets.toml.
 EOF
 }
 
@@ -56,8 +58,10 @@ esac
 
 new_workspace() {
     workspace=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-plan.XXXXXX")
+    manifest_records=$workspace/manifest-records
     sources=$workspace/sources
     actions=$workspace/actions
+    : >"$manifest_records"
     : >"$sources"
     : >"$actions"
     mkdir -p "$workspace/rendered"
@@ -70,185 +74,265 @@ validate_relative_path() {
     esac
 }
 
-set_source() {
-    source_root=$1
-    forced_method=$2
-    [ -d "$source_root" ] || return 0
+parse_manifest() {
+    [ -f "$manifest_file" ] || {
+        printf 'Missing deployment menu: %s\n' "$manifest_file" >&2
+        exit 1
+    }
 
-    find "$source_root" \( -type f -o -type l \) -print \
-        | LC_ALL=C sort \
-        | while IFS= read -r source_path; do
-            relative=${source_path#"$source_root"/}
-            validate_relative_path "$relative" || {
-                printf 'Unsafe source path: %s\n' "$relative" >&2
+    awk '
+        function trim(value) {
+            sub(/^[[:space:]]+/, "", value)
+            sub(/[[:space:]]+$/, "", value)
+            return value
+        }
+        function scalar(value) {
+            value = trim(value)
+            if (value ~ /^".*"$/) {
+                value = substr(value, 2, length(value) - 2)
+            }
+            return value
+        }
+        function list(value) {
+            value = trim(value)
+            if (value == "") return ""
+            if (value ~ /^\[.*\]$/) {
+                value = substr(value, 2, length(value) - 2)
+                gsub(/[[:space:]" ]/, "", value)
+                return value
+            }
+            return scalar(value)
+        }
+        function emit_group() {
+            if (group_id != "") {
+                printf "group\t%s\t%s\n", group_id, group_label
+            }
+            group_id = ""
+            group_label = ""
+        }
+        function emit_entry() {
+            if (entry_id != "") {
+                if (entry_platforms == "") entry_platforms = "all"
+                printf "entry\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", \
+                    entry_id, entry_group, entry_source, entry_target, \
+                    entry_method, entry_mode, entry_platforms, entry_requires
+            }
+            entry_id = ""
+            entry_group = ""
+            entry_source = ""
+            entry_target = ""
+            entry_method = ""
+            entry_mode = ""
+            entry_platforms = ""
+            entry_requires = ""
+        }
+        function field(line,    separator, key, value) {
+            sub(/^[[:space:]-]+/, "", line)
+            separator = index(line, ":")
+            if (separator == 0) return
+            key = substr(line, 1, separator - 1)
+            value = substr(line, separator + 1)
+            if (section == "groups") {
+                if (key == "id") group_id = scalar(value)
+                else if (key == "label") group_label = scalar(value)
+            } else if (section == "entries") {
+                if (key == "id") entry_id = scalar(value)
+                else if (key == "group") entry_group = scalar(value)
+                else if (key == "source") entry_source = scalar(value)
+                else if (key == "target") entry_target = scalar(value)
+                else if (key == "method") entry_method = scalar(value)
+                else if (key == "mode") entry_mode = scalar(value)
+                else if (key == "platforms") entry_platforms = list(value)
+                else if (key == "requires") entry_requires = list(value)
+            }
+        }
+        /^[[:space:]]*#/ || /^[[:space:]]*$/ { next }
+        /^[[:space:]]*groups:[[:space:]]*$/ {
+            emit_entry()
+            section = "groups"
+            next
+        }
+        /^[[:space:]]*entries:[[:space:]]*$/ {
+            emit_group()
+            section = "entries"
+            next
+        }
+        section == "groups" && /^[[:space:]]*-[[:space:]]+id:/ {
+            emit_group()
+            field($0)
+            next
+        }
+        section == "groups" && /^[[:space:]]+[a-z_]+:/ {
+            field($0)
+            next
+        }
+        section == "entries" && /^[[:space:]]*-[[:space:]]+id:/ {
+            emit_entry()
+            field($0)
+            next
+        }
+        section == "entries" && /^[[:space:]]+[a-z_]+:/ {
+            field($0)
+            next
+        }
+        END {
+            emit_group()
+            emit_entry()
+        }
+    ' "$manifest_file" >"$manifest_records"
+
+    awk -F '\t' '
+        $1 == "group" {
+            if ($2 == "" || $3 == "") bad = 1
+            groups[$2] = 1
+        }
+        $1 == "entry" && ($2 == "" || $3 == "" || $4 == "" || $5 == "" || $6 == "" || $7 == "") { bad = 1 }
+        $1 == "entry" {
+            if (target[$5]++) bad = 1
+            if (entry[$2]++) bad = 1
+            if (!groups[$3]) bad = 1
+            if ($6 !~ /^(link|copy|template)$/) bad = 1
+            if ($7 !~ /^[0-7][0-7][0-7][0-7]?$/) bad = 1
+        }
+        END {
+            if (bad) {
+                print "Invalid deployment menu: every group and entry needs its required fields." > "/dev/stderr"
                 exit 1
             }
-            awk -F '	' -v wanted="$relative" '$1 != wanted' "$sources" \
-                >"$sources.next"
-            mv "$sources.next" "$sources"
-            printf '%s\t%s\t%s\n' "$relative" "$source_path" "$forced_method" \
-                >>"$sources"
-        done
+        }
+    ' "$manifest_records"
 }
 
-add_platform_layers() {
-    section=$1
-    if [ "$platform" = arch ] || [ "$platform" = linux ]; then
-        set_source "$repo_dir/overlays/linux/${section}home" ""
+manifest_groups() {
+    awk -F '\t' '$1 == "group" { print $2 }' "$manifest_records"
+}
+
+platform_matches() {
+    platforms=$1
+    if [ -z "$platforms" ] || [ "$platforms" = all ]; then
+        return 0
     fi
-    if [ "$platform" = arch ]; then
-        set_source "$repo_dir/overlays/arch/${section}home" ""
-    elif [ "$platform" = macos ]; then
-        set_source "$repo_dir/overlays/macos/${section}home" ""
+    old_ifs=$IFS
+    IFS=','
+    for candidate in $platforms; do
+        if [ "$candidate" = "$platform" ]; then
+            IFS=$old_ifs
+            return 0
+        fi
+    done
+    IFS=$old_ifs
+    return 1
+}
+
+resolve_minijinja() {
+    candidate=$(command -v minijinja-cli 2>/dev/null || true)
+    if [ -n "$candidate" ] && [ -x "$candidate" ]; then
+        minijinja_bin=$candidate
+        return 0
     fi
+
+    if command -v mise >/dev/null 2>&1; then
+        candidate=$(MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
+            mise which minijinja-cli 2>/dev/null || true)
+        if [ -n "$candidate" ] && [ -x "$candidate" ]; then
+            minijinja_bin=$candidate
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+require_commands() {
+    requires=$1
+    [ -n "$requires" ] || return 0
+    old_ifs=$IFS
+    IFS=','
+    for required in $requires; do
+        if [ "$required" = minijinja-cli ]; then
+            if [ -z "$minijinja_bin" ] && ! resolve_minijinja; then
+                printf 'Required command is missing: %s\n' "$required" >&2
+                IFS=$old_ifs
+                return 1
+            fi
+        elif ! command -v "$required" >/dev/null 2>&1; then
+            printf 'Required command is missing: %s\n' "$required" >&2
+            IFS=$old_ifs
+            return 1
+        fi
+    done
+    IFS=$old_ifs
 }
 
 collect_sources() {
+    parse_manifest
     [ "$#" -gt 0 ] || set -- core
-    for scope in "$@"; do
-        case "$scope" in
-            core)
-                set_source "$repo_dir/home" ""
-                add_platform_layers ""
-                ;;
-            personal)
-                set_source "$repo_dir/personal/home" ""
-                add_platform_layers "personal/"
-                ;;
-            private)
-                set_source "$private_templates" template
-                add_platform_layers "private/"
-                set_source "$private_home" copy
-                ;;
-            *)
-                printf 'Unknown scope: %s\n' "$scope" >&2
-                exit 2
-                ;;
-        esac
+
+    for requested_group in "$@"; do
+        if ! awk -F '\t' -v wanted="$requested_group" \
+            '$1 == "group" && $2 == wanted { found = 1 } END { exit !found }' \
+            "$manifest_records"; then
+            printf 'Unknown configuration group: %s\n' "$requested_group" >&2
+            exit 2
+        fi
+
+        awk -F '\t' -v wanted="$requested_group" \
+            '$1 == "entry" && $3 == wanted { print }' "$manifest_records" \
+            | while IFS="$field_sep" read -r record_type id group source target method mode platforms requires; do
+                platform_matches "$platforms" || continue
+                validate_relative_path "$source" || {
+                    printf 'Unsafe deployment source: %s\n' "$source" >&2
+                    exit 1
+                }
+                validate_relative_path "$target" || {
+                    printf 'Unsafe deployment target: %s\n' "$target" >&2
+                    exit 1
+                }
+                source_path=$repo_dir/$source
+                [ -f "$source_path" ] || [ -L "$source_path" ] || {
+                    printf 'Missing deployment source: %s\n' "$source_path" >&2
+                    exit 1
+                }
+                require_commands "$requires" || exit 1
+                printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+                    "$target" "$source_path" "$method" "$mode" "$id" "$group" \
+                    >>"$sources"
+            done
     done
-}
-
-method_for() {
-    wanted=$1
-    forced=$2
-    if [ -n "$forced" ]; then
-        printf '%s\n' "$forced"
-        return
-    fi
-    awk -v wanted="$wanted" '
-        $1 !~ /^#/ && NF >= 2 && $2 == wanted { result = $1 }
-        END { print (result == "" ? "link" : result) }
-    ' "$rules_file"
-}
-
-mode_for() {
-    wanted=$1
-    method=$2
-    configured=$(awk -v wanted="$wanted" '
-        $1 !~ /^#/ && NF >= 3 && $2 == wanted { result = $3 }
-        END { print result }
-    ' "$rules_file")
-    if [ -n "$configured" ]; then
-        printf '%s\n' "$configured"
-    elif [ "$method" = template ]; then
-        printf '%s\n' 0600
-    else
-        printf '%s\n' 0644
-    fi
-}
-
-extract_secret_tokens() {
-    awk '
-        {
-            rest = $0
-            while (match(rest, /@SECRET:[A-Za-z0-9_.-]+@/)) {
-                print substr(rest, RSTART, RLENGTH)
-                rest = substr(rest, RSTART + RLENGTH)
-            }
-        }
-    ' "$1" | LC_ALL=C sort -u
 }
 
 render_template() {
     template=$1
     output=$2
-    token_map=$workspace/token-map
-    prepared=$workspace/prepared-template
-    printf '@HOME@\t%s\n' "$target_home" >"$token_map"
-    : >"$prepared"
+    if [ -z "$minijinja_bin" ] && ! resolve_minijinja; then
+        printf 'Template %s needs MiniJinja; run ./dotfiles install core first.\n' \
+            "$template" >&2
+        return 1
+    fi
 
-    include=true
-    while IFS= read -r line || [ -n "$line" ]; do
-        case "$line" in
-            '@IF_COMMAND '*)
-                command_name=${line#@IF_COMMAND }
-                command_name=${command_name%@}
-                case "$command_name" in
-                    '' | *[!A-Za-z0-9._+-]*)
-                        printf 'Invalid template command condition: %s\n' \
-                            "$command_name" >&2
-                        exit 1
-                        ;;
-                esac
-                if command -v "$command_name" >/dev/null 2>&1; then
-                    include=true
-                else
-                    include=false
-                fi
-                ;;
-            '@END@') include=true ;;
-            *) $include && printf '%s\n' "$line" >>"$prepared" ;;
-        esac
-    done <"$template"
+    if command -v docker >/dev/null 2>&1; then
+        docker_available=true
+    else
+        docker_available=false
+    fi
 
-    extract_secret_tokens "$prepared" \
-        | while IFS= read -r token; do
-            [ -n "$token" ] || continue
-            command -v taplo >/dev/null 2>&1 || {
-                printf 'Template %s needs Taplo; run ./dotfiles install core.\n' \
-                    "$template" >&2
-                exit 1
-            }
-            [ -f "$secrets_file" ] || {
-                printf 'Missing secrets file: %s\n' "$secrets_file" >&2
-                exit 1
-            }
-            key=${token#@SECRET:}
-            key=${key%@}
-            value=$(taplo get -f "$secrets_file" -s "$key") || {
-                printf 'Missing secret key: %s\n' "$key" >&2
-                exit 1
-            }
-            case "$value" in
-                *"	"* | *"
-"*)
-                    printf 'Secret %s contains an unsupported tab or newline.\n' "$key" >&2
-                    exit 1
-                    ;;
-            esac
-            printf '%s\t%s\n' "$token" "$value" >>"$token_map"
-        done
-
-    awk -F '	' '
-        function literal_replace(text, needle, value, before) {
-            while ((before = index(text, needle)) > 0) {
-                text = substr(text, 1, before - 1) value \
-                    substr(text, before + length(needle))
-            }
-            return text
-        }
-        NR == FNR {
-            split_at = index($0, "\t")
-            key = substr($0, 1, split_at - 1)
-            values[key] = substr($0, split_at + 1)
-            next
-        }
-        {
-            line = $0
-            for (key in values) line = literal_replace(line, key, values[key])
-            print line
-        }
-    ' "$token_map" "$prepared" >"$output"
+    if [ -f "$secrets_file" ]; then
+        if ! "$minijinja_bin" --config-file "$repo_dir/minijinja.toml" \
+            --strict --no-include --autoescape none \
+            -D "home=$target_home" \
+            -D "docker_available:=$docker_available" \
+            "$template" "$secrets_file" >"$output"; then
+            printf 'Failed to render template: %s\n' "$template" >&2
+            return 1
+        fi
+    elif ! "$minijinja_bin" --config-file "$repo_dir/minijinja.toml" \
+        --strict --no-include --autoescape none \
+        -D "home=$target_home" \
+        -D "docker_available:=$docker_available" \
+        "$template" >"$output"; then
+        printf 'Failed to render template: %s\n' "$template" >&2
+        return 1
+    fi
 }
 
 show_diff() {
@@ -264,41 +348,47 @@ build_plan() {
     action_count=0
     printf 'Platform: %s\nTarget:   %s\n\n' "$platform" "$target_home"
 
-    while IFS='	' read -r relative source_path forced_method; do
+    while IFS="$field_sep" read -r relative source_path method mode id group; do
         [ -n "$relative" ] || continue
-        method=$(method_for "$relative" "$forced_method")
-        mode=$(mode_for "$relative" "$method")
         target=$target_home/$relative
         desired=$source_path
 
-        if [ "$method" = template ]; then
-            index=$((index + 1))
-            desired=$workspace/rendered/$index
-            render_template "$source_path" "$desired"
-        fi
+        case "$method" in
+            link | copy) ;;
+            template)
+                index=$((index + 1))
+                desired=$workspace/rendered/$index
+                render_template "$source_path" "$desired"
+                ;;
+            *)
+                printf 'Invalid deployment method for %s: %s\n' "$id" "$method" >&2
+                exit 1
+                ;;
+        esac
 
         unchanged=false
         if [ "$method" = link ]; then
             if [ -L "$target" ] && [ "$(readlink "$target")" = "$source_path" ]; then
                 unchanged=true
             fi
-        elif [ -f "$target" ] && [ ! -L "$target" ] && cmp -s "$target" "$desired"; then
+        elif [ -f "$target" ] && [ ! -L "$target" ] \
+            && cmp -s "$target" "$desired" && mode_matches "$mode" "$target"; then
             unchanged=true
         fi
 
         if $unchanged; then
-            printf 'KEEP     %s\n' "$target"
+            printf 'KEEP     %s  [%s]\n' "$target" "$id"
             continue
         fi
 
         if [ -e "$target" ] || [ -L "$target" ]; then
-            printf 'REPLACE  %s  (%s)\n' "$target" "$method"
+            printf 'REPLACE  %s  (%s)  [%s]\n' "$target" "$method" "$id"
             show_diff "$target" "$desired"
         else
-            printf 'CREATE   %s  (%s)\n' "$target" "$method"
+            printf 'CREATE   %s  (%s)  [%s]\n' "$target" "$method" "$id"
         fi
-        printf '%s\t%s\t%s\t%s\t%s\n' \
-            "$method" "$relative" "$desired" "$target" "$mode" >>"$actions"
+        printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+            "$method" "$relative" "$desired" "$target" "$mode" "$id" >>"$actions"
         action_count=$((action_count + 1))
     done <"$sources"
 
@@ -309,7 +399,7 @@ clean_parent_symlinks() {
     target_path=$1
     dir=${target_path%/*}
     curr=""
-    OLD_IFS=$IFS
+    old_ifs=$IFS
     IFS='/'
     for segment in $dir; do
         [ -n "$segment" ] || continue
@@ -318,12 +408,12 @@ clean_parent_symlinks() {
             rm -f "$curr"
         fi
     done
-    IFS=$OLD_IFS
+    IFS=$old_ifs
     mkdir -p "$dir"
 }
 
 apply_actions() {
-    while IFS='	' read -r method relative desired target mode; do
+    while IFS="$field_sep" read -r method relative desired target mode id; do
         [ -n "$target" ] || continue
         clean_parent_symlinks "$target"
         if [ -d "$target" ] && [ ! -L "$target" ]; then
@@ -337,7 +427,7 @@ apply_actions() {
             cp "$desired" "$target"
             chmod "$mode" "$target"
         fi
-        printf 'APPLIED  %s\n' "$target"
+        printf 'APPLIED  %s  [%s]\n' "$target" "$id"
     done <"$actions"
 }
 
@@ -346,6 +436,16 @@ configure_secret_hook() {
         git -C "$repo_dir" config core.hooksPath tests
         printf 'ENABLED  repository secret-scanning hook\n'
     fi
+}
+
+file_mode() {
+    stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"
+}
+
+mode_matches() {
+    expected=${1#0}
+    actual=$(file_mode "$2")
+    [ "$actual" = "$expected" ] || [ "$actual" = "$1" ]
 }
 
 run_plan_or_apply() {
@@ -359,7 +459,7 @@ run_plan_or_apply() {
             scopes="$scopes $argument"
         fi
     done
-    # Scope names are fixed words, so intentional field splitting is safe here.
+    # Scope values come from the manifest's group identifiers.
     # shellcheck disable=SC2086
     set -- $scopes
     [ "$#" -gt 0 ] || set -- core
@@ -390,13 +490,9 @@ run_plan_or_apply() {
 
 run_install() {
     [ "$#" -gt 0 ] || set -- core
-    install_core=false
-    install_personal=false
     for scope in "$@"; do
         case "$scope" in
-            core) install_core=true ;;
-            personal) install_personal=true ;;
-            private) ;;
+            core) ;;
             *)
                 printf 'Unknown install scope: %s\n' "$scope" >&2
                 exit 2
@@ -404,32 +500,27 @@ run_install() {
         esac
     done
 
-    if $install_core; then
-        "$repo_dir/scripts/install-mise"
-        if command -v mise >/dev/null 2>&1; then
-            mise_bin=$(command -v mise)
-        else
-            mise_bin=$HOME/.local/bin/mise
-        fi
-        MISE_CONFIG_FILE="$repo_dir/home/.config/mise/config.toml" \
-            "$mise_bin" install
+    "$repo_dir/scripts/install-mise"
+    if command -v mise >/dev/null 2>&1; then
+        mise_bin=$(command -v mise)
+    else
+        mise_bin=$HOME/.local/bin/mise
     fi
-    if $install_personal; then
-        "$repo_dir/scripts/install-latest-git"
-    fi
+    MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
+        "$mise_bin" install
 }
 
 run_doctor() {
     new_workspace
     collect_sources "$@"
     failures=0
-    while IFS='	' read -r relative source_path forced_method; do
+    while IFS="$field_sep" read -r relative source_path method mode id group; do
         [ -n "$relative" ] || continue
-        method=$(method_for "$relative" "$forced_method")
         target=$target_home/$relative
         desired=$source_path
         if [ "$method" = template ]; then
-            desired=$workspace/rendered-doctor
+            desired=$workspace/rendered-doctor/$id
+            mkdir -p "$(dirname "$desired")"
             render_template "$source_path" "$desired"
         fi
         if [ "$method" = link ]; then
@@ -439,7 +530,8 @@ run_doctor() {
                 printf 'DRIFT    %s\n' "$target"
                 failures=$((failures + 1))
             fi
-        elif [ -f "$target" ] && [ ! -L "$target" ] && cmp -s "$target" "$desired"; then
+        elif [ -f "$target" ] && [ ! -L "$target" ] \
+            && cmp -s "$target" "$desired" && mode_matches "$mode" "$target"; then
             printf 'OK       %s\n' "$target"
         else
             printf 'DRIFT    %s\n' "$target"
@@ -465,17 +557,23 @@ run_explain() {
         *) relative=${requested#./} ;;
     esac
     new_workspace
-    collect_sources core personal private
-    record=$(awk -F '	' -v wanted="$relative" '$1 == wanted { print; exit }' "$sources")
+    parse_manifest >/dev/null
+    groups=$(manifest_groups | tr '\n' ' ')
+    # shellcheck disable=SC2086
+    collect_sources $groups
+    record=$(awk -F '\t' -v wanted="$relative" '$1 == wanted { print; exit }' "$sources")
     [ -n "$record" ] || {
         printf 'Not managed: %s\n' "$requested" >&2
         exit 1
     }
-    source_path=$(printf '%s\n' "$record" | awk -F '	' '{print $2}')
-    forced_method=$(printf '%s\n' "$record" | awk -F '	' '{print $3}')
-    method=$(method_for "$relative" "$forced_method")
-    printf 'Target:   %s/%s\nSource:   %s\nMethod:   %s\nPlatform: %s\n' \
-        "$target_home" "$relative" "$source_path" "$method" "$platform"
+    old_ifs=$IFS
+    IFS="$field_sep" read -r record_relative record_source record_method record_mode record_id record_group <<EOF
+$record
+EOF
+    IFS=$old_ifs
+    printf 'Target:   %s/%s\nSource:   %s\nMethod:   %s\nMode:     %s\nEntry:    %s\nPlatform: %s\n' \
+        "$target_home" "$record_relative" "$record_source" "$record_method" \
+        "$record_mode" "$record_id" "$platform"
 }
 
 command=${1:-help}

@@ -12,8 +12,12 @@ Run it directly:
 Then install every tool declared by the repository:
 
 ```sh
-MISE_CONFIG_FILE="$PWD/home/.config/mise/config.toml" mise install
+MISE_CONFIG_FILE="$PWD/config/mise/config.toml" mise install
 ```
+
+This also installs `minijinja-cli`, which the template deployment path uses to
+render agent configuration files. Secret values are supplied from
+the ignored repository-root `secrets.toml` when that file exists.
 
 Configuration deployment and software installation are intentionally separate:
 

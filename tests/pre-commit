@@ -26,18 +26,18 @@ REPO = Path(
 SIGNATURE_SOURCES = {"doctor", "tests/pre-commit"}
 
 FORBIDDEN_PATHS = (
-    re.compile(r"^private[.]local(/|$)", re.IGNORECASE),
+    re.compile(r"^secrets[.]toml$", re.IGNORECASE),
     re.compile(r"(^|/)\.env($|\.)", re.IGNORECASE),
     re.compile(r"(^|/)id_(rsa|ecdsa|ed25519)(\.|$)", re.IGNORECASE),
     re.compile(r"(^|/)rclone\.conf$", re.IGNORECASE),
     re.compile(r"(^|/).*\.remmina$", re.IGNORECASE),
     re.compile(r"(^|/).*\.(ovpn|p12|pfx)$", re.IGNORECASE),
     re.compile(
-        r"^(?:home|personal/home)/[.]config/mihomo/config\.ya?ml$",
+        r"^config/mihomo/config\.ya?ml$",
         re.IGNORECASE,
     ),
     re.compile(
-        r"^(?:home|personal/home)/[.]config/gh/hosts\.ya?ml$",
+        r"^config/gh/hosts\.ya?ml$",
         re.IGNORECASE,
     ),
 )

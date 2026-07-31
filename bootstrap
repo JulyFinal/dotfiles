@@ -1,6 +1,0 @@
-#!/bin/sh
-set -eu
-
-repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-printf '%s\n' 'bootstrap is now the compatibility entrypoint for ./setup.'
-exec "$repo_dir/setup" "$@"
