@@ -19,6 +19,10 @@ This also installs `minijinja-cli`, which the template deployment path uses to
 render agent configuration files. Secret values are supplied from
 the ignored repository-root `secrets.toml` when that file exists.
 
+The same tool set installs `rclone` and builds Helix's
+`simple-completion-language-server` from its Git repository with Cargo's
+locked dependency resolution.
+
 Configuration deployment and software installation are intentionally separate:
 
 ```sh

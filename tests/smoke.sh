@@ -44,6 +44,12 @@ test "$(grep -Fxc '% git, init' "$navi_cheat")" = 0
 grep -Fq 'caddy file-server --browse' "$navi_cheat"
 grep -Fq 'uvx python -m http.server 8000' "$navi_cheat"
 grep -Fq 'rclone serve http . --addr :8000' "$navi_cheat"
+grep -Fq 'simple-completion-language-server' "$repo_dir/config/helix/languages.toml"
+test -f "$repo_dir/config/helix/external-snippets.toml"
+test -f "$repo_dir/config/helix/snippets/python.toml"
+grep -Fq 'rclone = "latest"' "$repo_dir/config/mise/config.toml"
+grep -Fq 'cargo:https://github.com/estin/simple-completion-language-server' \
+    "$repo_dir/config/mise/config.toml"
 test -f "$repo_dir/manifests/agent-skills.yaml"
 test -f "$repo_dir/manifests/files.yaml"
 test -f "$repo_dir/systems/arch/packages/common.txt"
