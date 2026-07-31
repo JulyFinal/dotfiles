@@ -26,6 +26,14 @@ Configuration deployment and software installation are intentionally separate:
 ./dotfiles install core
 ```
 
+Yazi's plugin and flavor packages are installed separately after its personal
+configuration has been applied:
+
+```sh
+./dotfiles apply personal
+./dotfiles install yazi
+```
+
 After core configuration and tools are present, synchronize the shared agent
 skills declared in `manifests/agent-skills.yaml`:
 

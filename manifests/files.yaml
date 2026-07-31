@@ -157,106 +157,16 @@ entries:
     target: .config/vicinae/settings.json
     method: link
     mode: "0644"
-  - id: yazi.flavor-license
-    group: personal
-    source: config/yazi/flavors/catppuccin-mocha.yazi/LICENSE
-    target: .config/yazi/flavors/catppuccin-mocha.yazi/LICENSE
-    method: link
-    mode: "0644"
-  - id: yazi.flavor-license-tmtheme
-    group: personal
-    source: config/yazi/flavors/catppuccin-mocha.yazi/LICENSE-tmtheme
-    target: .config/yazi/flavors/catppuccin-mocha.yazi/LICENSE-tmtheme
-    method: link
-    mode: "0644"
-  - id: yazi.flavor-tmtheme
-    group: personal
-    source: config/yazi/flavors/catppuccin-mocha.yazi/tmtheme.xml
-    target: .config/yazi/flavors/catppuccin-mocha.yazi/tmtheme.xml
-    method: link
-    mode: "0644"
-  - id: yazi.flavor-readme
-    group: personal
-    source: config/yazi/flavors/catppuccin-mocha.yazi/README.md
-    target: .config/yazi/flavors/catppuccin-mocha.yazi/README.md
-    method: link
-    mode: "0644"
-  - id: yazi.flavor-preview
-    group: personal
-    source: config/yazi/flavors/catppuccin-mocha.yazi/preview.png
-    target: .config/yazi/flavors/catppuccin-mocha.yazi/preview.png
-    method: link
-    mode: "0644"
-  - id: yazi.flavor
-    group: personal
-    source: config/yazi/flavors/catppuccin-mocha.yazi/flavor.toml
-    target: .config/yazi/flavors/catppuccin-mocha.yazi/flavor.toml
-    method: link
-    mode: "0644"
-  - id: yazi.init
-    group: personal
-    source: config/yazi/init.lua
-    target: .config/yazi/init.lua
-    method: link
-    mode: "0644"
-  - id: yazi.keymap
-    group: personal
-    source: config/yazi/keymap.toml
-    target: .config/yazi/keymap.toml
-    method: link
-    mode: "0644"
   - id: yazi.package
     group: personal
     source: config/yazi/package.toml
     target: .config/yazi/package.toml
     method: link
     mode: "0644"
-  - id: yazi.bookmarks-license
-    group: personal
-    source: config/yazi/plugins/bookmarks.yazi/LICENSE
-    target: .config/yazi/plugins/bookmarks.yazi/LICENSE
-    method: link
-    mode: "0644"
-  - id: yazi.bookmarks-readme
-    group: personal
-    source: config/yazi/plugins/bookmarks.yazi/README.md
-    target: .config/yazi/plugins/bookmarks.yazi/README.md
-    method: link
-    mode: "0644"
-  - id: yazi.bookmarks-main
-    group: personal
-    source: config/yazi/plugins/bookmarks.yazi/main.lua
-    target: .config/yazi/plugins/bookmarks.yazi/main.lua
-    method: link
-    mode: "0644"
-  - id: yazi.bunny-license
-    group: personal
-    source: config/yazi/plugins/bunny.yazi/LICENSE
-    target: .config/yazi/plugins/bunny.yazi/LICENSE
-    method: link
-    mode: "0644"
-  - id: yazi.bunny-readme
-    group: personal
-    source: config/yazi/plugins/bunny.yazi/README.md
-    target: .config/yazi/plugins/bunny.yazi/README.md
-    method: link
-    mode: "0644"
-  - id: yazi.bunny-main
-    group: personal
-    source: config/yazi/plugins/bunny.yazi/main.lua
-    target: .config/yazi/plugins/bunny.yazi/main.lua
-    method: link
-    mode: "0644"
   - id: yazi.theme
     group: personal
     source: config/yazi/theme.toml
     target: .config/yazi/theme.toml
-    method: link
-    mode: "0644"
-  - id: yazi.config
-    group: personal
-    source: config/yazi/yazi.toml
-    target: .config/yazi/yazi.toml
     method: link
     mode: "0644"
   - id: pi.mcp

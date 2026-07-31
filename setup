@@ -39,7 +39,7 @@ printf '     %sZsh · Bash · Tmux · Navi · Mise · Starship%s\n\n' "$dim" "$r
 printf '  %s2%s  Personal configurations\n' "$blue" "$reset"
 printf '     %sEditors · terminal · Yazi · Atuin · agent configs%s\n\n' "$dim" "$reset"
 printf '  %s3%s  Install selected tools\n' "$blue" "$reset"
-printf '     %sExplicit network access through Mise and manifests%s\n\n' "$dim" "$reset"
+printf '     %sCore Mise tools; Yazi packages when personal is selected%s\n\n' "$dim" "$reset"
 printf '  %s4%s  Run diagnostics after setup\n\n' "$blue" "$reset"
 
 if [ -n "${DOTFILES_SETUP_SELECTION:-}" ]; then
@@ -80,6 +80,10 @@ if [ -n "$scopes" ]; then
     # Scope values are fixed words selected above.
     # shellcheck disable=SC2086
     "$repo_dir/dotfiles" apply $scopes
+fi
+
+if $install && $personal; then
+    "$repo_dir/dotfiles" install yazi
 fi
 
 if $doctor; then

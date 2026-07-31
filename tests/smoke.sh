@@ -23,6 +23,13 @@ test -f "$repo_dir/config/mise/config.toml"
 test -x "$repo_dir/config/mise/tasks/skills-sync"
 test -f "$repo_dir/config/shell/zshrc"
 test -f "$repo_dir/config/nvim/init.lua"
+test -f "$repo_dir/config/yazi/package.toml"
+test -f "$repo_dir/config/yazi/theme.toml"
+test ! -e "$repo_dir/config/yazi/init.lua"
+test ! -e "$repo_dir/config/yazi/keymap.toml"
+test ! -e "$repo_dir/config/yazi/yazi.toml"
+test ! -e "$repo_dir/config/yazi/plugins"
+test ! -e "$repo_dir/config/yazi/flavors"
 test -f "$repo_dir/config/agents/codex/config.toml.j2"
 test -f "$repo_dir/config/agents/pi/agent/mcp.json.j2"
 test -f "$repo_dir/config/README.md"
@@ -75,7 +82,13 @@ mkdir -p "$personal_home"
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" apply core personal --yes >/dev/null
 test -L "$personal_home/.config/nvim/init.lua"
-test -L "$personal_home/.config/yazi/flavors/catppuccin-mocha.yazi/tmtheme.xml"
+test -L "$personal_home/.config/yazi/package.toml"
+test -L "$personal_home/.config/yazi/theme.toml"
+test ! -e "$personal_home/.config/yazi/init.lua"
+test ! -e "$personal_home/.config/yazi/keymap.toml"
+test ! -e "$personal_home/.config/yazi/yazi.toml"
+test ! -e "$personal_home/.config/yazi/plugins"
+test ! -e "$personal_home/.config/yazi/flavors"
 test -f "$personal_home/.codex/config.toml"
 test ! -L "$personal_home/.codex/config.toml"
 grep -Fq "$personal_home/.local/share/mise/shims/context7-mcp" \
@@ -125,6 +138,35 @@ printf 'y\n' \
 test -f "$setup_home/.zshrc"
 grep -Fq 'Personal Environment Kit' "$test_root/setup-output"
 grep -Fq 'Platform  macOS' "$test_root/setup-output"
+
+yazi_install_home=$test_root/yazi-install
+mkdir -p "$yazi_install_home/.config/yazi"
+cp "$repo_dir/config/yazi/package.toml" \
+    "$yazi_install_home/.config/yazi/package.toml"
+yazi_mock_bin=$test_root/yazi-mock-bin
+yazi_install_log=$test_root/yazi-install-log
+mkdir -p "$yazi_mock_bin"
+printf '%s\n' \
+    '#!/bin/sh' \
+    'printf "mise %s\\n" "$*" >>"$YAZI_INSTALL_LOG"' \
+    'case "${1:-}" in' \
+    '  self-update|--version|install) exit 0 ;;' \
+    '  exec) shift; [ "${1:-}" = "--" ] && shift; exec "$@" ;;' \
+    'esac' \
+    >"$yazi_mock_bin/mise"
+printf '%s\n' \
+    '#!/bin/sh' \
+    'printf "ya YAZI_CONFIG_HOME=%s args=%s\\n" "$YAZI_CONFIG_HOME" "$*" >>"$YAZI_INSTALL_LOG"' \
+    >"$yazi_mock_bin/ya"
+chmod +x "$yazi_mock_bin/mise" "$yazi_mock_bin/ya"
+PATH="$yazi_mock_bin:$PATH" \
+    YAZI_INSTALL_LOG="$yazi_install_log" \
+    DOTFILES_HOME="$yazi_install_home" \
+    DOTFILES_PLATFORM=linux \
+    "$repo_dir/dotfiles" install yazi >"$test_root/yazi-install-output"
+grep -Fq 'mise install yazi' "$yazi_install_log"
+grep -Fq "ya YAZI_CONFIG_HOME=$yazi_install_home/.config/yazi args=pkg install" \
+    "$yazi_install_log"
 
 secret_manifest=$test_root/secret-manifest.yaml
 secret_target=$test_root/secret-target

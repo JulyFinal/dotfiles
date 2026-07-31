@@ -103,6 +103,7 @@ The public backend is intentionally small:
 ./dotfiles apply core personal
 ./dotfiles apply core --yes
 ./dotfiles install core
+./dotfiles install yazi
 ./dotfiles doctor core personal
 ./dotfiles explain ~/.zshrc
 ```
@@ -167,6 +168,20 @@ mise run skills-sync -- --dry-run
 ```
 
 See [`recipes/mise.md`](recipes/mise.md) for the direct commands.
+
+Yazi keeps only its flavor selection and package lock in the repository:
+[`config/yazi/theme.toml`](config/yazi/theme.toml) and
+[`config/yazi/package.toml`](config/yazi/package.toml). Applying personal
+configuration is offline; install the locked Yazi plugin/flavor explicitly
+afterward:
+
+```sh
+./dotfiles apply personal
+./dotfiles install yazi
+```
+
+The Yazi install step uses `ya pkg install` and downloads the locked packages
+into the target home's Yazi configuration directory.
 
 ## Arch installation
 

@@ -24,7 +24,7 @@ usage() {
 Usage:
   ./dotfiles plan [core] [personal]
   ./dotfiles apply [core] [personal] [--yes]
-  ./dotfiles install [core]
+  ./dotfiles install [core] [yazi]
   ./dotfiles doctor [core] [personal]
   ./dotfiles explain PATH
 
@@ -490,9 +490,12 @@ run_plan_or_apply() {
 
 run_install() {
     [ "$#" -gt 0 ] || set -- core
+    install_core=false
+    install_yazi=false
     for scope in "$@"; do
         case "$scope" in
-            core) ;;
+            core) install_core=true ;;
+            yazi) install_yazi=true ;;
             *)
                 printf 'Unknown install scope: %s\n' "$scope" >&2
                 exit 2
@@ -506,8 +509,25 @@ run_install() {
     else
         mise_bin=$HOME/.local/bin/mise
     fi
-    MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
-        "$mise_bin" install
+    if $install_core; then
+        MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
+            "$mise_bin" install
+    fi
+
+    if $install_yazi; then
+        yazi_config_home=$target_home/.config/yazi
+        [ -f "$yazi_config_home/package.toml" ] || {
+            printf '%s\n' \
+                'Yazi package.toml is missing; apply personal before installing Yazi.' \
+                >&2
+            exit 1
+        }
+        MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
+            "$mise_bin" install yazi
+        YAZI_CONFIG_HOME="$yazi_config_home" \
+            MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
+            "$mise_bin" exec -- ya pkg install
+    fi
 }
 
 run_doctor() {
