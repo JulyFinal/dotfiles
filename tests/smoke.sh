@@ -32,6 +32,8 @@ test -f "$repo_dir/manifests/files.yaml"
 test -f "$repo_dir/systems/arch/packages/common.txt"
 test -f "$repo_dir/minijinja.toml"
 test -f "$repo_dir/secrets.example.toml"
+test ! -e "$repo_dir/examples/mihomo"
+! grep -Fq '[mihomo]' "$repo_dir/secrets.example.toml"
 test ! -e "$repo_dir/personal"
 test ! -e "$repo_dir/overlays"
 test ! -e "$repo_dir/deploy.conf"
@@ -142,7 +144,7 @@ printf '%s\n' \
     '    requires: [minijinja-cli]' \
     >"$secret_manifest"
 printf '%s\n' \
-    '[mihomo]' \
+    '[example]' \
     'subscription_url = "https://example.invalid/latest"' \
     >"$test_root/secrets.toml"
 DOTFILES_HOME="$secret_target" \

@@ -24,7 +24,6 @@ config/README.md          source-tree guide
 manifests/files.yaml      source, target, method, mode, and platform menu
 manifests/agent-skills.yaml
                           external skills and their agent targets
-examples/                 safe non-secret examples
 secrets.example.toml      copyable secret-file shape; secrets.toml is ignored
 minijinja.toml            repository-local template defaults
 scripts/install-mise      standalone Mise installer
@@ -69,7 +68,7 @@ directly. MiniJinja receives the root TOML file as template data, so a template
 can use values such as:
 
 ```jinja
-{{ mihomo.subscription_url }}
+{{ service.api_token }}
 {{ home }}
 {% if docker_available %} ... {% endif %}
 ```
@@ -188,5 +187,5 @@ systems/arch/install --profile desktop
 ```
 
 The pre-commit scanner rejects credential-shaped content. Put real secret
-values in the ignored root `secrets.toml`, and keep non-secret examples under
-`examples/`.
+values in the ignored root `secrets.toml`; do not add runtime provider names or
+URLs to configuration examples.
