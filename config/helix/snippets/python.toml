@@ -1,0 +1,5 @@
+[[snippets]]
+prefix = "ld"
+scope = [ "python" ]  # language id https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers
+body = 'log.debug("$1")'
+description = "log at debug level"

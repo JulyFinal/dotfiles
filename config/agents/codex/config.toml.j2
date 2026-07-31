@@ -1,0 +1,55 @@
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+service_tier = "default"
+
+[projects."{{ home }}/dotfiles"]
+trust_level = "trusted"
+
+[projects."{{ home }}"]
+trust_level = "trusted"
+
+[mcp_servers]
+
+{% if docker_available %}
+[mcp_servers.lightpanda]
+command = "docker"
+args = ["exec", "-i", "lightpanda", "lightpanda", "mcp", "--log-level", "info"]
+
+[mcp_servers.lightpanda.tools.evaluate]
+approval_mode = "approve"
+{% endif %}
+
+[mcp_servers.filesystem]
+command = "{{ home }}/.local/share/mise/shims/mcp-server-filesystem"
+args = ["{{ home }}"]
+
+[mcp_servers.memory]
+command = "{{ home }}/.local/share/mise/shims/mcp-server-memory"
+args = []
+
+[mcp_servers.context7]
+command = "{{ home }}/.local/share/mise/shims/context7-mcp"
+args = []
+
+[mcp_servers.sequential_thinking]
+command = "{{ home }}/.local/share/mise/shims/mcp-server-sequential-thinking"
+args = []
+
+[mcp_servers.atuin]
+command = "{{ home }}/.local/share/mise/shims/atuin"
+args = ["mcp"]
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "context-used", "five-hour-limit", "weekly-limit"]
+status_line_use_colors = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+"gpt-5.6-sol" = 4
+
+[notice]
+hide_rate_limit_model_nudge = true
+
+[features]
+memories = true
+network_proxy = true
