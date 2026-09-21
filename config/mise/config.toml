@@ -3,16 +3,11 @@ atuin = "latest"
 go = "latest"
 node = "24"
 npm = "12"
-"npm:@anthropic-ai/claude-code" = { version = "latest", npm_args = "--ignore-scripts=true" }
-"npm:@earendil-works/pi-coding-agent" = { version = "latest", npm_args = "--ignore-scripts=true" }
-"npm:@google/gemini-cli" = "latest"
-"npm:@openai/codex" = "latest"
 "npm:@modelcontextprotocol/server-filesystem" = "latest"
 "npm:@modelcontextprotocol/server-memory" = "latest"
 "npm:@modelcontextprotocol/server-sequential-thinking" = "latest"
 "npm:@upstash/context7-mcp" = "latest"
 "npm:corepack" = "latest"
-"npm:vercel" = "latest"
 rust = "stable"
 uv = "latest"
 bat = "latest"
@@ -26,8 +21,6 @@ shfmt = "latest"
 starship = "latest"
 stylua = "latest"
 taplo = "latest"
-"cargo:tree-sitter-cli" = { version = "latest", default-features = false }
-"cargo:https://github.com/estin/simple-completion-language-server" = { version = "latest", locked = true }
 "cargo:minijinja-cli" = "latest"
 ty = "latest"
 yazi = "latest"
@@ -37,6 +30,11 @@ agy = "latest"
 lua-language-server = "latest"
 neovim = "latest"
 "npm:happy" = "latest"
+herdr = "latest"
+codex = "latest"
+pi = "latest"
+tree-sitter = "latest"
+vercel = { version = "latest", allow_builds = ["esbuild"], trust_policy_excludes = ["undici"] }
 
 [settings]
 minimum_release_age = "0"
