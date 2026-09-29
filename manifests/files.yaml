@@ -60,13 +60,6 @@ entries:
     source: config/mise/tasks/skills-sync
     target: .config/mise/tasks/skills-sync
 
-  - id: codex.config
-    group: personal
-    source: config/agents/codex/mcp.toml.j2
-    target: .codex/config.toml
-    method: merge-toml
-    mode: "0600"
-    requires: [minijinja-cli]
   - id: atuin.config
     group: personal
     source: config/atuin/config.toml
@@ -129,10 +122,11 @@ entries:
     target: .pi/agent/mcp.json
     method: merge-json
     mode: "0600"
-    requires: [minijinja-cli]
+    requires: [jq, minijinja-cli]
   - id: pi.settings
     group: personal
     source: config/agents/pi/agent/settings.json
     target: .pi/agent/settings.json
     method: merge-json
     mode: "0600"
+    requires: [jq]

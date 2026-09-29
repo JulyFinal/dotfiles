@@ -198,7 +198,7 @@ parse_manifest() {
             if (target[$5]++) bad = 1
             if (entry[$2]++) bad = 1
             if (!groups[$3]) bad = 1
-            if ($6 !~ /^(link|copy|template|merge-json|merge-toml)$/) bad = 1
+            if ($6 !~ /^(link|copy|template|merge-json)$/) bad = 1
             if ($7 !~ /^[0-7][0-7][0-7][0-7]?$/) bad = 1
         }
         END {
@@ -231,23 +231,18 @@ platform_matches() {
     return 1
 }
 
-resolve_minijinja() {
+resolve_tool() {
+    # Sets resolved_bin to an executable path for $1, or returns 1.
+    tool=$1
+    resolved_bin=
     if command -v mise >/dev/null 2>&1; then
-        candidate=$(MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
+        resolved_bin=$(MISE_CONFIG_FILE="$repo_dir/config/mise/config.toml" \
             MISE_TRUSTED_CONFIG_PATHS="$mise_trusted_config_paths" \
-            mise which minijinja-cli 2>/dev/null || true)
-        if [ -n "$candidate" ] && [ -x "$candidate" ]; then
-            minijinja_bin=$candidate
-            return 0
-        fi
+            mise which "$tool" 2>/dev/null || true)
+        [ -n "$resolved_bin" ] && [ -x "$resolved_bin" ] && return 0
     fi
-
-    candidate=$(command -v minijinja-cli 2>/dev/null || true)
-    if [ -n "$candidate" ] && [ -x "$candidate" ]; then
-        minijinja_bin=$candidate
-        return 0
-    fi
-
+    resolved_bin=$(command -v "$tool" 2>/dev/null || true)
+    [ -n "$resolved_bin" ] && [ -x "$resolved_bin" ] && return 0
     return 1
 }
 
@@ -257,13 +252,7 @@ require_commands() {
     old_ifs=$IFS
     IFS=','
     for required in $requires; do
-        if [ "$required" = minijinja-cli ]; then
-            if [ -z "$minijinja_bin" ] && ! resolve_minijinja; then
-                printf 'Required command is missing: %s\n' "$required" >&2
-                IFS=$old_ifs
-                return 1
-            fi
-        elif ! command -v "$required" >/dev/null 2>&1; then
+        if ! resolve_tool "$required"; then
             printf 'Required command is missing: %s\n' "$required" >&2
             IFS=$old_ifs
             return 1
@@ -312,11 +301,12 @@ collect_sources() {
 render_template() {
     template=$1
     output=$2
-    if [ -z "$minijinja_bin" ] && ! resolve_minijinja; then
+    if ! resolve_tool minijinja-cli; then
         printf 'Template %s needs MiniJinja; run ./dotfiles install core first.\n' \
             "$template" >&2
         return 1
     fi
+    minijinja_bin=$resolved_bin
 
     if command -v docker >/dev/null 2>&1; then
         docker_available=true
@@ -356,9 +346,14 @@ merge_json_file() {
         printf 'Merge target must be a regular JSON file: %s\n' "$current" >&2
         return 1
     }
-    if command -v jq >/dev/null 2>&1; then
-        merged=$workspace/merge-json-$merge_index
-        jq -s '
+    if ! resolve_tool jq; then
+        printf 'Merging JSON requires jq; run ./dotfiles install core first.\n' >&2
+        return 1
+    fi
+    jq_bin=$resolved_bin
+
+    merged=$workspace/merge-json-$merge_index
+    "$jq_bin" -s '
             .[0] as $current |
             .[1] as $managed |
             ($current * $managed) as $base |
@@ -378,178 +373,11 @@ merge_json_file() {
             return 1
         }
 
-        current_normalized=$workspace/merge-json-current-$merge_index
-        merged_normalized=$workspace/merge-json-merged-$merge_index
-        if jq -S -c . "$current" >"$current_normalized" \
-            && jq -S -c . "$merged" >"$merged_normalized" \
-            && cmp -s "$current_normalized" "$merged_normalized"; then
-            cp "$current" "$output"
-        else
-            cp "$merged" "$output"
-        fi
-        return 0
-    fi
-
-    if command -v python3 >/dev/null 2>&1; then
-        python3 - "$current" "$managed" "$output" <<'PY'
-import copy
-import json
-import sys
-
-current_path, managed_path, output_path = sys.argv[1:]
-with open(current_path, encoding="utf-8") as handle:
-    current_text = handle.read()
-with open(current_path, encoding="utf-8") as handle:
-    current = json.load(handle)
-with open(managed_path, encoding="utf-8") as handle:
-    managed = json.load(handle)
-
-def merge(base, overlay):
-    if not isinstance(base, dict) or not isinstance(overlay, dict):
-        return copy.deepcopy(overlay)
-    result = copy.deepcopy(base)
-    for key, value in overlay.items():
-        if key == "packages":
-            packages = result.get(key)
-            if not isinstance(packages, list):
-                packages = []
-            for package in value if isinstance(value, list) else []:
-                if package not in packages:
-                    packages.append(copy.deepcopy(package))
-            result[key] = packages
-        elif key in result and isinstance(result[key], dict) and isinstance(value, dict):
-            result[key] = merge(result[key], value)
-        else:
-            result[key] = copy.deepcopy(value)
-    return result
-
-merged = merge(current, managed)
-with open(output_path, "w", encoding="utf-8") as handle:
-    if merged == current:
-        handle.write(current_text)
-    else:
-        json.dump(merged, handle, indent=2, ensure_ascii=False)
-        handle.write("\n")
-PY
-        return 0
-    fi
-
-    printf '%s\n' \
-        'Merging JSON requires jq or python3; refusing to overwrite the target.' >&2
-    return 1
-}
-
-merge_toml_file() {
-    current=$1
-    managed=$2
-    output=$3
-
-    if [ ! -e "$current" ]; then
-        {
-            printf '%s\n\n' '[mcp_servers]'
-            cat "$managed"
-        } >"$output"
-        return 0
-    fi
-    [ -f "$current" ] && [ ! -L "$current" ] || {
-        printf 'Merge target must be a regular TOML file: %s\n' "$current" >&2
-        return 1
-    }
-
-    merged=$workspace/merge-toml-merged-$merge_index
-    awk -v managed_file="$managed" '
-        function trim(value) {
-            sub(/^[[:space:]]+/, "", value)
-            sub(/[[:space:]]+$/, "", value)
-            return value
-        }
-        function is_header(line) {
-            return line ~ /^[[:space:]]*(\[\[[^]]+\]\]|\[[^]]+\])[[:space:]]*$/
-        }
-        function header_name(line) {
-            return trim(line)
-        }
-        function assignment_key(line,    separator, key) {
-            if (line ~ /^[[:space:]]*#/ || line !~ /^[[:space:]]*[^#[:space:]][^=]*=/) {
-                return ""
-            }
-            separator = index(line, "=")
-            key = substr(line, 1, separator - 1)
-            return trim(key)
-        }
-        function emit_missing(section,    i, key, composite) {
-            if (!(section in managed_section)) return
-            for (i = 1; i <= managed_count[section]; i++) {
-                key = managed_order[section SUBSEP i]
-                composite = section SUBSEP key
-                if (!seen[composite]) {
-                    print managed_line[composite]
-                    seen[composite] = 1
-                }
-            }
-        }
-        BEGIN {
-            managed_current = ""
-            while ((getline line < managed_file) > 0) {
-                if (is_header(line)) {
-                    managed_current = header_name(line)
-                    if (!(managed_current in managed_section)) {
-                        managed_section[managed_current] = 1
-                        managed_order_sections[++managed_section_count] = managed_current
-                    }
-                    continue
-                }
-                key = assignment_key(line)
-                if (managed_current != "" && key != "") {
-                    composite = managed_current SUBSEP key
-                    if (!(composite in managed_line)) {
-                        managed_count[managed_current]++
-                        managed_order[managed_current SUBSEP managed_count[managed_current]] = key
-                        managed_line[composite] = line
-                    }
-                }
-            }
-            close(managed_file)
-            current_section = ""
-        }
-        {
-            line = $0
-            if (is_header(line)) {
-                if (current_section != "") emit_missing(current_section)
-                current_section = header_name(line)
-                current_section_seen[current_section] = 1
-                print line
-                next
-            }
-            key = assignment_key(line)
-            composite = current_section SUBSEP key
-            if (key != "" && composite in managed_line) {
-                if (!seen[composite]) {
-                    print managed_line[composite]
-                    seen[composite] = 1
-                }
-                next
-            }
-            print line
-        }
-        END {
-            if (current_section != "") emit_missing(current_section)
-            for (i = 1; i <= managed_section_count; i++) {
-                section = managed_order_sections[i]
-                if (!current_section_seen[section]) {
-                    print ""
-                    print section
-                    emit_missing(section)
-                }
-            }
-        }
-    ' "$current" >"$merged"
-
-    current_normalized=$workspace/merge-toml-current-normalized-$merge_index
-    merged_normalized=$workspace/merge-toml-merged-normalized-$merge_index
-    sed '/^[[:space:]]*$/d' "$current" >"$current_normalized"
-    sed '/^[[:space:]]*$/d' "$merged" >"$merged_normalized"
-    if cmp -s "$current_normalized" "$merged_normalized"; then
+    current_normalized=$workspace/merge-json-current-$merge_index
+    merged_normalized=$workspace/merge-json-merged-$merge_index
+    if "$jq_bin" -S -c . "$current" >"$current_normalized" \
+        && "$jq_bin" -S -c . "$merged" >"$merged_normalized" \
+        && cmp -s "$current_normalized" "$merged_normalized"; then
         cp "$current" "$output"
     else
         cp "$merged" "$output"
@@ -575,12 +403,6 @@ prepare_desired() {
                     ;;
             esac
             merge_json_file "$target" "$merge_source" "$desired_output"
-            ;;
-        merge-toml)
-            merge_index=$((merge_index + 1))
-            fragment=$workspace/merge-toml-$merge_index
-            render_template "$source" "$fragment"
-            merge_toml_file "$target" "$fragment" "$desired_output"
             ;;
         *)
             printf 'Invalid rendered deployment method: %s\n' "$method" >&2
@@ -609,7 +431,7 @@ build_plan() {
 
         case "$method" in
             link | copy) ;;
-            template | merge-json | merge-toml)
+            template | merge-json)
                 index=$((index + 1))
                 desired=$workspace/rendered/$index
                 prepare_desired "$method" "$source_path" "$target" "$desired"

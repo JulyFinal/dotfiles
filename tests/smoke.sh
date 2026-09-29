@@ -33,8 +33,7 @@ test ! -e "$repo_dir/config/yazi/keymap.toml"
 test ! -e "$repo_dir/config/yazi/yazi.toml"
 test ! -e "$repo_dir/config/yazi/plugins"
 test ! -e "$repo_dir/config/yazi/flavors"
-test -f "$repo_dir/config/agents/codex/mcp.toml.j2"
-test ! -e "$repo_dir/config/agents/codex/config.toml.j2"
+test ! -e "$repo_dir/config/agents/codex"
 test -f "$repo_dir/config/agents/pi/agent/mcp.json.j2"
 test -f "$repo_dir/config/README.md"
 test -z "$(find "$repo_dir/config" -name '.*' -print -quit)"
@@ -119,35 +118,11 @@ test ! -e "$personal_home/.config/yazi/keymap.toml"
 test ! -e "$personal_home/.config/yazi/yazi.toml"
 test ! -e "$personal_home/.config/yazi/plugins"
 test ! -e "$personal_home/.config/yazi/flavors"
-test -f "$personal_home/.codex/config.toml"
-test ! -L "$personal_home/.codex/config.toml"
-! grep -Fq '^model =' "$personal_home/.codex/config.toml"
-! grep -Fq '[projects.' "$personal_home/.codex/config.toml"
-! grep -Fq '[marketplaces.waza]' "$personal_home/.codex/config.toml"
-! grep -Fq '[marketplaces.kami]' "$personal_home/.codex/config.toml"
-! grep -Fq 'waza@waza' "$personal_home/.codex/config.toml"
-! grep -Fq 'kami@kami' "$personal_home/.codex/config.toml"
-test "$(stat -c '%a' "$personal_home/.codex/config.toml" 2>/dev/null || stat -f '%Lp' "$personal_home/.codex/config.toml")" = 600
 test -f "$personal_home/.pi/agent/mcp.json"
 test ! -L "$personal_home/.pi/agent/mcp.json"
 
 merge_home=$test_root/merge
-mkdir -p "$merge_home/.codex" "$merge_home/.pi/agent"
-printf '%s\n' \
-    'model = "gpt-local"' \
-    'model_reasoning_effort = "max"' \
-    '' \
-    '[projects."/tmp/keep"]' \
-    'trust_level = "trusted"' \
-    '' \
-    '[mcp_servers]' \
-    'custom = "keep"' \
-    '' \
-    '[mcp_servers.context7]' \
-    'command = "old-command"' \
-    'args = ["old"]' \
-    'custom_option = "keep"' \
-    >"$merge_home/.codex/config.toml"
+mkdir -p "$merge_home/.pi/agent"
 printf '%s\n' \
     '{' \
     '  "defaultModel": "local-model",' \
@@ -169,11 +144,6 @@ printf '%s\n' \
     >"$merge_home/.pi/agent/mcp.json"
 DOTFILES_HOME="$merge_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" apply personal --yes >/dev/null
-grep -Fq 'model = "gpt-local"' "$merge_home/.codex/config.toml"
-grep -Fq 'model_reasoning_effort = "max"' "$merge_home/.codex/config.toml"
-grep -Fq '[projects."/tmp/keep"]' "$merge_home/.codex/config.toml"
-grep -Fq 'custom = "keep"' "$merge_home/.codex/config.toml"
-grep -Fq 'custom_option = "keep"' "$merge_home/.codex/config.toml"
 grep -Fq '"defaultModel": "local-model"' "$merge_home/.pi/agent/settings.json"
 grep -Fq '"defaultThinkingLevel": "low"' "$merge_home/.pi/agent/settings.json"
 grep -Fq '"domain": "feishu"' "$merge_home/.pi/agent/settings.json"
@@ -196,10 +166,10 @@ DOTFILES_HOME="$macos_home" DOTFILES_PLATFORM=macos \
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" plan core personal --drift >/dev/null
 
-chmod 0644 "$personal_home/.codex/config.toml"
+chmod 0644 "$personal_home/.pi/agent/mcp.json"
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" plan personal >"$test_root/plan-mode"
-grep -Fq "REPLACE  $personal_home/.codex/config.toml  (merge-toml)" \
+grep -Fq "REPLACE  $personal_home/.pi/agent/mcp.json  (merge-json)" \
     "$test_root/plan-mode"
 if DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" plan personal --drift >"$test_root/plan-drift" 2>&1; then

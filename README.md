@@ -35,8 +35,8 @@ tests/                    smoke test and secret scanner
 
 The repository source path does not have to match the destination path. For
 example, `config/mise/config.toml` maps to
-`~/.config/mise/config.toml`, while `config/agents/codex/mcp.toml.j2` merges
-only its managed MCP keys into `~/.codex/config.toml`. See
+`~/.config/mise/config.toml`, while `config/agents/pi/agent/mcp.json.j2` merges
+only its managed MCP keys into `~/.pi/agent/mcp.json`. See
 [`config/README.md`](config/README.md) for the visible layout and
 [`manifests/files.yaml`](manifests/files.yaml) for the complete mapping.
 
@@ -142,11 +142,8 @@ source of truth:
   mode.
 - `merge-json` recursively updates only fields present in the source; the
   `packages` array is add-only, and unknown fields remain untouched.
-- `merge-toml` updates only TOML keys present in the source fragment; other
-  tables and fields remain untouched, and absent managed sections are not
-  deleted.
-- Existing JSON/TOML merge targets require `jq` or `python3`; if neither is
-  available, `apply` refuses to overwrite the target.
+- Existing JSON merge targets require `jq`; if it is missing, `apply` refuses
+  to overwrite the target.
 
 Shell entrypoints such as `~/.zshrc` are copied because installers often append
 to them. Their repository-owned configuration lives in `config/shell/`.
