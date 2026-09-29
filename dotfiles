@@ -117,6 +117,8 @@ parse_manifest() {
         }
         function emit_entry() {
             if (entry_id != "") {
+                if (entry_method == "") entry_method = "link"
+                if (entry_mode == "") entry_mode = "0644"
                 if (entry_platforms == "") entry_platforms = "all"
                 printf "entry\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", \
                     entry_id, entry_group, entry_source, entry_target, \

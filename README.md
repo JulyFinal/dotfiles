@@ -134,7 +134,9 @@ the manifest in the smoke test; it is not required to apply core files.
 The `method` field in [`manifests/files.yaml`](manifests/files.yaml) is the
 source of truth:
 
-- `link` creates an absolute symlink to the repository source.
+- `link` creates an absolute symlink to the repository source. It is the
+  default method; `mode` likewise defaults to `0644` and both fields are only
+  needed for exceptions.
 - `copy` creates an independent file and reapplies the declared mode.
 - `template` renders a `.j2` source through MiniJinja and applies the declared
   mode.
