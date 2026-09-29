@@ -2,6 +2,26 @@ search_mode = "daemon-fuzzy"
 store_failed = true
 secrets_filter = true
 
+[history]
+# 琐碎/导航类命令不记录也不保留(配合 `atuin history prune` 清理存量)
+exclude = [
+  "^ls$",
+  "^ll$",
+  "^lla$",
+  "^la$",
+  "^l$",
+  "^cd$",
+  "^cd ",
+  "^pwd$",
+  "^exit$",
+  "^clear$",
+  "^cls$",
+  "^history$",
+  "^top$",
+  "^df$",
+  "^free$",
+]
+
 [daemon]
 enabled = true
 autostart = true

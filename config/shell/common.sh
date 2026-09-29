@@ -8,3 +8,8 @@ if [ -d "$HOME/.nix-profile/bin" ]; then
     PATH="$HOME/.nix-profile/bin:$PATH"
 fi
 export PATH
+
+# user aliases (migrated from atuin dotfiles store)
+if [ -f "$HOME/.config/shell/aliases.sh" ]; then
+    . "$HOME/.config/shell/aliases.sh"
+fi

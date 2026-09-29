@@ -36,6 +36,12 @@ entries:
     target: .config/shell/common.sh
     method: link
     mode: "0644"
+  - id: shell.aliases
+    group: core
+    source: config/shell/aliases.sh
+    target: .config/shell/aliases.sh
+    method: link
+    mode: "0644"
   - id: shell.zsh-config
     group: core
     source: config/shell/zshrc

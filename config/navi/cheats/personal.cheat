@@ -11,6 +11,11 @@ rclone serve http . --addr :8000
 # python 当前目录 http 服务
 uvx python -m http.server 8000
 
+% fileserver, rw
+
+# dufs 当前目录双向文件服务器
+dufs . -A -p 8000
+
 % git
 
 # git 设置 nvim 为默认编辑器
