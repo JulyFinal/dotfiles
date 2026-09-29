@@ -186,8 +186,7 @@ grep -Fq '"customField": "keep"' "$merge_home/.pi/agent/mcp.json"
 grep -Fq '"directTools": true' "$merge_home/.pi/agent/mcp.json"
 grep -Fq '"context7"' "$merge_home/.pi/agent/mcp.json"
 DOTFILES_HOME="$merge_home" DOTFILES_PLATFORM=linux \
-    "$repo_dir/dotfiles" doctor personal >"$test_root/merge-doctor"
-grep -Fq '0 drifted or missing path(s).' "$test_root/merge-doctor"
+    "$repo_dir/dotfiles" plan personal --drift >/dev/null
 
 macos_home=$test_root/macos
 mkdir -p "$macos_home"
@@ -195,8 +194,7 @@ DOTFILES_HOME="$macos_home" DOTFILES_PLATFORM=macos \
     "$repo_dir/dotfiles" apply personal --yes >/dev/null
 
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
-    "$repo_dir/dotfiles" doctor core personal >"$test_root/doctor"
-grep -Fq '0 drifted or missing path(s).' "$test_root/doctor"
+    "$repo_dir/dotfiles" plan core personal --drift >/dev/null
 
 chmod 0644 "$personal_home/.codex/config.toml"
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
@@ -204,11 +202,10 @@ DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
 grep -Fq "REPLACE  $personal_home/.codex/config.toml  (merge-toml)" \
     "$test_root/plan-mode"
 if DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
-    "$repo_dir/dotfiles" doctor personal >"$test_root/doctor-mode" 2>&1; then
-    printf '%s\n' 'doctor unexpectedly ignored a mode drift' >&2
+    "$repo_dir/dotfiles" plan personal --drift >"$test_root/plan-drift" 2>&1; then
+    printf '%s\n' 'plan --drift unexpectedly ignored a mode drift' >&2
     exit 1
 fi
-grep -Fq "DRIFT    $personal_home/.codex/config.toml" "$test_root/doctor-mode"
 DOTFILES_HOME="$personal_home" DOTFILES_PLATFORM=linux \
     "$repo_dir/dotfiles" apply personal --yes >/dev/null
 

@@ -104,7 +104,7 @@ The public backend is intentionally small:
 ./dotfiles apply core --yes
 ./dotfiles install core
 ./dotfiles install yazi
-./dotfiles doctor core personal
+./dotfiles plan core personal --drift
 ./dotfiles explain ~/.zshrc
 ```
 
