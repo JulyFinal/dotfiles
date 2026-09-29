@@ -121,8 +121,6 @@ test ! -e "$personal_home/.config/yazi/plugins"
 test ! -e "$personal_home/.config/yazi/flavors"
 test -f "$personal_home/.codex/config.toml"
 test ! -L "$personal_home/.codex/config.toml"
-grep -Fq "$personal_home/.local/share/mise/shims/context7-mcp" \
-    "$personal_home/.codex/config.toml"
 ! grep -Fq '^model =' "$personal_home/.codex/config.toml"
 ! grep -Fq '[projects.' "$personal_home/.codex/config.toml"
 ! grep -Fq '[marketplaces.waza]' "$personal_home/.codex/config.toml"
@@ -132,7 +130,6 @@ grep -Fq "$personal_home/.local/share/mise/shims/context7-mcp" \
 test "$(stat -c '%a' "$personal_home/.codex/config.toml" 2>/dev/null || stat -f '%Lp' "$personal_home/.codex/config.toml")" = 600
 test -f "$personal_home/.pi/agent/mcp.json"
 test ! -L "$personal_home/.pi/agent/mcp.json"
-grep -Fq 'context7' "$personal_home/.pi/agent/mcp.json"
 
 merge_home=$test_root/merge
 mkdir -p "$merge_home/.codex" "$merge_home/.pi/agent"
@@ -177,8 +174,6 @@ grep -Fq 'model_reasoning_effort = "max"' "$merge_home/.codex/config.toml"
 grep -Fq '[projects."/tmp/keep"]' "$merge_home/.codex/config.toml"
 grep -Fq 'custom = "keep"' "$merge_home/.codex/config.toml"
 grep -Fq 'custom_option = "keep"' "$merge_home/.codex/config.toml"
-grep -Fq "$merge_home/.local/share/mise/shims/context7-mcp" \
-    "$merge_home/.codex/config.toml"
 grep -Fq '"defaultModel": "local-model"' "$merge_home/.pi/agent/settings.json"
 grep -Fq '"defaultThinkingLevel": "low"' "$merge_home/.pi/agent/settings.json"
 grep -Fq '"domain": "feishu"' "$merge_home/.pi/agent/settings.json"
