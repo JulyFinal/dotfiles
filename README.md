@@ -162,15 +162,7 @@ installs the tools declared by
 ./dotfiles install core
 ```
 
-That tool set includes `rclone` for the Navi file-server cheat and the Git
-Cargo build of `simple-completion-language-server` (`scls`) used by Helix
-snippets. After applying personal configuration, fetch the external snippet
-repository explicitly when needed:
-
-```sh
-simple-completion-language-server fetch-external-snippets
-simple-completion-language-server validate-snippets
-```
+That tool set includes `rclone` for the Navi file-server cheat.
 
 Tool declarations intentionally use `latest`. Agent skills are declared in
 [`manifests/agent-skills.yaml`](manifests/agent-skills.yaml). Synchronize the

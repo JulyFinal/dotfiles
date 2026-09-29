@@ -48,12 +48,9 @@ test "$(grep -Fxc 'git config --global credential.helper store' "$navi_cheat")" 
 grep -Fq 'caddy file-server --browse' "$navi_cheat"
 grep -Fq 'uvx python -m http.server 8000' "$navi_cheat"
 grep -Fq 'rclone serve http . --addr :8000' "$navi_cheat"
-grep -Fq 'simple-completion-language-server' "$repo_dir/config/helix/languages.toml"
 test -f "$repo_dir/config/helix/external-snippets.toml"
 test -f "$repo_dir/config/helix/snippets/python.toml"
 grep -Fq 'rclone = "latest"' "$repo_dir/config/mise/config.toml"
-grep -Fq 'cargo:https://github.com/estin/simple-completion-language-server' \
-    "$repo_dir/config/mise/config.toml"
 mise_installer_bin=$test_root/mise-installer-bin
 mise_installer_log=$test_root/mise-installer-calls
 mkdir -p "$mise_installer_bin"
