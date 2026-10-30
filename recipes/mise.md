@@ -1,52 +1,27 @@
 # Mise
 
-The executable installer uses the official `https://mise.run` endpoint and
-installs Mise into `~/.local/bin/mise`.
-
-Run it directly:
+先链接配置，再按需安装工具：
 
 ```sh
+./setup
 ./scripts/install-mise
+export PATH="$HOME/.local/bin:$PATH"
+mise trust ~/.config/mise/config.toml
+mise install
 ```
 
-Then install every tool declared by the repository:
+工具声明直接编辑 `home/.config/mise/config.toml`。
+`install-mise` 使用官方 `https://mise.run`，安装到 `~/.local/bin/mise`。
+
+Yazi 的插件与主题：
 
 ```sh
-MISE_CONFIG_FILE="$PWD/config/mise/config.toml" mise install
+ya pkg install
 ```
 
-This also installs `minijinja-cli`, which the template deployment path uses to
-render agent configuration files. Secret values are supplied from
-the ignored repository-root `secrets.toml` when that file exists.
-
-The same tool set installs `rclone` and builds Helix's
-`simple-completion-language-server` from its Git repository with Cargo's
-locked dependency resolution.
-
-Configuration deployment and software installation are intentionally separate:
-
-```sh
-./dotfiles apply core
-./dotfiles install core
-```
-
-Yazi's plugin and flavor packages are installed separately after its personal
-configuration has been applied:
-
-```sh
-./dotfiles apply personal
-./dotfiles install yazi
-```
-
-After core configuration and tools are present, synchronize the shared agent
-skills declared in `manifests/agent-skills.yaml`:
-
-```sh
-mise run skills-sync
-```
-
-Preview the resolved sources and target agents first:
+Agent skills 的来源和目标保留在 `manifests/agent-skills.yaml`：
 
 ```sh
 mise run skills-sync -- --dry-run
+mise run skills-sync
 ```

@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+"""Preview or apply the migration from ~/go to ~/.local/share/go."""
+
+import argparse
+import os
+from pathlib import Path
+import shutil
+import subprocess
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply", action="store_true", help="perform the migration")
+    args = parser.parse_args()
+    home = Path.home()
+    old = home / "go"
+    new = home / ".local/share/go"
+    tools = home / ".local/bin"
+    go = shutil.which("go")
+    if not go:
+        parser.error("go is not available on PATH")
+    if old.is_symlink() or new.is_symlink():
+        parser.error("GOPATH is a symlink; inspect it before migrating")
+    if old.exists() and new.exists():
+        parser.error(f"both {old} and {new} exist; refusing to merge or overwrite")
+    source = old if old.exists() else new
+    if source.exists() and not source.is_dir():
+        parser.error(f"{source} is not a directory")
+    bin_dir = source / "bin"
+    if bin_dir.is_symlink():
+        parser.error("GOPATH/bin is a symlink; inspect it before migrating")
+    binaries = sorted(bin_dir.iterdir()) if bin_dir.exists() else []
+    for binary in binaries:
+        target = tools / binary.name
+        if target.exists() or target.is_symlink():
+            parser.error(f"tool destination already exists: {target}")
+    print(f"GOPATH: {old} -> {new}")
+    print(f"GOBIN: {tools} ({len(binaries)} tools to move)")
+    print(f"GOMODCACHE: {new / 'pkg/mod'}")
+    if not args.apply:
+        print("Preview only. Run again with --apply to migrate.")
+        return
+    new.parent.mkdir(parents=True, exist_ok=True)
+    tools.mkdir(parents=True, exist_ok=True)
+    if old.exists():
+        shutil.move(str(old), str(new))
+    else:
+        new.mkdir(exist_ok=True)
+    for binary in binaries:
+        shutil.move(str(new / "bin" / binary.name), str(tools / binary.name))
+    if (new / "bin").exists():
+        (new / "bin").rmdir()
+    env = os.environ.copy()
+    for name in ("GOPATH", "GOBIN", "GOMODCACHE"):
+        env.pop(name, None)
+    subprocess.run(
+        [go, "env", "-w", f"GOPATH={new}", f"GOBIN={tools}",
+         f"GOMODCACHE={new / 'pkg/mod'}"],
+        env=env, check=True,
+    )
+    print("Migration complete. Open a new terminal to refresh shell variables.")
+
+
+if __name__ == "__main__":
+    main()

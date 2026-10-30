@@ -16,7 +16,5 @@ command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
 
 command -v navi >/dev/null 2>&1 && eval "$(navi widget zsh)"
 
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
 export GO111MODULE=on
 export GOPROXY=https://goproxy.cn

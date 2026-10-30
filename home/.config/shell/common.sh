@@ -1,3 +1,6 @@
+export GOPATH="$HOME/.local/share/go"
+export GOBIN="$HOME/.local/bin"
+
 if [ -d "$HOME/.local/bin" ]; then
     PATH="$HOME/.local/bin:$PATH"
 fi

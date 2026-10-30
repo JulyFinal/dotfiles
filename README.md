@@ -1,10 +1,25 @@
-# Personal Environment Kit
+# Dotfiles
 
-This repository is a small, direct configuration center for disposable
-machines. The source tree is intentionally visible; a single YAML menu maps
-those sources to the hidden paths applications expect under `$HOME`.
+`home/` 就是家目录的复刻。去掉 `home/`，就是文件在 `~` 下的位置。
 
-The default path needs only a POSIX shell and Git:
+```text
+home/
+├── .bashrc
+├── .profile
+├── .zshrc
+├── .tmux.conf
+├── .config/
+│   ├── mise/
+│   ├── nvim/
+│   ├── shell/
+│   ├── kitty/
+│   └── …
+├── .local/share/navi/
+└── .pi/agent/
+setup
+```
+
+## 初始化 / 更新
 
 ```sh
 git clone https://github.com/JulyFinal/dotfiles.git ~/dotfiles
@@ -12,209 +27,60 @@ cd ~/dotfiles
 ./setup
 ```
 
-`setup` presents a short interactive menu. On a temporary machine, selecting
-**Core configurations** is enough; personal files, tool installation, and
-diagnostics remain separate choices.
+`setup` 按相同路径逐个建立文件软链接，**覆盖目标处已有的文件或软链接，不备份**。
+其他文件保留；遇到同名目录或父目录软链接会报错，由你手动整理后重跑。
+脚本不下载、不安装软件，也不会自动拉取 Git 更新。
 
-## What lives where
+`.bashrc`、`.profile`、`.zshrc` 是例外：保留本机内容，只补上仓库入口中的加载语句，
+已有的相同语句不会重复添加。实际 Shell 配置编辑 `home/.config/shell/`。
+这些入口只放单行加载语句；仅本机使用的内容可以继续写在 `~/.zshrc` 等入口，
+也可以写进 `~/.zshrc.local`、`~/.bashrc.local`、`~/.profile.local`。
 
-```text
-config/                   visible configuration sources
-config/README.md          source-tree guide
-manifests/files.yaml      source, target, method, mode, and platform menu
-manifests/agent-skills.yaml
-                          external skills and their agent targets
-secrets.example.toml      copyable secret-file shape; secrets.toml is ignored
-minijinja.toml            repository-local template defaults
-scripts/install-mise      standalone Mise installer
-systems/                  Arch installer inputs plus Linux/macOS package references
-recipes/                  commands worth keeping, not deployed configuration
-docs/                     maintenance and contributor notes
-tests/                    smoke test and secret scanner
-```
-
-The repository source path does not have to match the destination path. For
-example, `config/mise/config.toml` maps to
-`~/.config/mise/config.toml`, while `config/agents/pi/agent/mcp.json.j2` merges
-only its managed MCP keys into `~/.pi/agent/mcp.json`. See
-[`config/README.md`](config/README.md) for the visible layout and
-[`manifests/files.yaml`](manifests/files.yaml) for the complete mapping.
-
-## Scopes
-
-The deployment menu currently has two groups:
-
-- **Core**: shell entrypoints, Tmux, Navi cheats, Mise, Starship, and portable
-  shell paths.
-- **Personal**: Neovim, Helix, Kitty, Yazi, Atuin, Tealdeer, Vicinae, and the
-  local agent configuration.
-
-The group is only a selection menu. The exact files and behavior live in the
-manifest, so adding or removing one file does not require changing the shell
-engine.
-
-## Secrets and templates
-
-Real secret values stay in the ignored repository-root `secrets.toml`:
+平时直接编辑 `home/` 中的配置，或编辑已经链接的目标文件。
+保存后文件内容立即同步，应用按自身方式重载配置。新增文件后再运行一次 `./setup`。
+更新仓库后也运行同一个命令：
 
 ```sh
-cp secrets.example.toml secrets.toml
-chmod 600 secrets.toml
-```
-
-The file is never linked into `$HOME`. A `.j2` source is rendered when its
-manifest entry uses `template` or a merge method; ordinary `link` and `copy`
-entries use the source directly. MiniJinja receives the root TOML file as
-template data, so a template can use values such as:
-
-```jinja
-{{ service.api_token }}
-{{ home }}
-{% if docker_available %} ... {% endif %}
-```
-
-On a temporary machine, apply only `core` and no secret file is needed. If the
-secret file was moved elsewhere, point at it explicitly:
-
-```sh
-DOTFILES_SECRETS_FILE=/path/to/secrets.toml \
-    ./dotfiles apply personal
-```
-
-## Human interface
-
-Use the interactive installer:
-
-```sh
+git pull
 ./setup
 ```
 
-It can select core or personal configuration, install the Mise tool set, and
-run diagnostics. Before changing the destination it prints the complete plan
-and unified diffs. After confirmation it applies the repository version
-directly; it does not create backups.
+旧机器上的链接若指向已移除的 `config/` 文件，重跑 `setup` 会重新建立。
+仓库中删除的文件不会自动从机器上清理；移动仓库后需要重新运行 `setup`。
 
-## Scriptable interface
+Pi 的两个 JSON 文件也是普通配置，直接链接并覆盖，不再做模板渲染或字段合并。
+需要保留本机 Pi 设置时，先手动整理差异。软链接目标中的修改也会写回仓库，密钥、
+令牌和机器私有配置不要放进这些文件；提交前可运行 `./tests/pre-commit worktree`。
 
-The public backend is intentionally small:
+## 软件安装
 
-```sh
-./dotfiles plan core personal
-./dotfiles apply core personal
-./dotfiles apply core --yes
-./dotfiles install core
-./dotfiles install yazi
-./dotfiles plan core personal --drift
-./dotfiles explain ~/.zshrc
-```
-
-Useful boundaries:
-
-- `apply` never accesses the network.
-- `install` is the only networked action.
-- Existing destination files are replaced only after the plan is shown and
-  confirmed.
-- Deleted repository files are not removed from old machines automatically.
-- `platforms` in the manifest controls platform-specific entries; there are no
-  separate overlay trees.
-
-Preview against an isolated home:
+配置和安装分开，按需执行：
 
 ```sh
-DOTFILES_HOME=/tmp/test-home DOTFILES_PLATFORM=macos \
-    ./dotfiles plan core personal
-```
+./scripts/install-mise
+export PATH="$HOME/.local/bin:$PATH"
+mise trust ~/.config/mise/config.toml
+mise install
 
-The manifest parser intentionally uses a small, flat YAML subset so the core
-workflow still works on a fresh POSIX machine. `yq`, when available, validates
-the manifest in the smoke test; it is not required to apply core files.
+# Yazi 插件与主题
+ya pkg install
 
-## Link, copy, template, and merge behavior
-
-The `method` field in [`manifests/files.yaml`](manifests/files.yaml) is the
-source of truth:
-
-- `link` creates an absolute symlink to the repository source. It is the
-  default method; `mode` likewise defaults to `0644` and both fields are only
-  needed for exceptions.
-- `copy` creates an independent file and reapplies the declared mode.
-- `template` renders a `.j2` source through MiniJinja and applies the declared
-  mode.
-- `merge-json` recursively updates only fields present in the source; the
-  `packages` array is add-only, and unknown fields remain untouched.
-- Existing JSON merge targets require `jq`; if it is missing, `apply` refuses
-  to overwrite the target.
-
-Shell entrypoints such as `~/.zshrc` are copied because installers often append
-to them. Their repository-owned configuration lives in `config/shell/`.
-Reapplying shows a diff and recreates the thin entrypoint. Codex and Pi agent
-settings use merge methods so model choices, project trust, Feishu values, and
-other machine-specific fields are preserved.
-
-## Installing tools
-
-Core installation uses the official Mise installer when Mise is missing, then
-installs the tools declared by
-[`config/mise/config.toml`](config/mise/config.toml):
-
-```sh
-./dotfiles install core
-```
-
-That tool set includes `rclone` for the Navi file-server cheat.
-
-Tool declarations intentionally use `latest`. Agent skills are declared in
-[`manifests/agent-skills.yaml`](manifests/agent-skills.yaml). Synchronize the
-shared copy for Codex, Claude Code, and Pi with:
-
-```sh
+# Agent skills（来源在 manifests/agent-skills.yaml）
 mise run skills-sync
 ```
 
-Preview without changing anything with:
+Arch 系统安装脚本保留在 `systems/arch/install`；Linux / macOS 软件列表在 `systems/`。
+更多 Mise 命令见 [recipes/mise.md](recipes/mise.md)。
 
-```sh
-mise run skills-sync -- --dry-run
-```
-
-See [`recipes/mise.md`](recipes/mise.md) for the direct commands.
-
-Yazi keeps only its flavor selection and flavor dependency lock in the repository:
-[`config/yazi/theme.toml`](config/yazi/theme.toml) and
-[`config/yazi/package.toml`](config/yazi/package.toml). Applying personal
-configuration is offline; install the locked Yazi plugin/flavor explicitly
-afterward:
-
-```sh
-./dotfiles apply personal
-./dotfiles install yazi
-```
-
-The Yazi install step uses `ya pkg install` and downloads the locked packages
-into the target home's Yazi configuration directory.
-
-## Arch installation
-
-Arch system installation is deliberately outside the dotfiles workflow:
-
-```sh
-systems/arch/install --profile laptop-intel --dry-run
-systems/arch/install --profile desktop
-```
-
-`setup` and `dotfiles apply` never call this installer.
-
-The Arch package files are consumed by `systems/arch/install`. The Linux and
-macOS files are deliberately manual reference lists for package-manager
-translation; no generic `dotfiles` command pretends to install them.
-
-## Safety and verification
+## 检查
 
 ```sh
 ./tests/smoke.sh
 ./tests/pre-commit worktree
 ```
 
-The pre-commit scanner rejects credential-shaped content. Put real secret
-values in the ignored root `secrets.toml`; do not add runtime provider names or
-URLs to configuration examples.
+冒烟测试使用临时 HOME，不修改当前用户配置。需要提交时自动检查敏感信息，可手动启用：
+
+```sh
+git config core.hooksPath tests
+```

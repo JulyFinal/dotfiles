@@ -1,6 +1,6 @@
 [tools]
 go = "latest"
-node = "24"
+node = "26"
 npm = "12"
 rust = "stable"
 uv = "latest"
@@ -16,7 +16,6 @@ shfmt = "latest"
 starship = "latest"
 stylua = "latest"
 taplo = "latest"
-"cargo:minijinja-cli" = "latest"
 ty = "latest"
 yazi = "latest"
 yq = "latest"
@@ -29,12 +28,26 @@ codex = "latest"
 pi = "latest"
 tree-sitter = "latest"
 vercel = { version = "latest", allow_builds = ["esbuild"], trust_policy_excludes = ["undici"] }
-python = "3.14"
+python = "3.15"
 superfile = "latest"
-atuin = "latest"
+"npm:cf" = "latest"
+"npm:@deepseek-ai/dsh" = "latest"
+cargo-binstall = "latest"
+atuin = { version = "latest", libc = "musl" }
+
+[env]
+GOPATH = "{{env.HOME}}/.local/share/go"
+GOBIN = "{{env.HOME}}/.local/bin"
 
 [settings]
 minimum_release_age = "0"
+http_timeout = "60"
 
 [settings.npm]
 package_manager = "npm"
+
+# [settings.url_replacements]
+# 代理 GitHub Release 和 Archive 下载
+# 'regex:^https://github\.com/' = 'https://gh-proxy.com/https://github.com/'
+# 单独代理 GitHub API 请求
+# 'regex:^https://api\.github\.com/' = 'https://gh-proxy.com/https://api.github.com/'

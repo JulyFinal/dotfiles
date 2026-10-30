@@ -4,7 +4,7 @@ runtime/
 *.tmp
 
 # lazy.nvim refreshes this runtime lock on plugin updates.
-/config/nvim/lazy-lock.json
+/home/.config/nvim/lazy-lock.json
 
 # Keep generated/live credentials out of Git.
 /secrets.toml
