@@ -11,3 +11,7 @@ runtime/
 *.ovpn
 *.p12
 *.pfx
+
+# Subscription URLs and node credentials stay machine-local.
+/home/config/nproxy/subscription.url
+/home/config/nproxy/subscription.yaml

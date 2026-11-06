@@ -1,0 +1,41 @@
+# Standalone direct-only proxy. Never imports the main mihomo configuration.
+mixed-port: 10818
+bind-address: 127.0.0.1
+allow-lan: false
+mode: direct
+log-level: info
+ipv6: false
+find-process-mode: off
+external-controller: ''
+external-controller-unix: ''
+profile:
+  store-selected: false
+  store-fake-ip: false
+tun:
+  enable: false
+proxies: []
+proxy-groups: []
+proxy-providers: {}
+rule-providers: {}
+rules:
+  - MATCH,DIRECT
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+  respect-rules: false
+  use-hosts: false
+  use-system-hosts: false
+  default-nameserver:
+    - tcp://45.90.28.0
+    - tcp://8.8.8.8
+  # NextDNS gave the most reliable GitHub addresses on this connection.
+  nameserver:
+    - tcp://45.90.28.0
+  fallback:
+    - tcp://8.8.8.8
+  fallback-filter:
+    # Keep valid foreign answers; use Google only if the primary fails.
+    geoip: false
+    ipcidr:
+      - 0.0.0.0/32

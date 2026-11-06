@@ -24,7 +24,9 @@
 ## 日常使用
 
 ```sh
-eproxy                         # 开启默认代理
+eproxy                         # 开启默认代理（10808）
+nproxy                         # 订阅节点代理，10809 自动选节点
+dproxy                         # DNS 直连代理，10818 全部直连
 eproxy http://127.0.0.1:7890    # 临时换地址；下次不带参数仍使用默认值
 checkproxy                     # 查看代理状态
 unproxy                        # 关闭代理
@@ -33,6 +35,30 @@ zshreload                      # 编辑后重载配置
 
 代理默认地址只需在 `home/config/shell/aliases.sh` 的 `eproxy` 函数中改一处。
 navi 中的代理条目也调用这些命令。重复重载共享配置不会重复添加 PATH。
+
+`nproxy` 或 `dproxy` 启动后照常运行 `mise up`、`mise install` 等命令。
+`unproxy` 关闭，`eproxy` 切回原来的 `10808`；两种新代理之间也可直接切换。
+仅影响当前 shell 及其子进程；多个 shell 共用对应的独立实例，最后一个使用者
+关闭代理或退出后自动停止，不改动已有 mihomo 服务。
+
+| 命令 | 本机端口 | 用途 | 仓库配置 |
+| --- | --- | --- | --- |
+| `eproxy` | `10808` | 原有代理 | 保持原样 |
+| `nproxy` | `10809` | 订阅节点，自动测延迟选择 | `home/config/nproxy/config.yaml` |
+| `dproxy` | `10818` | 全部 DIRECT，境外 DNS 优先 | `home/config/dproxy/config.yaml` |
+
+`nproxy` 启动时测试候选节点并选择已测最快的可用节点。
+`nproxy` 先按本机的境外优先 DNS 配置解析目标，再经订阅节点发送 IP，
+减少远端 DNS 不稳定的影响；至少一个节点实测通过后才切换当前终端代理。
+
+两个独立实例仅监听 `127.0.0.1`，主解析使用本机实测更适合 GitHub 的 NextDNS TCP DNS；
+解析失败时以 Google TCP DNS 兜底，当前不配置国内 DNS。
+关闭 GeoIP 回退判断，避免正常的境外地址被替换。需要已安装 `mihomo` 和 Python 3，`nproxy` 还需要 `yq` 和 `curl`。
+日志分别在 `~/.local/state/nproxy/mihomo.log`、`~/.local/state/dproxy/mihomo.log`。
+
+订阅地址只存本机 `~/.config/nproxy/subscription.url`（权限 `600`），不要提交到仓库。
+`nproxy` 启动时按需更新订阅，缓存一小时；更新失败时可继续使用已有缓存。
+节点凭据保存在 `~/.local/state/nproxy/data/`，订阅中的其他端口、规则和 DNS 配置不会应用。
 
 ## 初始化 / 更新
 

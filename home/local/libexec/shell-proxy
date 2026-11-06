@@ -1,0 +1,354 @@
+#!/usr/bin/env python3
+"""Manage isolated dproxy/nproxy mihomo instances; shell activation lives in aliases.sh."""
+
+import fcntl
+import json
+import http.client
+import os
+from pathlib import Path
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import time
+import urllib.request
+
+PORTS = {'dproxy': 10818, 'nproxy': 10809}
+if len(sys.argv) < 2 or sys.argv[1] not in PORTS:
+    raise SystemExit('Expected profile: dproxy or nproxy')
+PROFILE = sys.argv.pop(1)
+STATE = Path.home() / '.local/state' / PROFILE
+CONTROL = STATE / 'control.sock'
+CONFIG = Path.home() / '.config' / PROFILE / 'config.yaml'
+ADDRESS = ('127.0.0.1', PORTS[PROFILE])
+
+
+def clean_env():
+    return {k: v for k, v in os.environ.items()
+            if k.lower() not in {'http_proxy', 'https_proxy', 'all_proxy', 'no_proxy', 'ftp_proxy'}}
+
+
+def read_yaml(path, expression='.'):
+    if not shutil.which('yq'):
+        raise RuntimeError('nproxy requires yq (included in the mise tool configuration)')
+    result = subprocess.run(['yq', '-o=json', expression, str(path)],
+                            capture_output=True, text=True, timeout=10)
+    if result.returncode:
+        raise RuntimeError('private subscription/configuration could not be parsed')
+    return json.loads(result.stdout)
+
+
+def subscription_nodes(path):
+    nodes = read_yaml(path, '.proxies')
+    if not isinstance(nodes, list) or not nodes:
+        raise RuntimeError('the subscription contains no proxy nodes')
+    for node in nodes:
+        if not isinstance(node, dict) or not node.get('server') or node.get('dialer-proxy'):
+            raise RuntimeError('unsupported subscription node or proxy chain')
+        if node.get('type') in (None, 'direct', 'dns', 'reject'):
+            raise RuntimeError('the subscription must contain real proxy nodes')
+    return nodes
+
+
+def prepare_config():
+    """Keep credentials private; resolve target names locally before tunneling."""
+    if PROFILE != 'nproxy':
+        return CONFIG
+    source = CONFIG.parent / 'subscription.url'
+    if not source.is_file():
+        raise RuntimeError(f'local subscription URL is missing: {source}')
+    cache = STATE / 'data/subscription.yaml'
+    cache.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if not cache.is_file() or time.time() - cache.stat().st_mtime >= 3600:
+        url = source.read_text().strip()
+        if not url.startswith('https://'):
+            raise RuntimeError('subscription URL must use HTTPS')
+        temporary = cache.with_suffix('.new')
+        try:
+            opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            request = urllib.request.Request(url, headers={'User-Agent': 'mihomo'})
+            with opener.open(request, timeout=15) as response:
+                payload = response.read(8 * 1024 * 1024 + 1)
+            if not payload or len(payload) > 8 * 1024 * 1024:
+                raise ValueError('invalid subscription size')
+            temporary.touch(mode=0o600, exist_ok=True)
+            temporary.chmod(0o600)
+            temporary.write_bytes(payload)
+            subscription_nodes(temporary)
+            temporary.replace(cache)
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError):
+            # Never include the upstream URL/token or credentials in public errors.
+            if not cache.is_file():
+                raise RuntimeError('subscription download failed; the private URL was not logged') from None
+            print('Subscription refresh failed; using the local cached copy.', file=sys.stderr)
+        finally:
+            temporary.unlink(missing_ok=True)
+    nodes = subscription_nodes(cache)
+    effective = read_yaml(CONFIG)
+    effective['proxies'] = []
+    choices = []
+    for index, original in enumerate(nodes):
+        tunnel = dict(original)
+        tunnel['name'] = f'nproxy-tunnel-{index}'
+        local_dns = f'nproxy-dns-{index}'
+        effective['proxies'].extend([tunnel, {
+            'name': local_dns, 'type': 'direct', 'dialer-proxy': tunnel['name'],
+        }])
+        choices.append((original.get('port') != 443, local_dns))
+    effective['proxy-groups'][0]['proxies'] = [name for _, name in sorted(choices)]
+    effective['proxy-providers'] = {}
+    target = STATE / 'data/config.json'
+    target.touch(mode=0o600, exist_ok=True)
+    target.chmod(0o600)
+    target.write_text(json.dumps(effective))
+    return target
+
+
+def proxy_api(path, timeout=1, body=None):
+    connection = http.client.HTTPConnection('localhost', timeout=timeout)
+    connection.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    connection.sock.settimeout(timeout)
+    try:
+        connection.sock.connect(str(STATE / 'data/controller.sock'))
+        connection.request('PUT' if body is not None else 'GET', path,
+                           body=json.dumps(body) if body is not None else None,
+                           headers={'Content-Type': 'application/json'} if body is not None else {})
+        response = connection.getresponse()
+        return json.load(response) if response.status != 204 else None
+    finally:
+        connection.close()
+
+
+def check_nodes(configuration, running):
+    if not shutil.which('curl'):
+        raise RuntimeError('nproxy requires curl for HTTPS startup checks')
+    group = json.loads(configuration.read_text())['proxy-groups'][0]
+    passed = []
+    timeout = min(max(group.get('timeout', 4000) / 1000, 1), 10)
+    expected = int(group.get('expected-status', 200))
+    deadline = time.monotonic() + 20
+    for name in group['proxies']:
+        if not running() or time.monotonic() >= deadline:
+            break
+        proxy_api('/proxies/NPROXY', body={'name': name})
+        args = ['curl', '--proxy', f'socks5h://{ADDRESS[0]}:{ADDRESS[1]}',
+                '--noproxy', '', '--head', '--silent', '--show-error',
+                '--connect-timeout', str(min(3, timeout)), '--max-time', str(timeout), '--output', os.devnull,
+                '--write-out', '%{http_code} %{time_starttransfer}', group['url']]
+        probe = subprocess.Popen(args, env=clean_env(), stdout=subprocess.PIPE,
+                                 stderr=subprocess.DEVNULL, text=True)
+        try:
+            while probe.poll() is None and running():
+                time.sleep(0.05)
+            if not running():
+                raise RuntimeError('startup interrupted')
+            output, _ = probe.communicate(timeout=1)
+            fields = output.split()
+            if probe.returncode == 0 and len(fields) == 2 and int(fields[0]) == expected:
+                passed.append((float(fields[1]), name))
+                if len(passed) >= 3:
+                    break
+        finally:
+            stop_child(probe)
+    if not passed:
+        raise RuntimeError('no subscription node passed the HTTPS check; current shell proxy was preserved')
+    delay, chosen = min(passed)
+    proxy_api('/proxies/NPROXY', body={'name': chosen})
+    print(f'Selected a healthy subscription tunnel ({round(delay * 1000)} ms).', flush=True)
+
+
+def identity(pid):
+    """Distinguish a living owner shell from a reused PID or zombie."""
+    if pid <= 1:
+        return None
+    try:
+        if Path('/proc').is_dir():
+            fields = Path(f'/proc/{pid}/stat').read_text().rsplit(') ', 1)[1].split()
+            return fields[19] if fields[0] != 'Z' else None
+        os.kill(pid, 0)
+        return subprocess.check_output(['ps', '-p', str(pid), '-o', 'lstart='], text=True).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def rpc(op, owner):
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client:
+        client.settimeout(15)
+        client.connect(str(CONTROL))
+        client.sendall(json.dumps({'op': op, 'owner': owner}).encode() + b'\n')
+        with client.makefile('rb') as stream:
+            reply = json.loads(stream.readline(4096))
+    if 'error' in reply:
+        raise RuntimeError(reply['error'])
+    return reply
+
+
+def stop_child(child):
+    if child is not None and child.poll() is None:
+        child.terminate()
+        try:
+            child.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
+
+
+def serve(owner):
+    owners = {owner: identity(owner)}
+    if owners[owner] is None:
+        return
+    running = True
+
+    def shutdown(*_):
+        nonlocal running
+        running = False
+
+    for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+        signal.signal(sig, shutdown)
+    child = None
+    server = None
+    socket_inode = None
+    try:
+        binary = shutil.which('mihomo')
+        if not binary:
+            raise RuntimeError('mihomo is not installed')
+        configuration = prepare_config()
+        args = [binary, '-d', str(STATE / 'data'), '-f', str(configuration)]
+        if PROFILE == 'nproxy':
+            args.extend(['-ext-ctl-unix', str(STATE / 'data/controller.sock')])
+        with (STATE / 'mihomo.log').open('w') as log:
+            subprocess.run([*args, '-t'], env=clean_env(), stdout=log,
+                           stderr=subprocess.STDOUT, timeout=10, check=True)
+            child = subprocess.Popen(args, env=clean_env(), stdin=subprocess.DEVNULL,
+                                     stdout=log, stderr=subprocess.STDOUT)
+            deadline = time.monotonic() + (40 if PROFILE == 'nproxy' else 10)
+            checked_nodes = False
+            while running and time.monotonic() < deadline:
+                if child.poll() is not None:
+                    raise RuntimeError('mihomo exited during startup')
+                # A successful log from our own process identifies the listener.
+                listener_ready = (f'Mixed(http+socks) proxy listening at: {ADDRESS[0]}:{ADDRESS[1]}'
+                                  in (STATE / 'mihomo.log').read_text())
+                if listener_ready and PROFILE == 'nproxy' and not checked_nodes and (STATE / 'data/controller.sock').exists():
+                    try:
+                        check_nodes(configuration, lambda: running)
+                        checked_nodes = True
+                    except (FileNotFoundError, ConnectionRefusedError):
+                        time.sleep(0.05)
+                        continue
+                if listener_ready and (PROFILE != 'nproxy' or checked_nodes):
+                    with socket.create_connection(ADDRESS, timeout=1):
+                        break
+                time.sleep(0.05)
+            else:
+                raise RuntimeError('mihomo did not become ready')
+            server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            server.bind(str(CONTROL))
+            CONTROL.chmod(0o600)
+            socket_inode = CONTROL.stat().st_ino
+            server.listen(8)
+            server.settimeout(0.3)
+            while running and child.poll() is None:
+                owners = {pid: token for pid, token in owners.items() if identity(pid) == token}
+                if not owners:
+                    break
+                try:
+                    connection, _ = server.accept()
+                except socket.timeout:
+                    continue
+                with connection:
+                    connection.settimeout(2)
+                    try:
+                        with connection.makefile('rb') as stream:
+                            request = json.loads(stream.readline(4096))
+                        pid = int(request['owner'])
+                        op = request['op']
+                        if op == 'start':
+                            token = identity(pid)
+                            if token is None:
+                                raise ValueError('owner shell has exited')
+                            owners[pid] = token
+                        elif op == 'stop':
+                            owners.pop(pid, None)
+                        elif op != 'status':
+                            raise ValueError('unknown operation')
+                        if not owners:
+                            stop_child(child)
+                            running = False
+                        reply = {'pid': child.pid, 'owners': len(owners)}
+                    except (ValueError, KeyError, OSError) as exc:
+                        reply = {'error': str(exc)}
+                    try:
+                        connection.sendall(json.dumps(reply).encode() + b'\n')
+                    except OSError:
+                        pass
+    finally:
+        stop_child(child)
+        if server is not None:
+            server.close()
+        if socket_inode is not None and CONTROL.exists() and CONTROL.stat().st_ino == socket_inode:
+            CONTROL.unlink()
+
+
+def main():
+    if len(sys.argv) == 3 and sys.argv[1] == '__serve':
+        serve(int(sys.argv[2]))
+        return
+    if len(sys.argv) not in (2, 3) or sys.argv[1] not in ('start', 'stop', 'status'):
+        print(f'Use the shell command: {PROFILE}\nThen run mise up, mise install, or other commands.\nUse unproxy to release it; eproxy switches back to 10808.')
+        return
+    op = sys.argv[1]
+    owner = int(sys.argv[2]) if len(sys.argv) == 3 else os.getppid()
+    STATE.mkdir(mode=0o700, parents=True, exist_ok=True)
+    STATE.chmod(0o700)
+    with (STATE / 'start.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            reply = rpc(op, owner)
+        except (FileNotFoundError, ConnectionRefusedError):
+            if op != 'start':
+                if op == 'status':
+                    print('dproxy is stopped')
+                return
+            if identity(owner) is None:
+                raise RuntimeError('owner shell is not running')
+            if not CONFIG.is_file():
+                raise RuntimeError(f'configuration not found: {CONFIG}')
+            if not shutil.which('mihomo'):
+                raise RuntimeError('mihomo is not installed; install it before using dproxy')
+            # Refuse an occupied port rather than reuse or stop an unknown service.
+            with socket.socket() as probe:
+                probe.bind(ADDRESS)
+            CONTROL.unlink(missing_ok=True)
+            with (STATE / 'supervisor.log').open('w') as log:
+                process = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), PROFILE, '__serve', str(owner)],
+                                           env=clean_env(), cwd='/', start_new_session=True,
+                                           stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT)
+            try:
+                deadline = time.monotonic() + (60 if PROFILE == 'nproxy' else 15)
+                while time.monotonic() < deadline:
+                    if process.poll() is not None:
+                        raise RuntimeError(f'startup failed; see {STATE / "supervisor.log"} and mihomo.log')
+                    try:
+                        reply = rpc('start', owner)
+                        break
+                    except (FileNotFoundError, ConnectionRefusedError):
+                        time.sleep(0.05)
+                else:
+                    raise RuntimeError('startup timed out')
+            except BaseException:
+                stop_child(process)
+                raise
+        if op == 'status':
+            print(json.dumps(reply))
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(130)
+    except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as exc:
+        print(f'{PROFILE}: {exc}', file=sys.stderr)
+        sys.exit(1)

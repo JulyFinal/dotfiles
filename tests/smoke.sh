@@ -61,7 +61,7 @@ test -L "$workspace/external-mise/config.toml"
 # sh -n accepts one script; extra arguments would silently go unchecked.
 for script in setup scripts/install-mise home/config/mise/tasks/skills-sync \
     home/bashrc home/profile home/config/shell/common.sh home/config/shell/aliases.sh \
-    tests/smoke.sh tests/shell.sh; do
+    tests/smoke.sh tests/shell.sh home/local/bin/dproxy home/local/bin/nproxy; do
     sh -n "$repo_dir/$script"
 done
 bash -n "$repo_dir/systems/arch/install"
@@ -69,4 +69,5 @@ if command -v zsh >/dev/null 2>&1; then
     zsh -n "$repo_dir/home/zshrc"
 fi
 "$repo_dir/tests/shell.sh"
+python3 "$repo_dir/tests/proxy.py"
 printf '%s\n' 'smoke tests passed'

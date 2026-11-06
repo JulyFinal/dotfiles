@@ -1,0 +1,50 @@
+# Standalone subscription proxy. Node credentials are stored only on this machine.
+mixed-port: 10809
+bind-address: 127.0.0.1
+allow-lan: false
+mode: rule
+log-level: info
+ipv6: false
+find-process-mode: off
+external-controller: ''
+external-controller-unix: ''
+profile:
+  store-selected: false
+  store-fake-ip: false
+tun:
+  enable: false
+proxies: []
+# The manager fills this group with private local-DNS -> subscription tunnels.
+# With no subscription loaded, the public template rejects traffic.
+proxy-groups:
+  - name: NPROXY
+    type: select
+    proxies:
+      - REJECT
+    url: https://github.com/
+    expected-status: 200
+    timeout: 4000
+proxy-providers: {}
+rule-providers: {}
+rules:
+  - MATCH,NPROXY
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+  respect-rules: false
+  use-hosts: false
+  use-system-hosts: false
+  default-nameserver:
+    - tcp://45.90.28.0
+    - tcp://8.8.8.8
+  # NextDNS gave the most reliable GitHub addresses on this connection.
+  nameserver:
+    - tcp://45.90.28.0
+  fallback:
+    - tcp://8.8.8.8
+  fallback-filter:
+    # Keep valid foreign answers; use Google only if the primary fails.
+    geoip: false
+    ipcidr:
+      - 0.0.0.0/32

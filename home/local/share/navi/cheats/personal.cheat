@@ -53,6 +53,12 @@ HF_ENDPOINT=https://hf-mirror.com uvx hf download
 # 开启默认代理
 eproxy
 
+# 开启订阅节点代理（10809）
+nproxy
+
+# 开启 DNS 直连代理（10818，境外 DNS 优先）
+dproxy
+
 # 使用其他代理地址
 eproxy <proxy_url>
 

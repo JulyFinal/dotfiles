@@ -2,9 +2,33 @@
 # Proxy settings live here; eproxy accepts an optional complete proxy URL.
 
 # Remove old aliases when reloading an already-open terminal.
-unalias eproxy unproxy checkproxy 2>/dev/null || true
+unalias eproxy dproxy nproxy unproxy checkproxy 2>/dev/null || true
+
+_proxy_release() {
+    if [ "${_DPROXY_OWNER:-}" = "$$" ] && [ "${1:-}" != socks5h://127.0.0.1:10818 ]; then
+        "$HOME/.local/bin/dproxy" stop "$$" || return
+        unset _DPROXY_OWNER
+    fi
+    if [ "${_NPROXY_OWNER:-}" = "$$" ] && [ "${1:-}" != socks5h://127.0.0.1:10809 ]; then
+        "$HOME/.local/bin/nproxy" stop "$$" || return
+        unset _NPROXY_OWNER
+    fi
+}
+
+dproxy() {
+    "$HOME/.local/bin/dproxy" start "$$" || return
+    eproxy socks5h://127.0.0.1:10818
+    _DPROXY_OWNER=$$
+}
+
+nproxy() {
+    "$HOME/.local/bin/nproxy" start "$$" || return
+    eproxy socks5h://127.0.0.1:10809
+    _NPROXY_OWNER=$$
+}
 
 eproxy() {
+    _proxy_release "${1:-}" || return
     export http_proxy="${1:-socks5h://127.0.0.1:10808}"
     export https_proxy="$http_proxy" all_proxy="$http_proxy"
     export HTTP_PROXY="$http_proxy" HTTPS_PROXY="$http_proxy" ALL_PROXY="$http_proxy"
@@ -14,6 +38,7 @@ eproxy() {
 }
 
 unproxy() {
+    _proxy_release || return
     unset HTTP_PROXY HTTPS_PROXY ALL_PROXY http_proxy https_proxy all_proxy NO_PROXY no_proxy
     printf '%s\n' '🔓 代理已禁用'
 }

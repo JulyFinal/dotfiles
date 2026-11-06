@@ -40,6 +40,7 @@ FORBIDDEN_PATHS = (
         r"^home/(?:\.config|config)/gh/hosts\.ya?ml$",
         re.IGNORECASE,
     ),
+    re.compile(r"^home/(?:\.config|config)/nproxy/subscription\.(url|ya?ml)$", re.IGNORECASE),
 )
 
 PRIVATE_KEY = re.compile(
