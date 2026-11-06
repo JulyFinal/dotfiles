@@ -34,7 +34,7 @@ while [ -L "$script_path" ]; do
 done
 task_dir=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
 repo_dir=$(CDPATH= cd -- "$task_dir/../../../.." && pwd)
-manifest=${AGENT_SKILLS_MANIFEST:-"$repo_dir/manifests/agent-skills.yaml"}
+manifest=${AGENT_SKILLS_MANIFEST:-"$repo_dir/skills.yaml"}
 
 if ! command -v yq >/dev/null 2>&1; then
 	printf '%s\n' 'skills-sync requires yq (provided by the core Mise config).' >&2

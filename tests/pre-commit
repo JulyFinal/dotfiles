@@ -33,11 +33,11 @@ FORBIDDEN_PATHS = (
     re.compile(r"(^|/).*\.remmina$", re.IGNORECASE),
     re.compile(r"(^|/).*\.(ovpn|p12|pfx)$", re.IGNORECASE),
     re.compile(
-        r"^home/\.config/mihomo/config\.ya?ml$",
+        r"^home/(?:\.config|config)/mihomo/config\.ya?ml$",
         re.IGNORECASE,
     ),
     re.compile(
-        r"^home/\.config/gh/hosts\.ya?ml$",
+        r"^home/(?:\.config|config)/gh/hosts\.ya?ml$",
         re.IGNORECASE,
     ),
 )

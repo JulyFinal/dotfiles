@@ -23,7 +23,6 @@ zoxide = "latest"
 agy = "latest"
 lua-language-server = "latest"
 neovim = "latest"
-herdr = "latest"
 codex = "latest"
 pi = "latest"
 tree-sitter = "latest"
@@ -34,6 +33,7 @@ superfile = "latest"
 "npm:@deepseek-ai/dsh" = "latest"
 cargo-binstall = "latest"
 atuin = { version = "latest", libc = "musl" }
+bun = "latest"
 
 [env]
 GOPATH = "{{env.HOME}}/.local/share/go"

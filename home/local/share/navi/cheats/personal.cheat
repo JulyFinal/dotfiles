@@ -50,17 +50,17 @@ HF_ENDPOINT=https://hf-mirror.com uvx hf download
 
 % proxy, network
 
-# proxy on
-```sh
-proxy_on(){ ip="${1:-127.0.0.1}"; port="${2:-10808}"; export http_proxy="http://$ip:$port" https_proxy="http://$ip:$port" all_proxy="http://$ip:$port" HTTP_PROXY="http://$ip:$port" HTTPS_PROXY="http://$ip:$port" ALL_PROXY="http://$ip:$port" no_proxy="localhost,127.0.0.1,$ip,::1" NO_PROXY="localhost,127.0.0.1,$ip,::1"; echo "🔗 代理已启用: $ip:$port"; }
-proxy_on
-```
+# 开启默认代理
+eproxy
 
-# proxy off
-```sh
-proxy_off(){ unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY no_proxy NO_PROXY; echo "🔌 代理已关闭"; }
-proxy_off
-```
+# 使用其他代理地址
+eproxy <proxy_url>
+
+# 查看代理状态
+checkproxy
+
+# 关闭代理
+unproxy
 
 % python, package
 
@@ -74,3 +74,5 @@ ssh-keygen -t ed25519 -C "julyfinal@outlook.com"
 
 # ssh rsa key
 ssh-keygen -t rsa -b 4096 -C "julyfinal@outlook.com"
+
+$ proxy_url: printf '%s\n' socks5h://127.0.0.1:10808 http://127.0.0.1:7890

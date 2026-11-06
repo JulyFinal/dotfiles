@@ -1,5 +1,5 @@
 #!/bin/sh
-# home/ mirrors $HOME. Link files; append shell entrypoints without replacing them.
+# Visible names in home/ map to dotfiles in $HOME; shell entrypoints stay local.
 set -eu
 
 case "${1:-}" in
@@ -28,7 +28,11 @@ esac
 
 find "$repo_dir/home" -type f | sort | while IFS= read -r source; do
     relative=${source#"$repo_dir/home/"}
-    target=$target_home/$relative
+    # Only the first component gains a dot: config/nvim -> .config/nvim.
+    target=$target_home/.$relative
+    case "$relative" in
+    bashrc | profile | zshrc) target=$target_home/.config/shell/$relative ;;
+    esac
 
     # Do not follow directory links into an old checkout or another config tree.
     parent=${target%/*}
@@ -41,31 +45,34 @@ find "$repo_dir/home" -type f | sort | while IFS= read -r source; do
     done
     mkdir -p "${target%/*}"
 
-    case "$relative" in
-    .bashrc | .profile | .zshrc)
-        # Detach existing entrypoint symlinks before appending to local files.
-        if [ -L "$target" ]; then
-            temporary=$(mktemp "$target.setup.XXXXXX")
-            if [ -f "$target" ]; then cat "$target" >"$temporary"; fi
-            mv -f "$temporary" "$target"
+    if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
+        continue
+    fi
+    # rm -f deliberately refuses to remove an actual directory.
+    rm -f "$target"
+    ln -s "$source" "$target"
+    printf 'LINK  %s\n' "$target"
+
+done
+
+# Keep writable machine entrypoints separate from repository configuration.
+for shell_file in bashrc profile zshrc; do
+    target=$target_home/.$shell_file
+    if [ -L "$target" ]; then
+        temporary=$(mktemp "$target.setup.XXXXXX")
+        if [ -f "$target" ]; then cat "$target" >"$temporary"; fi
+        mv -f "$temporary" "$target"
+    fi
+    touch "$target"
+    loader='.'
+    if [ "$shell_file" = zshrc ]; then loader=source; fi
+    {
+        printf '%s "$HOME/.config/shell/%s"\n' "$loader" "$shell_file"
+        printf '[ -f "$HOME/.%s.local" ] && %s "$HOME/.%s.local"\n' "$shell_file" "$loader" "$shell_file"
+    } | while IFS= read -r line; do
+        if ! grep -Fqx -- "$line" "$target"; then
+            printf '\n%s\n' "$line" >>"$target"
         fi
-        touch "$target"
-        while IFS= read -r line; do
-            [ -n "$line" ] || continue
-            if ! grep -Fqx -- "$line" "$target"; then
-                printf '\n%s\n' "$line" >>"$target"
-            fi
-        done <"$source"
-        printf 'LOAD  %s\n' "$target"
-        ;;
-    *)
-        if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
-            continue
-        fi
-        # rm -f deliberately refuses to remove an actual directory.
-        rm -f "$target"
-        ln -s "$source" "$target"
-        printf 'LINK  %s\n' "$target"
-        ;;
-    esac
+    done
+    printf 'LOAD  %s\n' "$target"
 done

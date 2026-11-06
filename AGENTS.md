@@ -1,13 +1,32 @@
-## Agent skills
+# Repository guidance
 
-### Issue tracker
+## Issues and specs
 
-Issues and specs are tracked as local Markdown under `.scratch/`. See `docs/agents/issue-tracker.md`.
+Use local Markdown under `.scratch/<feature-slug>/`:
 
-### Triage labels
+- Spec: `spec.md`.
+- One implementation issue per `issues/NN-slug.md`, numbered from `01`; never combine tickets in one file.
+- Record triage as a `Status:` line near the top. Append conversation under `## Comments`.
+- When a skill says publish to the issue tracker, create a file in this local structure.
+- When fetching a ticket, read the path or issue number supplied by the user.
 
-Triage state uses the default mattpocock/skills label vocabulary. See `docs/agents/triage-labels.md`.
+Triage labels use the default mattpocock/skills vocabulary:
 
-### Domain docs
+| Status | Meaning |
+| --- | --- |
+| `needs-triage` | Maintainer evaluation needed |
+| `needs-info` | Waiting for information |
+| `ready-for-agent` | Fully specified; agent can implement |
+| `ready-for-human` | Human implementation needed |
+| `wontfix` | Will not be actioned |
 
-This is a single-context repository. See `docs/agents/domain.md`.
+For wayfinding, use `.scratch/<effort>/map.md` and one child per `issues/NN-slug.md`.
+Record dependencies as `Blocked by: NN, NN`. Select the first open, unblocked, unclaimed ticket by number.
+Set `Status: claimed` when starting; append the result under `## Answer`, set `Status: resolved`, and update the map when done.
+
+## Domain context
+
+This is a single-context repository. Before exploring, read root `CONTEXT.md` and relevant decisions
+under `docs/adr/` when they exist; otherwise proceed silently. Domain-modeling skills create them lazily.
+Use the glossary's terms, avoid explicitly rejected synonyms, and reconsider or flag missing terminology
+for domain modeling. Surface conflicts with an ADR instead of silently overriding it.

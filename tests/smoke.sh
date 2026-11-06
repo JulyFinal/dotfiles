@@ -14,12 +14,16 @@ ln -s "$workspace/missing-old-source" "$HOME/.tmux.conf"
 "$repo_dir/setup" >"$workspace/first-run"
 find "$repo_dir/home" -type f | while IFS= read -r source; do
     relative=${source#"$repo_dir/home/"}
-    case "$relative" in .bashrc | .profile | .zshrc) continue ;; esac
-    test "$(readlink "$HOME/$relative")" = "$source"
+    target=$HOME/.$relative
+    case "$relative" in
+    bashrc | profile | zshrc) target=$HOME/.config/shell/$relative ;;
+    esac
+    test "$(readlink "$target")" = "$source"
 done
 grep -Fqx '# machine shell settings' "$HOME/.zshrc"
 grep -Fqx 'local runtime state' "$HOME/.config/nvim/lazy-lock.json"
 test ! -L "$HOME/.zshrc"
+grep -Fqx 'source "$HOME/.config/shell/zshrc"' "$HOME/.zshrc"
 cp "$HOME/.zshrc" "$workspace/zshrc-first"
 "$repo_dir/setup" >"$workspace/second-run"
 cmp "$HOME/.zshrc" "$workspace/zshrc-first"
@@ -54,6 +58,15 @@ fi
 grep -q 'Directory symlink needs manual migration' "$workspace/parent-conflict"
 test -L "$workspace/external-mise/config.toml"
 
-sh -n "$repo_dir/setup" "$repo_dir/scripts/install-mise" \
-    "$repo_dir/home/.config/mise/tasks/skills-sync"
+# sh -n accepts one script; extra arguments would silently go unchecked.
+for script in setup scripts/install-mise home/config/mise/tasks/skills-sync \
+    home/bashrc home/profile home/config/shell/common.sh home/config/shell/aliases.sh \
+    tests/smoke.sh tests/shell.sh; do
+    sh -n "$repo_dir/$script"
+done
+bash -n "$repo_dir/systems/arch/install"
+if command -v zsh >/dev/null 2>&1; then
+    zsh -n "$repo_dir/home/zshrc"
+fi
+"$repo_dir/tests/shell.sh"
 printf '%s\n' 'smoke tests passed'
